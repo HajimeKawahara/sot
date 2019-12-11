@@ -24,13 +24,15 @@ cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky\
 =io_refdata.read_refdata("/home/kawahara/exomap/sot/data/refdata")
 
 #mean albedo between waves and wavee
-bands=[[0.4,0.5],[0.5,0.6],[0.6,0.7],[0.7,0.8],[0.8,0.9]]
+#bands=[[0.4,0.5],[0.5,0.6],[0.6,0.7],[0.7,0.8],[0.8,0.9]]
+bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75],[0.75,0.8],[0.8,0.85],[0.85,0.9]]
+
 refsurfaces=[water,soil,veg]
 malbedo=io_surface_type.set_meanalbedo(0.8,0.9,refsurfaces,clear_sky)
 mmap,malbedo=toymap.make_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
 ave_band=np.mean(np.array(bands),axis=1)
 io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,malbedo,valexp)
-plt.show()
+#plt.show()
 
 ### Generating Multicolor Lightcurves
 #ephemeris setting
@@ -61,19 +63,46 @@ for i in range(0,len(bands)):
     lcall.append(lc/ave)
 lcall=np.array(lcall).T
 
-##NMF multiplicative
+## NMF multiplicative
 
-Y=cp.asarray(lcall)
+normmat=np.diag(1.0/np.sum(lcall,axis=0))
+#Y=cp.asarray(lcall)
+Y=cp.asarray(np.dot(lcall,normmat))
 N=3
-A0=np.random.rand(npix,N)
-X0=np.random.rand(N,np.shape(Y)[1])
+
+## NMF Initialization ============================
+
+#A0=np.random.rand(npix,N)
+#X0=np.random.rand(N,np.shape(Y)[1])
+
+import sklearn
+from sklearn.decomposition import PCA
+from sklearn.linear_model import Ridge
+pca = PCA(n_components=N)
+pca.fit(lcall) #x(k,l)
+X0=(np.abs(pca.components_))
+
+iN=np.shape(W)[0]
+jN=np.shape(W)[1]
+kN=np.shape(X0)[0]
+lN=np.shape(X0)[1]
+
+dd=lcall.flatten()
+Wd=np.einsum("ij,kl->iljk",W,X0)
+Wd=Wd.reshape((iN*lN,jN*kN))
+clf = Ridge(alpha=1.e-3)
+clf.fit(Wd, dd)
+A0=np.abs(clf.coef_.reshape((jN,kN)))
+#==================================================
+
 
 W=cp.asarray(W)
 A=cp.asarray(A0)
-X=cp.asarray(X0)
+X=cp.asarray(np.dot(X0,normmat))
 epsilon=1.e-7
-lam=1.0
-for i in range(0,30000):
+lam=3.e-4
+#lam=1.0
+for i in range(0,3000):
     if np.mod(i,10)==0: print(i,cp.sum(Y - cp.dot(cp.dot(W,A),X)))
     ATA = cp.dot(A.T,A)
     Wt = cp.dot(cp.dot(cp.dot(W.T,Y),X.T),ATA)+ epsilon
@@ -88,4 +117,4 @@ for i in range(0,30000):
 An=cp.asnumpy(A)
 Xn=cp.asnumpy(X)
 Wn=cp.asnumpy(W)
-np.savez("nmftest1e0_30000",An,Xn,Wn)
+np.savez("nmftest_10bands_1e0_300000_inipca",An,Xn,Wn,bands)
