@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
 
-dat=np.load("nmftest_10bands_1e0_3000.npz")
+dat=np.load("nmftest_10bands_3em5_300000_inipca.npz")
 A=dat["arr_0"]
 X=dat["arr_1"]
 print(np.shape(X))
