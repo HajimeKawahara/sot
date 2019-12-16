@@ -8,7 +8,8 @@ import healpy as hp
 import cupy as cp
 import sys
 import healpy as hp
-
+import initnmf
+import runnmf
 ## load class map
 dataclass=np.load("/home/kawahara/exomap/sot/data/cmap3class.npz")
 cmap=dataclass["arr_0"]
@@ -55,66 +56,61 @@ WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
 
 npix=hp.nside2npix(nside)
-np.mean(mmap)
 lcall=[]
 for i in range(0,len(bands)):
     lc=np.dot(W,mmap[:,i])
-    ave=np.sum(W,axis=1)
-    lcall.append(lc/ave)
+#    ave=np.sum(W,axis=1)
+#    lcall.append(lc/ave)
+    lcall.append(lc)
 lcall=np.array(lcall).T
 
-## NMF multiplicative
-
-normmat=np.diag(1.0/np.sum(lcall,axis=0))
-#Y=cp.asarray(lcall)
-Y=cp.asarray(np.dot(lcall,normmat))
+#normmat=np.diag(1.0/np.sum(lcall,axis=0))
+#Y=cp.asarray(np.dot(lcall,normmat))
 N=3
 
+
 ## NMF Initialization ============================
+#A0,X0=init_random(N,npix,Y)
+A0,X0=initnmf.initpca(N,W,lcall)
 
-#A0=np.random.rand(npix,N)
-#X0=np.random.rand(N,np.shape(Y)[1])
+#lam=3.e-4
+#lam=3.e-5
 
-import sklearn
-from sklearn.decomposition import PCA
-from sklearn.linear_model import Ridge
-pca = PCA(n_components=N)
-pca.fit(lcall) #x(k,l)
-X0=(np.abs(pca.components_))
+#X=cp.asarray(np.dot(X0,normmat))
 
-iN=np.shape(W)[0]
-jN=np.shape(W)[1]
-kN=np.shape(X0)[0]
-lN=np.shape(X0)[1]
+#print(np.shape(mmap),np.shape(cmap),np.shape(malbedo))
+#cTc=np.dot(cmap.T,cmap)
+#Qtrue=np.sum(lcall - np.dot(Wn,mmap))+lam*np.linalg.det(cTc)
+#print(Qtrue)
+#sys.exit()
 
-dd=lcall.flatten()
-Wd=np.einsum("ij,kl->iljk",W,X0)
-Wd=Wd.reshape((iN*lN,jN*kN))
-clf = Ridge(alpha=1.e-3)
-clf.fit(Wd, dd)
-A0=np.abs(clf.coef_.reshape((jN,kN)))
-#==================================================
+Ntry=300
+lam=1.0
+epsilon=1.e-9
 
 
-W=cp.asarray(W)
-A=cp.asarray(A0)
-X=cp.asarray(np.dot(X0,normmat))
-epsilon=1.e-7
-lam=3.e-4
-#lam=1.0
-for i in range(0,3000):
-    if np.mod(i,10)==0: print(i,cp.sum(Y - cp.dot(cp.dot(W,A),X)))
+#A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+
+import scipy
+Y=np.copy(lcall)
+NI=np.shape(Y)[0]
+NL=np.shape(Y)[1]
+A=np.copy(A0)
+X=np.copy(X0)
+NK=np.shape(A)[1]
+
+for i in range(0,Ntry):
     ATA = cp.dot(A.T,A)
-    Wt = cp.dot(cp.dot(cp.dot(W.T,Y),X.T),ATA)+ epsilon
-    Wb = cp.dot(cp.dot(cp.dot(cp.dot(cp.dot(W.T,W),A),X),X.T),ATA) + lam*cp.linalg.det(ATA)*A + epsilon
-    #print(np.shape(Wt/Wb),np.shape(A))
-    A = A*(Wt/Wb)
-    A = cp.dot(A,cp.diag(1/cp.sum(A[:,:],axis=0)))
-    Wt = cp.dot(cp.dot(A.T,W.T),Y)+ epsilon
-    Wb = cp.dot(cp.dot(cp.dot(cp.dot(A.T,W.T),W),A),X)+ epsilon 
-    X = X*(Wt/Wb)
+    if np.mod(i,10)==0: print(i,np.sum(Y - np.dot(np.dot(W,A),X))+lam*np.linalg.det(ATA))
+    G=cp.dot(W,A)
+    #Solve Dl = G Xl
+    for l in range(0,NL):
+        X[:,l]=scipy.optimize.nnls(G, Y[:,l])
 
-An=cp.asnumpy(A)
-Xn=cp.asnumpy(X)
-Wn=cp.asnumpy(W)
-np.savez("nmftest_10bands_1e0_300000_inipca",An,Xn,Wn,bands)
+
+    #Solve
+    for k in range(0,NK):
+        h=np.lingalg.norm(X[k,:])
+        Wi=
+
+        matrixA = h*h*np.eye(NI)+
