@@ -65,14 +65,21 @@ for i in range(0,len(bands)):
     lcall.append(lc)
 lcall=np.array(lcall).T
 
+##################################################
+
+nside=16
+npix=hp.nside2npix(nside)
+WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
+W=WV[:,:]*WI[:,:]
+
 #normmat=np.diag(1.0/np.sum(lcall,axis=0))
 #Y=cp.asarray(np.dot(lcall,normmat))
 N=3
 
 
 ## NMF Initialization ============================
-#A0,X0=init_random(N,npix,Y)
-A0,X0=initnmf.initpca(N,W,lcall)
+A0,X0=initnmf.init_random(N,npix,lcall)
+#A0,X0=initnmf.initpca(N,W,lcall)
 
 #lam=3.e-4
 #lam=3.e-5
@@ -85,53 +92,33 @@ A0,X0=initnmf.initpca(N,W,lcall)
 #print(Qtrue)
 #sys.exit()
 
-Ntry=300
+Ntry=30000
 lam=1.0
 epsilon=1.e-9
 
+A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+#A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 
-#A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+hp.mollview(A[:,0], title="0",flip="geo",cmap=plt.cm.jet)
+hp.mollview(A[:,1], title="1",flip="geo",cmap=plt.cm.jet)
+hp.mollview(A[:,2], title="2",flip="geo",cmap=plt.cm.jet)
 
-### QP_MVC_NMF
-import scipy
-Y=np.copy(lcall)
-NI=np.shape(Y)[0]
-NL=np.shape(Y)[1]
-A=np.copy(A0)
-X=np.copy(X0)
-NK=np.shape(A)[1]
+fig= plt.figure(figsize=(10,7))
+ax = fig.add_subplot(111)
+fac0=3.e1
+fac1=1.5e1
+fac2=1.e1
+fac3=2.5e1
+plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C0")
+plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C1")
+plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C2")
+plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C0")
+plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C1")
+plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C2")
+plt.xlim(0.4,0.9)
 
-WTW=np.dot(W.T,W)
-
-for i in range(0,Ntry):
-    ATA = np.dot(A.T,A)
-    if np.mod(i,10)==0: print(i,np.sum(Y - np.dot(np.dot(W,A),X))+lam*np.linalg.det(ATA))
-    G=cp.dot(W,A)
-    #Solve Dl = G Xl
-#    for l in range(0,NL):
-#        X[:,l]=scipy.optimize.nnls(G, Y[:,l])
-
-
-    #Solve QPx
-    Delta_r = Y - np.dot(np.dot(W,A),X)
-    for s in range(0,NK):
-        xast2=np.linalg.norm(X[s,:])**2
-        Aminus = np.delete(A,obj=s,axis=1)
-        #st=time.time()
-        #U,S,VT=np.linalg.svd(Aminus)
-        #Cs=U[:,2:]
-        #CsCsT=np.dot(Cs,Cs.T)
-        #ed=time.time()
-        #print(ed-st,"sec for Cs")
-        #st=time.time()
-        ATAinverse=np.linalg.inv(np.dot(Aminus.T,Aminus))
-        K=np.eye(npix) - np.dot(np.dot(Aminus,ATAinverse),Aminus.T)
-        #ed=time.time()
-        #print(ed-st,"sec for K")
-        #deltaQ=np.dot(Cs,Cs.T) - K
-        #print(np.sum(deltaQ))
-
-        Delta = Delta_r + np.dot(W,np.outer(A[:,s],X[s,:])) 
-        Wcal=xast2*WTW + lam*K
-        b = np.dot(np.dot(W.T,Delta),X[s,:])
-    sys.exit()
+plt.tick_params(labelsize=16)
+plt.ylabel("Reflection Spectra",fontsize=16)
+plt.xlabel("wavelength [micron]",fontsize=16)
+plt.legend(fontsize=13)
+plt.show()
