@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
 
-dat=np.load("nmftest_10bands_3em5_300000_inipca.npz")
+dat=np.load("nmftest_10bands_3000_inipcax.npz")
 A=dat["arr_0"]
 X=dat["arr_1"]
-print(np.shape(X))
+W=dat["arr_2"]
 
 ## load class map
 dataclass=np.load("/home/kawahara/exomap/sot/data/cmap3class.npz")
@@ -34,6 +34,13 @@ malbedo=io_surface_type.set_meanalbedo(0.8,0.9,refsurfaces,clear_sky)
 mmap,malbedo=toymap.make_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
 ave_band=np.mean(np.array(bands),axis=1)
 
+
+hp.mollview(A[:,0], title="0",flip="geo",cmap=plt.cm.jet)
+hp.mollview(A[:,1], title="1",flip="geo",cmap=plt.cm.jet)
+hp.mollview(A[:,2], title="2",flip="geo",cmap=plt.cm.jet)
+#hp.mollview(A[:,0]+A[:,1], title="0+1",flip="geo",cmap=plt.cm.jet)
+
+
 fig= plt.figure(figsize=(10,7))
 ax = fig.add_subplot(111)
 ax.plot(veg[:,0],veg[:,1],c="black",lw=2,label="vegitation (deciduous)")
@@ -49,35 +56,36 @@ for i in range(0,len(valexp)):
 plt.xlim(0.4,0.9)
 
 #io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,malbedo,valexp)
-fac0=1.e3
-fac1=1.e3
-fac2=1.e3
+fac0=3.e1
+fac1=1.5e1
+fac2=1.e1
+fac3=2.5e1
 
 plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C0")
 plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C1")
 plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C2")
+#plt.plot(np.median(bands,axis=1),(X[0,:]+X[1,:])*fac3,"^",label="Component 0+1",color="C1")
+
 plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C0")
 plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C1")
 plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C2")
+#plt.plot(np.median(bands,axis=1),(X[0,:]+X[1,:])*fac3,color="C1")
+
 plt.tick_params(labelsize=16)
 plt.ylabel("Reflection Spectra",fontsize=16)
 plt.xlabel("wavelength [micron]",fontsize=16)
 plt.legend(fontsize=13)
 
 plt.savefig("ref.pdf", bbox_inches="tight", pad_inches=0.0)
-plt.show()
-
-
-
-#hp.mollview(A[:,0], title="",flip="geo",cmap=plt.cm.jet)
-#plt.show()
-#hp.mollview(A[:,1], title="",flip="geo",cmap=plt.cm.jet)
-#plt.show()
-#hp.mollview(A[:,2], title="",flip="geo",cmap=plt.cm.jet)
-#plt.show()
-
 
 Aclass=np.argmax(A,axis=1)
 print(Aclass)
 hp.mollview(Aclass, title="",flip="geo",cmap=plt.cm.Greys,max=3.5)
+
+
+dataclass=np.load("/home/kawahara/exomap/sot/data/cmap3class.npz")
+cmapans=dataclass["arr_0"]
+hp.mollview(cmapans, title="ANSWER",flip="geo",cmap=plt.cm.Greys_r)
+
+
 plt.show()
