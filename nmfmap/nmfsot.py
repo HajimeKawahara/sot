@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import io_surface_type 
 import io_refdata
@@ -91,6 +92,7 @@ epsilon=1.e-9
 
 #A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 
+### QP_MVC_NMF
 import scipy
 Y=np.copy(lcall)
 NI=np.shape(Y)[0]
@@ -99,18 +101,37 @@ A=np.copy(A0)
 X=np.copy(X0)
 NK=np.shape(A)[1]
 
+WTW=np.dot(W.T,W)
+
 for i in range(0,Ntry):
-    ATA = cp.dot(A.T,A)
+    ATA = np.dot(A.T,A)
     if np.mod(i,10)==0: print(i,np.sum(Y - np.dot(np.dot(W,A),X))+lam*np.linalg.det(ATA))
     G=cp.dot(W,A)
     #Solve Dl = G Xl
-    for l in range(0,NL):
-        X[:,l]=scipy.optimize.nnls(G, Y[:,l])
+#    for l in range(0,NL):
+#        X[:,l]=scipy.optimize.nnls(G, Y[:,l])
 
 
-    #Solve
-    for k in range(0,NK):
-        h=np.lingalg.norm(X[k,:])
-        Wi=
+    #Solve QPx
+    Delta_r = Y - np.dot(np.dot(W,A),X)
+    for s in range(0,NK):
+        xast2=np.linalg.norm(X[s,:])**2
+        Aminus = np.delete(A,obj=s,axis=1)
+        #st=time.time()
+        #U,S,VT=np.linalg.svd(Aminus)
+        #Cs=U[:,2:]
+        #CsCsT=np.dot(Cs,Cs.T)
+        #ed=time.time()
+        #print(ed-st,"sec for Cs")
+        #st=time.time()
+        ATAinverse=np.linalg.inv(np.dot(Aminus.T,Aminus))
+        K=np.eye(npix) - np.dot(np.dot(Aminus,ATAinverse),Aminus.T)
+        #ed=time.time()
+        #print(ed-st,"sec for K")
+        #deltaQ=np.dot(Cs,Cs.T) - K
+        #print(np.sum(deltaQ))
 
-        matrixA = h*h*np.eye(NI)+
+        Delta = Delta_r + np.dot(W,np.outer(A[:,s],X[s,:])) 
+        Wcal=xast2*WTW + lam*K
+        b = np.dot(np.dot(W.T,Delta),X[s,:])
+    sys.exit()
