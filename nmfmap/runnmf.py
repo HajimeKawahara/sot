@@ -16,6 +16,7 @@ def NG_MVC_NMF(Ntry,lcall,Win,A0,X0,lam,epsilon):
         #print(np.shape(Wt/Wb),np.shape(A))
         A = A*(Wt/Wb)
         A = cp.dot(A,cp.diag(1/cp.sum(A[:,:],axis=0)))
+
         Wt = cp.dot(cp.dot(A.T,W.T),Y)+ epsilon
         Wb = cp.dot(cp.dot(cp.dot(cp.dot(A.T,W.T),W),A),X)+ epsilon 
         X = X*(Wt/Wb)

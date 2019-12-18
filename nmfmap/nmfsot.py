@@ -30,10 +30,12 @@ cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky\
 bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75],[0.75,0.8],[0.8,0.85],[0.85,0.9]]
 
 refsurfaces=[water,soil,veg]
-malbedo=io_surface_type.set_meanalbedo(0.8,0.9,refsurfaces,clear_sky)
-mmap,malbedo=toymap.make_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
+#malbedo=io_surface_type.set_meanalbedo(0.8,0.9,refsurfaces,clear_sky)
+
+mmap,Ainit,Xinit=toymap.make_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
 ave_band=np.mean(np.array(bands),axis=1)
-io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,malbedo,valexp)
+
+io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,Xinit,valexp)
 #plt.show()
 
 ### Generating Multicolor Lightcurves
@@ -57,17 +59,19 @@ WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
 
 npix=hp.nside2npix(nside)
-lcall=[]
-for i in range(0,len(bands)):
-    lc=np.dot(W,mmap[:,i])
+
+lcall=np.dot(np.dot(W,Ainit),Xinit)
+#lcall=[]
+#for i in range(0,len(bands)):
+#    lc=np.dot(W,mmap[:,i])
 #    ave=np.sum(W,axis=1)
 #    lcall.append(lc/ave)
-    lcall.append(lc)
-lcall=np.array(lcall).T
+#    lcall.append(lc)
+#lcall=np.array(lcall).T
 
 ##################################################
 
-nside=16
+nside=8
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
@@ -76,11 +80,11 @@ W=WV[:,:]*WI[:,:]
 #Y=cp.asarray(np.dot(lcall,normmat))
 N=3
 
-
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(N,npix,lcall)
 #A0,X0=initnmf.initpca(N,W,lcall)
-
+#A0=Ainit
+X0=Xinit
 #lam=3.e-4
 #lam=3.e-5
 
@@ -92,11 +96,12 @@ A0,X0=initnmf.init_random(N,npix,lcall)
 #print(Qtrue)
 #sys.exit()
 
-Ntry=30000
+Ntry=3000
 lam=1.0
 epsilon=1.e-9
 
 A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+
 #A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 
 hp.mollview(A[:,0], title="0",flip="geo",cmap=plt.cm.jet)
