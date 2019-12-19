@@ -6,24 +6,35 @@ def NG_MVC_NMF(Ntry,lcall,Win,A0,X0,lam,epsilon):
     W=cp.asarray(Win)
     A=cp.asarray(A0)
     X=cp.asarray(X0)
-
+    logmetric=[]
     for i in range(0,Ntry):
         ATA = cp.dot(A.T,A)
-        if np.mod(i,10)==0: print(i,cp.sum(Y - cp.dot(cp.dot(W,A),X))+lam*cp.linalg.det(ATA))
-        
+
+        #----------------------------------------------------
+        if np.mod(i,1000)==0:
+            chi2=cp.sum((Y - cp.dot(cp.dot(W,A),X))**2)
+            metric=[i,cp.asnumpy(chi2+lam*cp.linalg.det(ATA)),cp.asnumpy(chi2),cp.asnumpy(lam*cp.linalg.det(ATA))]
+            logmetric.append(metric)
+            print(metric)
+            if np.mod(i,100000)==0:
+                LogNMF(i,cp.asnumpy(A),cp.asnumpy(X))
+        #----------------------------------------------------
+            
         Wt = cp.dot(cp.dot(cp.dot(W.T,Y),X.T),ATA)+ epsilon
         Wb = cp.dot(cp.dot(cp.dot(cp.dot(cp.dot(W.T,W),A),X),X.T),ATA) + lam*cp.linalg.det(ATA)*A + epsilon
-        #print(np.shape(Wt/Wb),np.shape(A))
         A = A*(Wt/Wb)
-        A = cp.dot(A,cp.diag(1/cp.sum(A[:,:],axis=0)))
-
+#        A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
         Wt = cp.dot(cp.dot(A.T,W.T),Y)+ epsilon
         Wb = cp.dot(cp.dot(cp.dot(cp.dot(A.T,W.T),W),A),X)+ epsilon 
         X = X*(Wt/Wb)
-
+#        X = cp.dot(cp.diag(1/cp.max(X[:,:],axis=1)),X)
+        
     A=cp.asnumpy(A)
     X=cp.asnumpy(X)
-        
+    #----------------------------------------------------
+    LogMetricPlot(logmetric)
+    #----------------------------------------------------
+
     return A, X
 
 def QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon):
@@ -38,9 +49,9 @@ def QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon):
     npix=np.shape(A)[0]
     WTW=np.dot(W.T,W)
     for i in range(0,Ntry):
-        if np.mod(i,100)==0:
-            ATA = np.dot(A.T,A)
-            print(i,np.sum(Y - np.dot(np.dot(W,A),X))+lam*np.linalg.det(ATA))
+        ATA = cp.dot(A.T,A)
+        chi2=cp.sum((Y - cp.dot(cp.dot(W,A),X))**2)
+        if np.mod(i,10)==0: print(i,chi2+lam*cp.linalg.det(ATA),chi2,lam*cp.linalg.det(ATA))
         G=cp.dot(W,A)
         #Solve Dl = G Xl
         #print("X")
@@ -75,3 +86,44 @@ def QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon):
             A[:,s]=sol
         
     return A, X
+
+
+def LogNMF(i,A,X):
+    import healpy as hp
+    import matplotlib.pyplot as plt
+    hp.mollview(A[:,0], title="0",flip="geo",cmap=plt.cm.jet)
+    plt.savefig("run/mmap0_"+str(i)+".png")
+    plt.close()
+
+    hp.mollview(A[:,1], title="1",flip="geo",cmap=plt.cm.jet)
+    plt.savefig("run/mmap1_"+str(i)+".png")
+    plt.close()
+
+    hp.mollview(A[:,2], title="2",flip="geo",cmap=plt.cm.jet)
+    plt.savefig("run/mmap2_"+str(i)+".png")
+    plt.close()
+
+    fig= plt.figure(figsize=(10,7))
+    ax = fig.add_subplot(111)
+    plt.plot(X[0,:],"o",label="Component 0",color="C0")
+    plt.plot(X[1,:],"s",label="Component 1",color="C1")
+    plt.plot(X[2,:],"^",label="Component 2",color="C2")
+    plt.plot(X[0,:],color="C0")
+    plt.plot(X[1,:],color="C1")
+    plt.plot(X[2,:],color="C2")
+    plt.savefig("run/unmix_"+str(i)+".png")
+    plt.close()
+
+def LogMetricPlot(logmetric):
+    import matplotlib.pyplot as plt
+
+    logmetric=np.array(logmetric)
+    fig= plt.figure(figsize=(10,7))
+    ax = fig.add_subplot(111)
+    plt.plot(logmetric[1:,0],logmetric[1:,1],label="Q")
+    plt.plot(logmetric[1:,0],logmetric[1:,2],label="chi")
+    plt.plot(logmetric[1:,0],logmetric[1:,3],label="lam det A")
+    plt.yscale("log")
+    plt.legend()
+    plt.savefig("run/logmetric.png")
+    plt.close()

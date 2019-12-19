@@ -59,71 +59,44 @@ WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
 
 npix=hp.nside2npix(nside)
+#Ainit = np.dot(np.diag(1/np.sum(Ainit[:,:],axis=1)),Ainit)
+#Xinit = np.dot(np.diag(1/np.sum(Xinit[:,:],axis=1)),Xinit)
 
 lcall=np.dot(np.dot(W,Ainit),Xinit)
-#lcall=[]
-#for i in range(0,len(bands)):
-#    lc=np.dot(W,mmap[:,i])
-#    ave=np.sum(W,axis=1)
-#    lcall.append(lc/ave)
-#    lcall.append(lc)
-#lcall=np.array(lcall).T
 
+noiselevel=0.01
+lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
 ##################################################
 
 nside=8
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
-
 #normmat=np.diag(1.0/np.sum(lcall,axis=0))
-#Y=cp.asarray(np.dot(lcall,normmat))
 N=3
 
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(N,npix,lcall)
 #A0,X0=initnmf.initpca(N,W,lcall)
 #A0=Ainit
-X0=Xinit
+#X0=Xinit
 #lam=3.e-4
 #lam=3.e-5
 
 #X=cp.asarray(np.dot(X0,normmat))
 
 #print(np.shape(mmap),np.shape(cmap),np.shape(malbedo))
-#cTc=np.dot(cmap.T,cmap)
-#Qtrue=np.sum(lcall - np.dot(Wn,mmap))+lam*np.linalg.det(cTc)
-#print(Qtrue)
-#sys.exit()
 
-Ntry=3000
-lam=1.0
-epsilon=1.e-9
+Ntry=7000000
+lam=0.3
+epsilon=1.e-10
+
+#ATA=np.dot(Ainit.T,Ainit)
+#Qtrue=np.sum((lcall - np.dot(np.dot(W,Ainit),Xinit))**2)+lam*np.linalg.det(ATA)
+#print(Qtrue,lam*np.linalg.det(ATA),np.sum(Ainit))
 
 A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
-
 #A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 
-hp.mollview(A[:,0], title="0",flip="geo",cmap=plt.cm.jet)
-hp.mollview(A[:,1], title="1",flip="geo",cmap=plt.cm.jet)
-hp.mollview(A[:,2], title="2",flip="geo",cmap=plt.cm.jet)
 
-fig= plt.figure(figsize=(10,7))
-ax = fig.add_subplot(111)
-fac0=3.e1
-fac1=1.5e1
-fac2=1.e1
-fac3=2.5e1
-plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C0")
-plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C1")
-plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C2")
-plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C0")
-plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C1")
-plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C2")
-plt.xlim(0.4,0.9)
-
-plt.tick_params(labelsize=16)
-plt.ylabel("Reflection Spectra",fontsize=16)
-plt.xlabel("wavelength [micron]",fontsize=16)
-plt.legend(fontsize=13)
-plt.show()
+#plt.show()
