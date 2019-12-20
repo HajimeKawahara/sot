@@ -7,7 +7,7 @@ import healpy as hp
 
 
 
-dat=np.load("nmftest_10bands_1e0_3000_r.npz")
+dat=np.load("nmftest_10bands_300000_inipcax.npz")
 A=dat["arr_0"]
 X=dat["arr_1"]
 print(np.shape(X))
@@ -58,10 +58,10 @@ for i in range(0,len(valexp)):
 plt.xlim(0.4,0.9)
 
 #io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,malbedo,valexp)
-fac0=3.e1
-fac1=1.5e1
-fac2=1.e1
-fac3=2.5e1
+fac0=2.6e-4
+fac1=3.5e-4
+fac2=1.e-4
+fac3=2.5e-4
 
 plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C0")
 plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C1")
