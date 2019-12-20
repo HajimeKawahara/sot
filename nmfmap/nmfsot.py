@@ -11,6 +11,9 @@ import sys
 import healpy as hp
 import initnmf
 import runnmf
+
+np.random.seed(34)
+
 ## load class map
 dataclass=np.load("/home/kawahara/exomap/sot/data/cmap3class.npz")
 cmap=dataclass["arr_0"]
@@ -40,10 +43,11 @@ io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,Xin
 
 ### Generating Multicolor Lightcurves
 #ephemeris setting
-inc=0.0
+inc=45.0/180.0*np.pi
+#inc=0.0
 Thetaeq=np.pi/2
-#zeta=23.4/180.0*np.pi
-zeta=90.0/180.0*np.pi 
+zeta=23.4/180.0*np.pi
+#zeta=60.0/180.0*np.pi 
 Pspin=23.9344699/24.0 #Pspin: a sidereal day
 wspin=2*np.pi/Pspin 
 #Porb=365.242190402                                            
@@ -68,7 +72,7 @@ noiselevel=0.01
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
 ##################################################
 
-nside=8
+nside=16
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
@@ -87,16 +91,20 @@ A0,X0=initnmf.init_random(N,npix,lcall)
 
 #print(np.shape(mmap),np.shape(cmap),np.shape(malbedo))
 
-Ntry=7000000
+Ntry=1000000
 lam=0.3
-epsilon=1.e-10
+epsilon=1.e-16
+
 
 #ATA=np.dot(Ainit.T,Ainit)
 #Qtrue=np.sum((lcall - np.dot(np.dot(W,Ainit),Xinit))**2)+lam*np.linalg.det(ATA)
 #print(Qtrue,lam*np.linalg.det(ATA),np.sum(Ainit))
 
-A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+#A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+#A,X=runnmf.NG_L2MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+A,X=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 #A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 
+np.savez("ax",A,X)
 
 #plt.show()
