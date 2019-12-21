@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import io_surface_type 
 import io_refdata
@@ -8,6 +9,10 @@ import healpy as hp
 import cupy as cp
 import sys
 import healpy as hp
+import initnmf
+import runnmf
+
+np.random.seed(34)
 
 ## load class map
 dataclass=np.load("/home/kawahara/exomap/sot/data/cmap3class.npz")
@@ -24,20 +29,25 @@ cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky\
 =io_refdata.read_refdata("/home/kawahara/exomap/sot/data/refdata")
 
 #mean albedo between waves and wavee
-bands=[[0.4,0.5],[0.5,0.6],[0.6,0.7],[0.7,0.8],[0.8,0.9]]
+#bands=[[0.4,0.5],[0.5,0.6],[0.6,0.7],[0.7,0.8],[0.8,0.9]]
+bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75],[0.75,0.8],[0.8,0.85],[0.85,0.9]]
+
 refsurfaces=[water,soil,veg]
-malbedo=io_surface_type.set_meanalbedo(0.8,0.9,refsurfaces,clear_sky)
-mmap,malbedo=toymap.make_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
+#malbedo=io_surface_type.set_meanalbedo(0.8,0.9,refsurfaces,clear_sky)
+
+mmap,Ainit,Xinit=toymap.make_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
 ave_band=np.mean(np.array(bands),axis=1)
-io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,malbedo,valexp)
-plt.show()
+
+io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,Xinit,valexp)
+#plt.show()
 
 ### Generating Multicolor Lightcurves
 #ephemeris setting
-inc=0.0
+inc=45.0/180.0*np.pi
+#inc=0.0
 Thetaeq=np.pi/2
-#zeta=23.4/180.0*np.pi
-zeta=90.0/180.0*np.pi 
+zeta=23.4/180.0*np.pi
+#zeta=60.0/180.0*np.pi 
 Pspin=23.9344699/24.0 #Pspin: a sidereal day
 wspin=2*np.pi/Pspin 
 #Porb=365.242190402                                            
@@ -53,39 +63,48 @@ WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
 
 npix=hp.nside2npix(nside)
-np.mean(mmap)
-lcall=[]
-for i in range(0,len(bands)):
-    lc=np.dot(W,mmap[:,i])
-    ave=np.sum(W,axis=1)
-    lcall.append(lc/ave)
-lcall=np.array(lcall).T
+#Ainit = np.dot(np.diag(1/np.sum(Ainit[:,:],axis=1)),Ainit)
+#Xinit = np.dot(np.diag(1/np.sum(Xinit[:,:],axis=1)),Xinit)
 
-##NMF multiplicative
+lcall=np.dot(np.dot(W,Ainit),Xinit)
 
-Y=cp.asarray(lcall)
+noiselevel=0.01
+lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
+##################################################
+
+nside=16
+npix=hp.nside2npix(nside)
+WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
+W=WV[:,:]*WI[:,:]
+#normmat=np.diag(1.0/np.sum(lcall,axis=0))
 N=3
-A0=np.random.rand(npix,N)
-X0=np.random.rand(N,np.shape(Y)[1])
 
-W=cp.asarray(W)
-A=cp.asarray(A0)
-X=cp.asarray(X0)
-epsilon=1.e-7
-lam=1.0
-for i in range(0,30000):
-    if np.mod(i,10)==0: print(i,cp.sum(Y - cp.dot(cp.dot(W,A),X)))
-    ATA = cp.dot(A.T,A)
-    Wt = cp.dot(cp.dot(cp.dot(W.T,Y),X.T),ATA)+ epsilon
-    Wb = cp.dot(cp.dot(cp.dot(cp.dot(cp.dot(W.T,W),A),X),X.T),ATA) + lam*cp.linalg.det(ATA)*A + epsilon
-    #print(np.shape(Wt/Wb),np.shape(A))
-    A = A*(Wt/Wb)
-    A = cp.dot(A,cp.diag(1/cp.sum(A[:,:],axis=0)))
-    Wt = cp.dot(cp.dot(A.T,W.T),Y)+ epsilon
-    Wb = cp.dot(cp.dot(cp.dot(cp.dot(A.T,W.T),W),A),X)+ epsilon 
-    X = X*(Wt/Wb)
+## NMF Initialization ============================
+A0,X0=initnmf.init_random(N,npix,lcall)
+#A0,X0=initnmf.initpca(N,W,lcall)
+#A0=Ainit
+#X0=Xinit
+#lam=3.e-4
+#lam=3.e-5
 
-An=cp.asnumpy(A)
-Xn=cp.asnumpy(X)
-Wn=cp.asnumpy(W)
-np.savez("nmftest1e0_30000",An,Xn,Wn)
+#X=cp.asarray(np.dot(X0,normmat))
+
+#print(np.shape(mmap),np.shape(cmap),np.shape(malbedo))
+
+Ntry=1000000
+lam=0.3
+epsilon=1.e-16
+
+
+#ATA=np.dot(Ainit.T,Ainit)
+#Qtrue=np.sum((lcall - np.dot(np.dot(W,Ainit),Xinit))**2)+lam*np.linalg.det(ATA)
+#print(Qtrue,lam*np.linalg.det(ATA),np.sum(Ainit))
+
+#A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+#A,X=runnmf.NG_L2MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+A,X=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+#A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+
+np.savez("ax",A,X)
+
+#plt.show()
