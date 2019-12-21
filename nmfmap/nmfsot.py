@@ -68,7 +68,7 @@ npix=hp.nside2npix(nside)
 
 lcall=np.dot(np.dot(W,Ainit),Xinit)
 
-noiselevel=0.01
+noiselevel=0.0001
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
 ##################################################
 
@@ -92,7 +92,8 @@ A0,X0=initnmf.init_random(N,npix,lcall)
 #print(np.shape(mmap),np.shape(cmap),np.shape(malbedo))
 
 Ntry=1000000
-lam=0.3
+lamA=1.e-2
+lamX=1.e2
 epsilon=1.e-16
 
 
@@ -102,7 +103,7 @@ epsilon=1.e-16
 
 #A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 #A,X=runnmf.NG_L2MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
-A,X=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
+A,X=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
 #A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 
 np.savez("ax",A,X)
