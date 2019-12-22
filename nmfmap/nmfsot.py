@@ -50,8 +50,8 @@ zeta=23.4/180.0*np.pi
 #zeta=60.0/180.0*np.pi 
 Pspin=23.9344699/24.0 #Pspin: a sidereal day
 wspin=2*np.pi/Pspin 
-#Porb=365.242190402                                            
-Porb=30.0
+Porb=365.242190402                                            
+#Porb=30.0
 worb=2*np.pi/Porb 
 N=1024
 expt=Porb #observation duration 10d
@@ -91,9 +91,9 @@ A0,X0=initnmf.init_random(N,npix,lcall)
 
 #print(np.shape(mmap),np.shape(cmap),np.shape(malbedo))
 
-Ntry=1000000
+Ntry=10000000
 lamA=1.e-2
-lamX=1.e2
+lamX=1.e0
 epsilon=1.e-16
 
 
@@ -103,9 +103,9 @@ epsilon=1.e-16
 
 #A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 #A,X=runnmf.NG_L2MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
-A,X=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
+A,X,logmetric=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
 #A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 
-np.savez("ax",A,X)
-
+np.savez("ax"+str(int(lamX)),A,X)
+np.savez("metric"+str(int(lamX)),logmetric)
 #plt.show()

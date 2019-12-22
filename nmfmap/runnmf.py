@@ -46,7 +46,7 @@ def L2_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon):
     LogMetricPlot(logmetric)
     #----------------------------------------------------
 
-    return A, X
+    return A, X, logmetric
 
 
 def NG_MVC_NMF(Ntry,lcall,Win,A0,X0,lam,epsilon):
