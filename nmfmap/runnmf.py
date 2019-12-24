@@ -1,7 +1,18 @@
 import cupy as cp
 import numpy as np
+import sys
+
+def check_nonnegative(Y,lab):
+    if np.min(Y)<0:
+        print("Error: Negative elements in the initial matrix of "+lab)
+        sys.exit()
+
 
 def L2_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon):
+    check_nonnegative(lcall,"LC")
+    check_nonnegative(A0,"A")
+    check_nonnegative(X0,"X")
+    
     Y=cp.asarray(lcall)
     W=cp.asarray(Win)
     A=cp.asarray(A0)
@@ -146,29 +157,21 @@ def QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon):
     return A, X
 
 
-def LogNMF(i,A,X):
+def LogNMF(i,A,X, lim=3):
     import healpy as hp
     import matplotlib.pyplot as plt
-    hp.mollview(A[:,0], title="0",flip="geo",cmap=plt.cm.jet)
-    plt.savefig("run/mmap0_"+str(i)+".png")
-    plt.close()
 
-    hp.mollview(A[:,1], title="1",flip="geo",cmap=plt.cm.jet)
-    plt.savefig("run/mmap1_"+str(i)+".png")
-    plt.close()
-
-    hp.mollview(A[:,2], title="2",flip="geo",cmap=plt.cm.jet)
-    plt.savefig("run/mmap2_"+str(i)+".png")
-    plt.close()
+    for j in range(0,lim):
+        hp.mollview(A[:,j], title="Component "+str(j),flip="geo",cmap=plt.cm.jet)
+        plt.savefig("run/mmap"+str(j)+"_"+str(i)+".png")
+        plt.close()
 
     fig= plt.figure(figsize=(10,7))
     ax = fig.add_subplot(111)
-    plt.plot(X[0,:],"o",label="Component 0",color="C0")
-    plt.plot(X[1,:],"s",label="Component 1",color="C1")
-    plt.plot(X[2,:],"^",label="Component 2",color="C2")
-    plt.plot(X[0,:],color="C0")
-    plt.plot(X[1,:],color="C1")
-    plt.plot(X[2,:],color="C2")
+    marker=["o","s","^"]
+    for j in range(0,lim):
+        plt.plot(X[j,:],marker[np.mod(j,3)],label="Component "+str(j),color="C"+str(j))
+        plt.plot(X[j,:],color="C"+str(j))
     plt.savefig("run/unmix_"+str(i)+".png")
     plt.close()
 
