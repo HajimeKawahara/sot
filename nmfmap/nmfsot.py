@@ -78,34 +78,20 @@ WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
 #normmat=np.diag(1.0/np.sum(lcall,axis=0))
 N=3
+Ntry=10000000
+epsilon=1.e-16
+lamA=1.e-2
+lamX=1.e0
 
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(N,npix,lcall)
-#A0,X0=initnmf.initpca(N,W,lcall)
-#A0=Ainit
-#X0=Xinit
-#lam=3.e-4
-#lam=3.e-5
+#A0,X0=initnmf.initpca(N,W,lcall,lamA)
 
-#X=cp.asarray(np.dot(X0,normmat))
+#A,X,logmetric=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
+A,X,logmetric=runnmf.L2VR_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
 
-#print(np.shape(mmap),np.shape(cmap),np.shape(malbedo))
-
-Ntry=10000000
-lamA=1.e-2
-lamX=1.e0
-epsilon=1.e-16
-
-
-#ATA=np.dot(Ainit.T,Ainit)
-#Qtrue=np.sum((lcall - np.dot(np.dot(W,Ainit),Xinit))**2)+lam*np.linalg.det(ATA)
-#print(Qtrue,lam*np.linalg.det(ATA),np.sum(Ainit))
-
-#A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
-#A,X=runnmf.NG_L2MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
-A,X,logmetric=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
 #A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 
-np.savez("ax"+str(int(lamX)),A,X)
-np.savez("metric"+str(int(lamX)),logmetric)
+np.savez("axVR"+str(int(lamX)),A,X)
+np.savez("metricVR"+str(int(lamX)),logmetric)
 #plt.show()

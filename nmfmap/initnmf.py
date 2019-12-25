@@ -44,7 +44,11 @@ def initpca(N,W,lcall,lam,mode="Ridge"):
         print("Solve NNLS")
         sol,rnorm=scipy.optimize.nnls(Wd, dd)
         A0=(sol.reshape((jN,kN)))
-        
+    elif mode=="Random":
+        A0=np.random.rand(jN,kN)
+    else:
+        print("No mode for initpca.")
+        sys.exit()
     return A0,X0
 
 def plotinit(A0):

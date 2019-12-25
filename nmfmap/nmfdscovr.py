@@ -22,20 +22,17 @@ W,t,lcall=rd.read_dscovr("/home/kawahara/exomap/data/for_HKawahara",9)
 
 noiselevel=0.0001
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
-
-print(np.min(lcall))
-print(len(lcall[lcall<0]))
 ##################################################
 
 #normmat=np.diag(1.0/np.sum(lcall,axis=0))
 N=3
-lamA=3.e-4
-lamX=3.e-2
+lamA=1.e-6
+lamX=1.e-3
 
 ## NMF Initialization ============================
 #A0,X0=initnmf.init_random(N,npix,lcall)
 A0,X0=initnmf.initpca(N,W,lcall,lamA)
-runnmf.LogNMF(-1,A0,X0,3)
+runnmf.LogNMF(-1,A0,X0,N)
 
 Ntry=10000000
 #lamA=0.0
