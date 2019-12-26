@@ -8,7 +8,7 @@ def check_nonnegative(Y,lab):
         sys.exit()
 
         
-def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon, off=0):
+def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,rho=0.1, off=0):
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
     check_nonnegative(X0,"X")
@@ -52,8 +52,7 @@ def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon, off=0):
         detXXT=cp.linalg.det(XXT)
         Wt = cp.dot(cp.dot(cp.dot(A.T,W.T),Y),XTX)+ epsilon
         Wb = cp.dot(cp.dot(cp.dot(cp.dot(cp.dot(A.T,W.T),W),A),X),XTX)+ lamX*detXXT*X + epsilon
-        
-        X = X*(Wt/Wb)
+        X = (1.0-rho)*X + rho*X*(Wt/Wb)
 #        X = X*(Wb/Wt)
         #X = cp.dot(cp.diag(1/cp.sum(X[:,:],axis=1)),X)
         #X = cp.dot(X,cp.diag(1/cp.sum(X[:,:],axis=0)))

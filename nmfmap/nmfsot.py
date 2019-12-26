@@ -81,7 +81,7 @@ N=3
 Ntry=1000000
 epsilon=1.e-6
 lamA=1.e-2
-lamX=0.0
+lamX=1.e0
 
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(N,npix,lcall)
@@ -90,8 +90,9 @@ Ntryini=20000
 A,X,logmetric=runnmf.L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
 A0,X0=A,X
 off=Ntryini
+rho=0.1
 for j in range(0,10):
-    A,X,logmetric=runnmf.L2VR_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,off)
+    A,X,logmetric=runnmf.L2VR_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,rho,off)
     np.savez("axVR"+str(int(np.log10(lamX)))+"_"+str(j),A,X)
     np.savez("metricVRx"+str(int(np.log10(lamX)))+"_"+str(j),logmetric)
     A0,X0=A,X
