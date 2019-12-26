@@ -7,7 +7,8 @@ def check_nonnegative(Y,lab):
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
-def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon):
+        
+def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon, off=0):
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
     check_nonnegative(X0,"X")
@@ -19,16 +20,17 @@ def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon):
     logmetric=[]
     jj=0
     for i in range(0,Ntry):
+        ATA = cp.dot(A.T,A)
+        XTX = cp.dot(X.T,X)
         XXT = cp.dot(X,X.T)
-        
+
         #----------------------------------------------------
         if np.mod(i,1000)==0:
             jj=jj+1
             AA=np.sum(A*A)
             detXXT=cp.asnumpy(cp.linalg.det(XXT))
-
             chi2=cp.sum((Y - cp.dot(cp.dot(W,A),X))**2)
-            metric=[i,cp.asnumpy(chi2+lamA*AA+lamX*detXXT),cp.asnumpy(chi2),lamA*AA,lamX*detXXT]
+            metric=[i+off,cp.asnumpy(chi2+lamA*AA+lamX*detXXT),cp.asnumpy(chi2),lamA*AA,lamX*detXXT]
             logmetric.append(metric)
             #            print(metric,np.sum(A),np.sum(X))
             import terminalplot
@@ -37,19 +39,22 @@ def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon):
             print(metric)
             terminalplot.plot(list(bandl),list(Xn[np.mod(jj,Nk),:]))
             if np.mod(i,10000)==0:
-                LogNMF(i,cp.asnumpy(A),cp.asnumpy(X),Nk)
+                LogNMF(i+off,cp.asnumpy(A),cp.asnumpy(X),Nk)
         #----------------------------------------------------
-            
+        #SGD 
         Wt = cp.dot(cp.dot(W.T,Y),X.T)+ epsilon
         Wb = (cp.dot(cp.dot(cp.dot(cp.dot(W.T,W),A),X),X.T)) + lamA*A + epsilon
         A = A*(Wt/Wb)
-        #A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
         A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
+        # A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
+        
+        XTX = cp.dot(X.T,X)
         detXXT=cp.linalg.det(XXT)
-        XTX=XXT.T
-        Wt = cp.dot(XTX,cp.dot(cp.dot(A.T,W.T),Y))+ epsilon
-        Wb = cp.dot(XTX,cp.dot(cp.dot(cp.dot(cp.dot(A.T,W.T),W),A),X))+ lamX*detXXT*X + epsilon 
+        Wt = cp.dot(cp.dot(cp.dot(A.T,W.T),Y),XTX)+ epsilon
+        Wb = cp.dot(cp.dot(cp.dot(cp.dot(cp.dot(A.T,W.T),W),A),X),XTX)+ lamX*detXXT*X + epsilon
+        
         X = X*(Wt/Wb)
+#        X = X*(Wb/Wt)
         #X = cp.dot(cp.diag(1/cp.sum(X[:,:],axis=1)),X)
         #X = cp.dot(X,cp.diag(1/cp.sum(X[:,:],axis=0)))
         
@@ -62,7 +67,7 @@ def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon):
     return A, X, logmetric
 
         
-def L2_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon):
+def L2_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,off=0):
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
     check_nonnegative(X0,"X")
@@ -81,7 +86,7 @@ def L2_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon):
             AA=np.sum(A*A)
             XX=np.sum(X*X)
             chi2=cp.sum((Y - cp.dot(cp.dot(W,A),X))**2)
-            metric=[i,cp.asnumpy(chi2+lamA*AA+lamX*XX),cp.asnumpy(chi2),lamA*AA,lamX*XX]
+            metric=[i+off,cp.asnumpy(chi2+lamA*AA+lamX*XX),cp.asnumpy(chi2),lamA*AA,lamX*XX]
             logmetric.append(metric)
             #            print(metric,np.sum(A),np.sum(X))
             import terminalplot
@@ -90,7 +95,7 @@ def L2_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon):
             print(metric)
             terminalplot.plot(list(bandl),list(Xn[np.mod(jj,Nk),:]))
             if np.mod(i,10000)==0:
-                LogNMF(i,cp.asnumpy(A),cp.asnumpy(X),Nk)
+                LogNMF(i+off,cp.asnumpy(A),cp.asnumpy(X),Nk)
         #----------------------------------------------------
             
         Wt = cp.dot(cp.dot(W.T,Y),X.T)+ epsilon
