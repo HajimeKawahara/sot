@@ -41,21 +41,40 @@ def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,rho=0.1, off=0):
             if np.mod(i,10000)==0:
                 LogNMF(i+off,cp.asnumpy(A),cp.asnumpy(X),Nk)
         #----------------------------------------------------
+
+        detXXT=cp.linalg.det(XXT)
+        WA=cp.dot(W,A)
+        Wt = cp.dot(cp.dot(WA.T,Y),XTX) + epsilon
+        Wb = cp.dot(cp.dot(cp.dot(WA.T,WA),X),XTX)+ lamX*detXXT*X + epsilon
+#        Wt = (cp.dot(WA.T,Y)) + epsilon
+#        Wb = (cp.dot(cp.dot(WA.T,WA),X))+ lamX*detXXT*X + epsilon
+
+#        chi2=cp.sum((Y - cp.dot(WA,X))**2)+lamX*detXXT
+        rho=1.0
+        X = (1.0-rho)*X + rho*X*(Wt/Wb)
+#        chi2up=cp.sum((Y - cp.dot(WA,XX))**2)+ lamX*cp.linalg.det(cp.dot(XX,XX.T))
+#        while chi2up > chi2:
+#            rho=rho/2.0
+#            XX = (1.0-rho)*X + rho*X*(Wt/Wb)
+#            chi2up=cp.sum((Y - cp.dot(WA,XX))**2)+lamX*cp.linalg.det(cp.dot(XX,XX.T))
+#        X=XX
+        
         #SGD 
         Wt = cp.dot(cp.dot(W.T,Y),X.T)+ epsilon
-        Wb = (cp.dot(cp.dot(cp.dot(cp.dot(W.T,W),A),X),X.T)) + lamA*A + epsilon
+        Wb = (cp.dot(cp.dot(cp.dot(W.T,WA),X),X.T)) + lamA*A + epsilon
         A = A*(Wt/Wb)
         A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
         # A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
+#        if rho < 1.0:
+#            print(rho)
+#        if chi2 - chi2up < 1.e-8:
+#            A=cp.asnumpy(A)
+#            X=cp.asnumpy(X)
+#            #----------------------------------------------------
+#            LogMetricPlot(logmetric)
+#            #----------------------------------------------------
+#            return A, X, logmetric
         
-        XTX = cp.dot(X.T,X)
-        detXXT=cp.linalg.det(XXT)
-        Wt = cp.dot(cp.dot(cp.dot(A.T,W.T),Y),XTX)+ epsilon
-        Wb = cp.dot(cp.dot(cp.dot(cp.dot(cp.dot(A.T,W.T),W),A),X),XTX)+ lamX*detXXT*X + epsilon
-        X = (1.0-rho)*X + rho*X*(Wt/Wb)
-#        X = X*(Wb/Wt)
-        #X = cp.dot(cp.diag(1/cp.sum(X[:,:],axis=1)),X)
-        #X = cp.dot(X,cp.diag(1/cp.sum(X[:,:],axis=0)))
         
     A=cp.asnumpy(A)
     X=cp.asnumpy(X)
@@ -100,14 +119,12 @@ def L2_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,off=0):
         Wt = cp.dot(cp.dot(W.T,Y),X.T)+ epsilon
         Wb = (cp.dot(cp.dot(cp.dot(cp.dot(W.T,W),A),X),X.T)) + lamA*A + epsilon
         A = A*(Wt/Wb)
-        #A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
         A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
-        
-        Wt = cp.dot(cp.dot(A.T,W.T),Y)+ epsilon
-        Wb = cp.dot(cp.dot(cp.dot(cp.dot(A.T,W.T),W),A),X)+ lamX*X + epsilon 
+
+        WA=cp.dot(W,A)        
+        Wt = cp.dot(WA.T,Y)+ epsilon
+        Wb = cp.dot(cp.dot(WA.T,WA),X)+ lamX*X + epsilon 
         X = X*(Wt/Wb)
-        #X = cp.dot(cp.diag(1/cp.sum(X[:,:],axis=1)),X)
-        #X = cp.dot(X,cp.diag(1/cp.sum(X[:,:],axis=0)))
         
     A=cp.asnumpy(A)
     X=cp.asnumpy(X)
@@ -117,51 +134,6 @@ def L2_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,off=0):
 
     return A, X, logmetric
 
-
-def NG_MVC_NMF(Ntry,lcall,Win,A0,X0,lam,epsilon):
-    Y=cp.asarray(lcall)
-    W=cp.asarray(Win)
-    A=cp.asarray(A0)
-    X=cp.asarray(X0)
-    logmetric=[]
-    jj=0
-    for i in range(0,Ntry):
-        ATA = cp.dot(A.T,A)
-        #----------------------------------------------------
-        if np.mod(i,1000)==0:
-            jj=jj+1
-            chi2=cp.sum((Y - cp.dot(cp.dot(W,A),X))**2)
-            metric=[i,cp.asnumpy(chi2+lam*cp.linalg.det(ATA)),cp.asnumpy(chi2),cp.asnumpy(lam*cp.linalg.det(ATA))]
-            logmetric.append(metric)
-            #            print(metric,np.sum(A),np.sum(X))
-            import terminalplot
-            Xn=cp.asnumpy(X)
-            bandl=np.array(range(0,len(Xn[0,:])))
-            terminalplot.plot(list(bandl),list(Xn[np.mod(jj,3),:]))
-
-            if np.mod(i,10000)==0:
-                LogNMF(i,cp.asnumpy(A),cp.asnumpy(X))
-        #----------------------------------------------------
-            
-        Wt = cp.dot(cp.dot(cp.dot(W.T,Y),X.T),ATA)+ epsilon
-        Wb = cp.dot(cp.dot(cp.dot(cp.dot(cp.dot(W.T,W),A),X),X.T),ATA) + lam*cp.linalg.det(ATA)*A + epsilon
-        A = A*(Wt/Wb)
-        #A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
-        X = cp.dot(X,cp.diag(1/cp.sum(X[:,:],axis=0)))
-        
-        Wt = cp.dot(cp.dot(A.T,W.T),Y)+ epsilon
-        Wb = cp.dot(cp.dot(cp.dot(cp.dot(A.T,W.T),W),A),X)+ epsilon 
-        X = X*(Wt/Wb)
-        #       X = cp.dot(cp.diag(1/cp.sum(X[:,:],axis=1)),X)
-        #X = cp.dot(X,cp.diag(1/cp.sum(X[:,:],axis=0)))
-        
-    A=cp.asnumpy(A)
-    X=cp.asnumpy(X)
-    #----------------------------------------------------
-    LogMetricPlot(logmetric)
-    #----------------------------------------------------
-
-    return A, X
 
 
 def QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon):
