@@ -47,7 +47,7 @@ def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
     logmetric=[]
     return A, X, logmetric
 
-def APGr(Q,p,x0,Ntry=1000):
+def APGr(Q,p,x0,Ntry=1000,alpha0=1.0):
     n=np.shape(Q)[0]
     normQ = np.sqrt(np.sum(Q**2))
     Theta1 = np.eye(n) - Q/normQ
@@ -55,7 +55,7 @@ def APGr(Q,p,x0,Ntry=1000):
     x = np.copy(x0)
     y = np.copy(x0)
     x[x<0]=0.0
-    alpha=1
+    alpha=alpha0
     costp=0.5*np.dot(x0,np.dot(Q,x0)) - np.dot(p,x0)
     for i in range(0,Ntry):
         xp=np.copy(x)
@@ -71,7 +71,8 @@ def APGr(Q,p,x0,Ntry=1000):
         if cost > costp:
             x = np.dot(Theta1,xp) + theta2
             y = np.copy(x)
-            costp=np.copy(cost)
+            alpha=alpha0
+        costp=np.copy(cost)
     return x
         
 def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,rho=0.1, off=0):
