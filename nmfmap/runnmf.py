@@ -162,7 +162,7 @@ def QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon):
         Delta_r = Y - np.dot(np.dot(W,A),X)
         Aprev=np.copy(A)
         #print("A")
-        for s in range(0,NK):
+        for s in range(0,NK): 
             xast2=np.linalg.norm(X[s,:])**2
             Aminus = np.delete(Aprev,obj=s,axis=1)
             #st=time.time()
