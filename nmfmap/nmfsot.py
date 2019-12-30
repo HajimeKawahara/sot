@@ -94,12 +94,7 @@ A0,X0=initnmf.init_random(N,npix,lcall)
 #off=Ntryini
 off=0.0
 rho=1.0
-for j in range(0,10):
-    A,X,logmetric=runnmf.L2VR_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,rho,off)
-    np.savez("axVR"+str(int(np.log10(lamX)))+"_"+str(j),A,X)
-    np.savez("metricVRx"+str(int(np.log10(lamX)))+"_"+str(j),logmetric)
-    A0,X0=A,X
-    off=off+Ntry
+A,X,logmetric=runnmf.QP_UNC_NMR(10,lcall,W,A0,X0,lamA,epsilon)
 
 #A,X,logmetric=runnmf.L2VR_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
 
