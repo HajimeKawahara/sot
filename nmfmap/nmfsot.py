@@ -71,7 +71,7 @@ lcall=np.dot(np.dot(W,Ainit),Xinit)
 noiselevel=0.0001
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
 ##################################################
-lcall= np.dot(np.diag(1/np.sum(lcall[:,:],axis=1)),lcall)
+#lcall= np.dot(np.diag(1/np.sum(lcall[:,:],axis=1)),lcall)
 
 
 nside=16
@@ -80,16 +80,16 @@ WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
 #normmat=np.diag(1.0/np.sum(lcall,axis=0))
 N=3
-Ntry=10000
+Ntry=1000
 epsilon=1.e-6
-lamA=1.e-5
+lamA=1.e-2
 lamX=1.e2
 filename="uncAX_a"+str(np.log10(lamA))+"_try"+str(Ntry)
 
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(N,npix,lcall)
 #A0,X0=initnmf.initpca(N,W,lcall,lamA)
-Ntryini=10000
+Ntryini=100000
 A,X,logmetric=runnmf.L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
 A0,X0=A,X
 off=Ntryini

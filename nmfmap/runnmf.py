@@ -7,7 +7,7 @@ def check_nonnegative(Y,lab):
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
-def QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon):
+def QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,NtryAPG=100):
     import scipy
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
@@ -23,7 +23,6 @@ def QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon):
     Nj=np.shape(A)[0]
 
     WTW=np.dot(W.T,W)
-    NtryAPG=10
 
     jj=0
     for i in range(0,Ntry):
@@ -71,7 +70,7 @@ def QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon):
     return A, X, logmetric
 
 
-def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
+def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon,NtryAPG=100):
     import scipy
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
@@ -87,7 +86,6 @@ def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
     Nj=np.shape(A)[0]
 
     WTW=np.dot(W.T,W)
-    NtryAPG=10
 
     jj=0
     for i in range(0,Ntry):
@@ -101,7 +99,12 @@ def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
             Wa=np.dot(W,ak)
             W_x=np.dot(Wa,Wa)*np.eye(Nl)
             bx=np.dot(np.dot(Delta.T,W),ak)
-            X[k,:]=APGr(W_x,bx,X[k,:],Ntry=NtryAPG)
+            Xpropose=APGr(W_x,bx,X[k,:],Ntry=NtryAPG)
+            if np.sum(Xpropose) > 0.0:
+                X[k,:]=Xpropose
+            else:
+                print("Zero end")
+                sys.exit()
         ## ak
         res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)
         for k in range(0,Nk):
@@ -112,9 +115,20 @@ def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
             W_a=(np.dot(xk,xk))*(np.dot(W.T,W))
             b=np.dot(np.dot(W.T,Delta),xk)
             T_a=lamA*np.eye(Nj)
-            A[:,k]=APGr(W_a+T_a,b,A[:,k],Ntry=NtryAPG)
-            
+            Apropose=APGr(W_a+T_a,b,A[:,k],Ntry=NtryAPG)
+            if np.sum(Xpropose) > 0.0:
+                A[:,k]=Apropose
+            else:
+                print("Zero end")
+                sys.exit()
+
+        #####################
+#        nprev=(np.sum(W@A@X))
+#        X = np.dot(np.diag(1/np.sum(X[:,:],axis=1)),X)
 #        A = np.dot(np.diag(1/np.sum(A[:,:],axis=1)),A)
+#        nup=(np.sum(W@A@X))
+#        X=X*nprev/nup
+        #####################
         res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)
         print("Residual=",res)
 
