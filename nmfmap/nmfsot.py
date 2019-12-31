@@ -80,10 +80,11 @@ WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
 #normmat=np.diag(1.0/np.sum(lcall,axis=0))
 N=3
-Ntry=100
+Ntry=10000
 epsilon=1.e-6
 lamA=1.e-5
 lamX=1.e2
+filename="uncAX_a"+str(np.log10(lamA))+"_try"+str(Ntry)
 
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(N,npix,lcall)
@@ -93,7 +94,11 @@ A,X,logmetric=runnmf.L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
 A0,X0=A,X
 off=Ntryini
 #off=0.0
+#A,X,logmetric=runnmf.QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
 A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon)
+np.savez(filename,A,X)
+
+#A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon)
 
 #A,X,logmetric=runnmf.L2VR_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
 

@@ -7,6 +7,69 @@ def check_nonnegative(Y,lab):
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
+def QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon):
+    import scipy
+    check_nonnegative(lcall,"LC")
+    check_nonnegative(A0,"A")
+    check_nonnegative(X0,"X")
+    res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.linalg.det(np.dot(X0,X0.T))
+    print("Ini residual=",res)
+    A=np.copy(A0)
+    X=np.copy(X0)
+    Y=np.copy(lcall)
+    Ni=np.shape(Y)[0]
+    Nl=np.shape(Y)[1]
+    Nk=np.shape(A)[1]
+    Nj=np.shape(A)[0]
+
+    WTW=np.dot(W.T,W)
+    NtryAPG=10
+
+    jj=0
+    for i in range(0,Ntry):
+        print(i)
+        ## xk
+        for k in range(0,Nk):
+            print("X, k=",k)
+            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
+            Delta=Y-np.dot(W,AX)
+            ak=A[:,k]
+            Wa=np.dot(W,ak)
+            W_x=np.dot(Wa,Wa)*np.eye(Nl)
+            bx=np.dot(np.dot(Delta.T,W),ak)
+            #Det XXT
+            Xminus = np.delete(X,obj=k,axis=0)
+            XXTinverse=np.linalg.inv(np.dot(Xminus,Xminus.T))
+            K=np.eye(Nl) - np.dot(np.dot(Xminus.T,XXTinverse),Xminus)
+            K=K*np.linalg.det(np.dot(Xminus,Xminus.T))*lamX
+            #            detm=np.dot(np.dot(xk.T,K),xk)*np.linalg.det(np.dot(Xminus,Xminus.T))            
+            X[k,:]=APGr(W_x + K ,bx,X[k,:],Ntry=NtryAPG)
+        ## ak
+        for k in range(0,Nk):
+            print("A, k=",k)
+            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
+            Delta=Y-np.dot(W,AX)
+            xk=X[k,:]
+            W_a=(np.dot(xk,xk))*(np.dot(W.T,W))
+            b=np.dot(np.dot(W.T,Delta),xk)
+            T_a=lamA*np.eye(Nj)
+            A[:,k]=APGr(W_a+T_a,b,A[:,k],Ntry=NtryAPG)
+            
+#        A = np.dot(np.diag(1/np.sum(A[:,:],axis=1)),A)
+        res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)+lamX*np.linalg.det(np.dot(X,X.T))
+        print("Residual=",res)
+
+        #normalization
+        LogNMF(i,A,X,Nk)
+        bandl=np.array(range(0,len(X[0,:])))
+        import terminalplot
+        terminalplot.plot(list(bandl),list(X[np.mod(jj,Nk),:]))
+
+        jj=jj+1
+            
+    logmetric=[]
+    return A, X, logmetric
+
 
 def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
     import scipy
