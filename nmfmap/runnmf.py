@@ -10,39 +10,47 @@ def check_nonnegative(Y,lab):
 
 def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
     import scipy
+    check_nonnegative(lcall,"LC")
+    check_nonnegative(A0,"A")
+    check_nonnegative(X0,"X")
+
+    A=np.copy(A0)*1.e-1
+    X=np.copy(X0)*1.e-1
     Y=np.copy(lcall)
     Ni=np.shape(Y)[0]
     Nl=np.shape(Y)[1]
     Nk=np.shape(A)[1]
     Nj=np.shape(A)[0]
-    A=np.copy(A0)
-    X=np.copy(X0)
 
     WTW=np.dot(W.T,W)
     NtryAPG=100
+
+    
     for i in range(0,Ntry):
-        ## ak
-        for k in range(0,Nk):
-            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            Delta=D-np.dot(W,AX)
-            xk=X[k,:]
-            W_a=(np.dot(xk,xk))*(np.dot(W.T,W))
-            b=np.dot(np.dot(W.T,Delta),xk)
-            T_a=lamA*np.eye(Nj)
-            A[:,k]=APGr(W_a+T_a,b,A[:,k],Ntry=NtryAPG)
-
-        #normalization
-        A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
-
+        print(i)
         ## xk
         for k in range(0,Nk):
             AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            Delta=D-np.dot(W,AX)
+            Delta=Y-np.dot(W,AX)
             ak=A[:,k]
             Wa=np.dot(W,ak)
             W_x=np.dot(Wa,Wa)*np.eye(Nl)
             bx=np.dot(np.dot(Delta.T,W),ak)
             X[k,:]=APGr(W_x,bx,X[k,:],Ntry=NtryAPG)
+        ## ak
+        for k in range(0,Nk):
+            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
+            Delta=Y-np.dot(W,AX)
+            xk=X[k,:]
+            W_a=(np.dot(xk,xk))*(np.dot(W.T,W))
+            b=np.dot(np.dot(W.T,Delta),xk)
+            T_a=lamA*np.eye(Nj)
+            A[:,k]=APGr(W_a+T_a,b,A[:,k],Ntry=NtryAPG)
+        print(np.sum(X),np.sum(A))
+        #normalization
+        #        A = np.dot(np.diag(1/np.sum(A[:,:],axis=1)),A)
+        LogNMF(i,A,X,Nk)
+
             
     logmetric=[]
     return A, X, logmetric
@@ -61,6 +69,7 @@ def APGr(Q,p,x0,Ntry=1000,alpha0=1.0):
         xp=np.copy(x)
         x = np.dot(Theta1,y) + theta2
         x[x<0] = 0.0
+
         dx=x-xp
         aa=alpha*alpha
         beta=alpha*(1.0-alpha)
@@ -73,6 +82,11 @@ def APGr(Q,p,x0,Ntry=1000,alpha0=1.0):
             y = np.copy(x)
             alpha=alpha0
         costp=np.copy(cost)
+        if cost != cost:
+            print(Q,p,x0)
+            print(cost)
+            sys.exit()
+
     return x
         
 def L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,rho=0.1, off=0):
