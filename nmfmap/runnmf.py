@@ -13,9 +13,10 @@ def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
     check_nonnegative(X0,"X")
-
-    A=np.copy(A0)*1.e-1
-    X=np.copy(X0)*1.e-1
+    res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)
+    print("Ini residual=",res)
+    A=np.copy(A0)
+    X=np.copy(X0)
     Y=np.copy(lcall)
     Ni=np.shape(Y)[0]
     Nl=np.shape(Y)[1]
@@ -23,13 +24,14 @@ def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
     Nj=np.shape(A)[0]
 
     WTW=np.dot(W.T,W)
-    NtryAPG=100
+    NtryAPG=10
 
-    
+    jj=0
     for i in range(0,Ntry):
         print(i)
         ## xk
         for k in range(0,Nk):
+            print("X, k=",k)
             AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
             Delta=Y-np.dot(W,AX)
             ak=A[:,k]
@@ -38,7 +40,9 @@ def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
             bx=np.dot(np.dot(Delta.T,W),ak)
             X[k,:]=APGr(W_x,bx,X[k,:],Ntry=NtryAPG)
         ## ak
+        res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)
         for k in range(0,Nk):
+            print("A, k=",k)
             AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
             Delta=Y-np.dot(W,AX)
             xk=X[k,:]
@@ -46,16 +50,23 @@ def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon):
             b=np.dot(np.dot(W.T,Delta),xk)
             T_a=lamA*np.eye(Nj)
             A[:,k]=APGr(W_a+T_a,b,A[:,k],Ntry=NtryAPG)
-        print(np.sum(X),np.sum(A))
-        #normalization
-        #        A = np.dot(np.diag(1/np.sum(A[:,:],axis=1)),A)
-        LogNMF(i,A,X,Nk)
+            
+#        A = np.dot(np.diag(1/np.sum(A[:,:],axis=1)),A)
+        res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)
+        print("Residual=",res)
 
+        #normalization
+        LogNMF(i,A,X,Nk)
+        bandl=np.array(range(0,len(X[0,:])))
+        import terminalplot
+        terminalplot.plot(list(bandl),list(X[np.mod(jj,Nk),:]))
+
+        jj=jj+1
             
     logmetric=[]
     return A, X, logmetric
 
-def APGr(Q,p,x0,Ntry=1000,alpha0=1.0):
+def APGr(Q,p,x0,Ntry=1000,alpha0=0.9):
     n=np.shape(Q)[0]
     normQ = np.sqrt(np.sum(Q**2))
     Theta1 = np.eye(n) - Q/normQ

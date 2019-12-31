@@ -82,18 +82,17 @@ W=WV[:,:]*WI[:,:]
 N=3
 Ntry=100
 epsilon=1.e-6
-lamA=1.e-2
+lamA=1.e-5
 lamX=1.e2
 
 ## NMF Initialization ============================
-#A0,X0=initnmf.init_random(N,npix,lcall)
-A0,X0=initnmf.initpca(N,W,lcall,lamA)
-#Ntryini=10000
-#A,X,logmetric=runnmf.L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
-#A0,X0=A,X
-#off=Ntryini
-off=0.0
-rho=1.0
+A0,X0=initnmf.init_random(N,npix,lcall)
+#A0,X0=initnmf.initpca(N,W,lcall,lamA)
+Ntryini=10000
+A,X,logmetric=runnmf.L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
+A0,X0=A,X
+off=Ntryini
+#off=0.0
 A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon)
 
 #A,X,logmetric=runnmf.L2VR_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
