@@ -61,48 +61,47 @@ Thetav=worb*obst
 Phiv=np.mod(wspin*obst,2*np.pi)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
-
 npix=hp.nside2npix(nside)
-#Ainit = np.dot(np.diag(1/np.sum(Ainit[:,:],axis=1)),Ainit)
-#Xinit = np.dot(np.diag(1/np.sum(Xinit[:,:],axis=1)),Xinit)
 
 lcall=np.dot(np.dot(W,Ainit),Xinit)
-
 noiselevel=0.0001
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
 ##################################################
 #lcall= np.dot(np.diag(1/np.sum(lcall[:,:],axis=1)),lcall)
 
-
 nside=16
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
-#normmat=np.diag(1.0/np.sum(lcall,axis=0))
 N=3
-Ntry=1000
+Ntry=100000
 epsilon=1.e-6
-lamA=1.e-2
-lamX=1.e2
-filename="uncAX_a"+str(np.log10(lamA))+"_try"+str(Ntry)
+lamA=1.e-3
+lamX=10**(1.0)
+filename="DetAX_a"+str(np.log10(lamA))+"x"+str(np.log10(lamX))+"_try"+str(Ntry)
 
 ## NMF Initialization ============================
-A0,X0=initnmf.init_random(N,npix,lcall)
-#A0,X0=initnmf.initpca(N,W,lcall,lamA)
-Ntryini=100000
-A,X,logmetric=runnmf.L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
-A0,X0=A,X
+#A0,X0=initnmf.init_random(N,npix,lcall)
+##A0,X0=initnmf.initpca(N,W,lcall,lamA)
+Ntryini=10000
+#A,X,logmetric=runnmf.MP_L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
+#A0,X0=A,X
+#np.savez("init_uncMP",A,X)
+dat=np.load("init_uncMP.npz")
+A0=dat["arr_0"]
+X0=dat["arr_1"]
+
 off=Ntryini
 #off=0.0
-#A,X,logmetric=runnmf.QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
-A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon)
+A,X,logmetric=runnmf.QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=1000,eta=1.e-6)
+#A,X,logmetric=runnmf.QP_L2_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=1.e-5)
+#A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0)
+
+#A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon,filename)
 np.savez(filename,A,X)
 
 #A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon)
-
 #A,X,logmetric=runnmf.L2VR_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
-
-
 #A,X,logmetric=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
 #A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
 
