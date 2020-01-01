@@ -76,9 +76,9 @@ W=WV[:,:]*WI[:,:]
 N=3
 Ntry=100000
 epsilon=1.e-6
-lamA=1.e-3
-lamX=10**(1.0)
-filename="DetAX_a"+str(np.log10(lamA))+"x"+str(np.log10(lamX))+"_try"+str(Ntry)
+lamA=1.e-2
+lamX=0.0
+filename="uncAX_a"+str(np.log10(lamA))+"x"+str(np.log10(lamX))+"_try"+str(Ntry)
 
 ## NMF Initialization ============================
 #A0,X0=initnmf.init_random(N,npix,lcall)
@@ -93,9 +93,9 @@ X0=dat["arr_1"]
 
 off=Ntryini
 #off=0.0
-A,X,logmetric=runnmf.QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=1000,eta=1.e-6)
-#A,X,logmetric=runnmf.QP_L2_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=1.e-5)
-#A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0)
+#A,X,logmetric=runnmf.QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6)
+#A,X,logmetric=runnmf.QP_L2_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6)
+A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6)
 
 #A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon,filename)
 np.savez(filename,A,X)
