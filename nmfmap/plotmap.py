@@ -5,7 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
 import matplotlib
-dat=np.load("npz/ax_dscovr0_0.npz")
+#dat=np.load("npznew/DetAX_a-2.0x1.0_try100000j32000.npz")
+dat=np.load("npznew/L2AX_a-2.0x2.0_try100000j19000.npz")
+#dat=np.load("npznew/uncAX_a-2.0x-inf_try100000j19000.npz")
+
 A=dat["arr_0"]
 X=dat["arr_1"]
 
@@ -36,14 +39,14 @@ ave_band=np.mean(np.array(bands),axis=1)
 cc=plt.cm.viridis
 fontsize=18
 matplotlib.rcParams.update({'font.size':fontsize})
-hp.mollview(A[:,0], title="Component 0",flip="geo",cmap=cc,min=0,max=1)
+hp.mollview(A[:,0], title="Component 0",flip="geo",cmap=cc)#,min=0,max=1)
 
 plt.savefig("C0.pdf", bbox_inches="tight", pad_inches=0.0)
 
-hp.mollview(A[:,1], title="Component 1",flip="geo",cmap=cc,min=0,max=1)
+hp.mollview(A[:,1], title="Component 1",flip="geo",cmap=cc)#,min=0,max=1)
 plt.savefig("C1.pdf", bbox_inches="tight", pad_inches=0.0)
 
-hp.mollview(A[:,2], title="Component 2",flip="geo",cmap=cc,min=0,max=1)
+hp.mollview(A[:,2], title="Component 2",flip="geo",cmap=cc)#,min=0,max=1)
 plt.savefig("C2.pdf", bbox_inches="tight", pad_inches=0.0)
 
 #hp.mollview(A[:,0]+A[:,1], title="0+1",flip="geo",cmap=plt.cm.jet)
@@ -64,7 +67,7 @@ ax.plot(water[:,0],water[:,1],c="gray",ls="-.",label="water")
 plt.xlim(0.4,0.9)
 
 #io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,malbedo,valexp)
-fac=0.28
+fac=0.33
 fac0=fac
 fac1=fac
 fac2=fac
@@ -84,7 +87,7 @@ plt.tick_params(labelsize=16)
 plt.ylabel("Reflection Spectra",fontsize=16)
 plt.xlabel("wavelength [micron]",fontsize=16)
 plt.legend(fontsize=13)
-
+plt.title("Unconstrained")
 plt.savefig("ref.pdf", bbox_inches="tight", pad_inches=0.0)
 
 A[(A>0.333333)*(A<0.333334)]=0
