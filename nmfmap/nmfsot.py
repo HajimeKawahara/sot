@@ -10,7 +10,8 @@ import cupy as cp
 import sys
 import healpy as hp
 import initnmf
-import runnmf
+#import runnmf_cpu as runnmf #CPU version (slow)
+import runnmf_gpu as runnmf #GPU version
 
 np.random.seed(34)
 
@@ -37,21 +38,15 @@ refsurfaces=[water,soil,veg]
 
 mmap,Ainit,Xinit=toymap.make_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
 ave_band=np.mean(np.array(bands),axis=1)
-
 io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,Xinit,valexp)
-#plt.show()
 
 ### Generating Multicolor Lightcurves
-#ephemeris setting
 inc=45.0/180.0*np.pi
-#inc=0.0
 Thetaeq=np.pi/2
 zeta=23.4/180.0*np.pi
-#zeta=60.0/180.0*np.pi 
 Pspin=23.9344699/24.0 #Pspin: a sidereal day
 wspin=2*np.pi/Pspin 
 Porb=365.242190402                                            
-#Porb=30.0
 worb=2*np.pi/Porb 
 N=1024
 expt=Porb #observation duration 10d
@@ -61,49 +56,41 @@ Thetav=worb*obst
 Phiv=np.mod(wspin*obst,2*np.pi)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
-
 npix=hp.nside2npix(nside)
-#Ainit = np.dot(np.diag(1/np.sum(Ainit[:,:],axis=1)),Ainit)
-#Xinit = np.dot(np.diag(1/np.sum(Xinit[:,:],axis=1)),Xinit)
 
 lcall=np.dot(np.dot(W,Ainit),Xinit)
-
 noiselevel=0.0001
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
-##################################################
-lcall= np.dot(np.diag(1/np.sum(lcall[:,:],axis=1)),lcall)
-
+#lcall= np.dot(np.diag(1/np.sum(lcall[:,:],axis=1)),lcall)
 
 nside=16
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
-#normmat=np.diag(1.0/np.sum(lcall,axis=0))
 N=3
-Ntry=10000
+Ntry=100000
 epsilon=1.e-6
-lamA=1.e-5
-lamX=1.e2
-filename="uncAX_a"+str(np.log10(lamA))+"_try"+str(Ntry)
+lamA=1.e-2
+lamX=1.e1
 
 ## NMF Initialization ============================
-A0,X0=initnmf.init_random(N,npix,lcall)
-#A0,X0=initnmf.initpca(N,W,lcall,lamA)
-Ntryini=10000
-A,X,logmetric=runnmf.L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
-A0,X0=A,X
-off=Ntryini
-#off=0.0
-#A,X,logmetric=runnmf.QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
-A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon)
+#A0,X0=initnmf.init_random(N,npix,lcall)
+##A0,X0=initnmf.initpca(N,W,lcall,lamA)
+#Ntryini=10000
+#Initialization by Multiplicative Update
+#A,X,logmetric=runnmf.MP_L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
+#A0,X0=A,X
+#np.savez("init_uncMP",A,X)
+## ===============================================
+dat=np.load("init_uncMP.npz")
+A0=dat["arr_0"]
+X0=dat["arr_1"]
+
+#regmode="L2-VRDet"
+regmode="L2-VRLD"
+
+filename=regmode+"AX_a"+str(np.log10(lamA))+"x"+str(np.log10(lamX))+"_try"+str(Ntry)
+
+A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6)
 np.savez(filename,A,X)
 
-#A,X,logmetric=runnmf.QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon)
-
-#A,X,logmetric=runnmf.L2VR_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
-
-
-#A,X,logmetric=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
-#A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
-
-#plt.show()
