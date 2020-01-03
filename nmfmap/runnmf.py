@@ -14,55 +14,60 @@ def QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
     check_nonnegative(X0,"X")
     res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.linalg.det(np.dot(X0,X0.T))
     print("Ini residual=",res)
-    A=np.copy(A0)
-    X=np.copy(X0)
-    Y=np.copy(lcall)
-    Ni=np.shape(Y)[0]
-    Nl=np.shape(Y)[1]
-    Nk=np.shape(A)[1]
-    Nj=np.shape(A)[0]
+    Ni=np.shape(lcall)[0]
+    Nl=np.shape(lcall)[1]
+    Nk=np.shape(A0)[1]
+    Nj=np.shape(A0)[0]
+    Y=cp.asarray(lcall)
+    W=cp.asarray(Win)
+    A=cp.asarray(A0)
+    X=cp.asarray(X0)
 
-    WTW=np.dot(W.T,W)
+    WTW=cp.dot(W.T,W)
 
     jj=0
     for i in range(0,Ntry):
         print(i)
         ## xk
         for k in range(0,Nk):
-            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            Delta=Y-np.dot(W,AX)
+#            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
+            AX=cp.dot(A,X) - cp.dot(A[:,k:k+1],X[k:k+1,:]) 
+            Delta=Y-cp.dot(W,AX)
             ak=A[:,k]
-            Wa=np.dot(W,ak)
-            W_x=np.dot(Wa,Wa)*np.eye(Nl)
-            bx=np.dot(np.dot(Delta.T,W),ak)
+            Wa=cp.dot(W,ak)
+            W_x=cp.dot(Wa,Wa)*cp.eye(Nl)
+            bx=cp.dot(cp.dot(Delta.T,W),ak)
             #Det XXT
-            Xminus = np.delete(X,obj=k,axis=0)
-            XXTinverse=np.linalg.inv(np.dot(Xminus,Xminus.T))
-            K=np.eye(Nl) - np.dot(np.dot(Xminus.T,XXTinverse),Xminus)
-            K=K*np.linalg.det(np.dot(Xminus,Xminus.T))*lamX
-            X[k,:]=APGr(W_x + K ,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+            Xminus = np.delete(cp.asnumpy(X),obj=k,axis=0)
+            XXTinverse=cp.linalg.inv(cp.dot(X,X.T)-cp.dot(X[k:k+1,:],X[k:k+1,:].T))
+            Kn=cp.eye(Nl) - cp.dot(np.dot(Xminus.T,XXTinverse),Xminus)
+            Kn=Kn*np.linalg.det(np.dot(Xminus,Xminus.T))*lamX
+            K=cp.asarray(Kn)
+            X[k,:]=APGr(Nl,W_x + K ,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
 
         ## ak
         for k in range(0,Nk):
-            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            Delta=Y-np.dot(W,AX)
+#            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
+            AX=cp.dot(A,X) - cp.dot(A[:,k:k+1],X[k:k+1,:]) 
+
+            Delta=Y-cp.dot(W,AX)
             xk=X[k,:]
-            W_a=(np.dot(xk,xk))*(np.dot(W.T,W))
-            b=np.dot(np.dot(W.T,Delta),xk)
-            T_a=lamA*np.eye(Nj)
-            A[:,k]=APGr(W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
+            W_a=(cp.dot(xk,xk))*(cp.dot(W.T,W))
+            b=cp.dot(cp.dot(W.T,Delta),xk)
+            T_a=lamA*cp.eye(Nj)
+            A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
             
-        res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)+lamX*np.linalg.det(np.dot(X,X.T))
+        #res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)+lamX*np.linalg.det(np.dot(X,X.T))
         print("Residual=",res)
         #normalization
         #LogNMF(i,A,X,Nk)
         bandl=np.array(range(0,len(X[0,:])))
         import terminalplot
-        terminalplot.plot(list(bandl),list(X[np.mod(jj,Nk),:]))
+        terminalplot.plot(list(bandl),list(cp.asnumpy(X[np.mod(jj,Nk),:])))
 
         jj=jj+1
         if np.mod(jj,1000) == 0:
-            np.savez(filename+"j"+str(jj),A,X)
+            np.savez(filename+"j"+str(jj),cp.asunmpy(A),cp.asnumpy(X))
 
             
     logmetric=[]
@@ -220,21 +225,21 @@ def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon,filename,NtryAPGX=10,NtryAPGA=100
     logmetric=[]
     return A, X, logmetric
 
-def APGr(Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
+def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
     #Accelerated Projected Gradient + restart
-    n=np.shape(Q)[0]
-    normQ = np.sqrt(np.sum(Q**2))
-    Theta1 = np.eye(n) - Q/normQ
+#    n=np.shape(Q)[0]
+    normQ = cp.sqrt(cp.sum(Q**2))
+    Theta1 = cp.eye(n) - Q/normQ
     theta2 = p/normQ
-    x = np.copy(x0)
-    y = np.copy(x0)
+    x = cp.copy(x0)
+    y = cp.copy(x0)
     x[x<0]=0.0
     alpha=alpha0
-    cost0=0.5*np.dot(x0,np.dot(Q,x0)) - np.dot(p,x0)
+    cost0=0.5*cp.dot(x0,cp.dot(Q,x0)) - cp.dot(p,x0)
     costp=cost0
     for i in range(0,Ntry):
-        xp=np.copy(x)
-        x = np.dot(Theta1,y) + theta2
+        xp=cp.copy(x)
+        x = cp.dot(Theta1,y) + theta2
         x[x<0] = 0.0
         dx=x-xp
         aa=alpha*alpha
@@ -242,16 +247,16 @@ def APGr(Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
         alpha=0.5*(np.sqrt(aa*aa + 4*aa) - aa)
         beta=beta/(alpha + aa)
         y=x+beta*dx
-        cost=0.5*np.dot(x,np.dot(Q,x)) - np.dot(p,x)
+        cost=0.5*cp.dot(x,cp.dot(Q,x)) - cp.dot(p,x)
         if cost > costp:
-            x = np.dot(Theta1,xp) + theta2
-            y = np.copy(x)
+            x = cp.dot(Theta1,xp) + theta2
+            y = cp.copy(x)
             alpha=alpha0
         elif costp - cost < eta:
             print(i,cost0 - cost)
             return x
 
-        costp=np.copy(cost)
+        costp=cp.copy(cost)
         if cost != cost:
             print("Halt at APGr")
             print("Q,p,x0",Q,p,x0)
