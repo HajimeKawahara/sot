@@ -7,44 +7,70 @@ def check_nonnegative(Y,lab):
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
-def QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0):
+def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0, delta=1.e-6):
     import scipy
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
     check_nonnegative(X0,"X")
-    res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.linalg.det(np.dot(X0,X0.T))
-    print("Ini residual=",res)
     Ni=np.shape(lcall)[0]
     Nl=np.shape(lcall)[1]
     Nk=np.shape(A0)[1]
     Nj=np.shape(A0)[0]
+
+    if reg=="L2-VRDet":
+        res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.linalg.det(np.dot(X0,X0.T))
+    elif reg=="L2-VRLD":
+        res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.log(np.linalg.det(np.dot(X0,X0.T)+delta*np.eye(Nk)))
+    elif reg=="Dual-L2":
+        res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.sum(X0**2)
+    elif reg=="Unconstrained":
+        res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)
+    else:
+        print("No mode. Halt.")
+        sys.exit()
+        
+    print("Ini residual=",res)
     Y=cp.asarray(lcall)
     W=cp.asarray(Win)
     A=cp.asarray(A0)
     X=cp.asarray(X0)
-
     WTW=cp.dot(W.T,W)
 
     jj=0
     for i in range(0,Ntry):
         print(i)
         ## xk
+        if reg=="L2-VRLD":
+            sys.exit()
+            D=lamX*cp.linalg.inv(cp.dot(X.T,X) + delta*cp.eye(Nl))
+
         for k in range(0,Nk):
-#            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            AX=cp.dot(A,X) - cp.dot(A[:,k:k+1],X[k:k+1,:]) 
+            AX=cp.dot(A,X) - cp.dot(A[:,k:k+1],X[k:k+1,:])
+            #AXn=np.dot(np.delete(cp.asnumpy(A),obj=k,axis=1),np.delete(cp.asnumpy(X),obj=k,axis=0))
+            #print(np.sum(AXn-cp.asnumpy(AX)))
             Delta=Y-cp.dot(W,AX)
             ak=A[:,k]
             Wa=cp.dot(W,ak)
             W_x=cp.dot(Wa,Wa)*cp.eye(Nl)
             bx=cp.dot(cp.dot(Delta.T,W),ak)
-            #Det XXT
-            Xminus = np.delete(cp.asnumpy(X),obj=k,axis=0)
-            XXTinverse=cp.linalg.inv(cp.dot(X,X.T)-cp.dot(X[k:k+1,:],X[k:k+1,:].T))
-            Kn=cp.eye(Nl) - cp.dot(np.dot(Xminus.T,XXTinverse),Xminus)
-            Kn=Kn*np.linalg.det(np.dot(Xminus,Xminus.T))*lamX
-            K=cp.asarray(Kn)
-            X[k,:]=APGr(Nl,W_x + K ,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
-
+            if reg=="L2-VRDet":
+                Xn=cp.asnumpy(X)
+                Xminus = np.delete(Xn,obj=k,axis=0)
+                XXTinverse=np.linalg.inv(np.dot(Xminus,Xminus.T))
+                Kn=np.eye(Nl) - np.dot(np.dot(Xminus.T,XXTinverse),Xminus)
+                Kn=Kn*np.linalg.det(np.dot(Xminus,Xminus.T))*lamX
+                K=cp.asarray(Kn)
+                X[k,:]=APGr(Nl,W_x + K ,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+            elif reg=="L2-VRLD":
+                E=D[k,k]*np.eye(Nl)
+                sys.exit()
+                X[k,:]=APGr(Nl,W_x + E,bx + ex,X[k,:],Ntry=NtryAPGX, eta=eta)                
+            elif reg=="Dual-L2":
+                T_x=lamX*cp.eye(Nj)
+                X[k,:]=APGr(Nl,W_x + T_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+            elif reg=="Unconstrained":
+                X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+                            
         ## ak
         for k in range(0,Nk):
 #            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
@@ -56,8 +82,18 @@ def QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
             b=cp.dot(cp.dot(W.T,Delta),xk)
             T_a=lamA*cp.eye(Nj)
             A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
-            
-        #res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)+lamX*np.linalg.det(np.dot(X,X.T))
+
+        #A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
+
+        if reg=="L2-VRDet":
+            res=cp.sum((Y-cp.dot(cp.dot(W,A),X))**2)+lamA*cp.sum(A**2)+lamX*cp.linalg.det(cp.dot(X,X.T))
+        elif reg=="L2-VRLD":
+            res=cp.sum((Y-cp.dot(cp.dot(W,A),X))**2)+lamA*cp.sum(A0**2)+lamX*cp.log(cp.linalg.det(cp.dot(X,X.T)+delta*cp.eye(Nk)))
+        elif reg=="Dual-L2":
+            res=cp.sum((Y-cp.dot(cp.dot(W,A),X))**2)+lamA*cp.sum(A**2)+lamX*cp.sum(X**2)
+        elif reg=="Unconstrained":
+            res=cp.sum((Y-cp.dot(cp.dot(W,A),X))**2)+lamA*cp.sum(A**2)
+        
         print("Residual=",res)
         #normalization
         #LogNMF(i,A,X,Nk)
@@ -68,159 +104,6 @@ def QP_DET_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
         jj=jj+1
         if np.mod(jj,1000) == 0:
             np.savez(filename+"j"+str(jj),cp.asunmpy(A),cp.asnumpy(X))
-
-            
-    logmetric=[]
-    return A, X, logmetric
-
-def QP_L2_NMR(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0):
-    import scipy
-    check_nonnegative(lcall,"LC")
-    check_nonnegative(A0,"A")
-    check_nonnegative(X0,"X")
-    res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.sum(X0**2)
-    print("Ini residual=",res)
-    A=np.copy(A0)
-    X=np.copy(X0)
-    Y=np.copy(lcall)
-    Ni=np.shape(Y)[0]
-    Nl=np.shape(Y)[1]
-    Nk=np.shape(A)[1]
-    Nj=np.shape(A)[0]
-
-    WTW=np.dot(W.T,W)
-
-    jj=0
-    for i in range(0,Ntry):
-        print(i)
-        ## xk
-        for k in range(0,Nk):
-            print("X, k=",k)
-            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            Delta=Y-np.dot(W,AX)
-            ak=A[:,k]
-            Wa=np.dot(W,ak)
-            W_x=np.dot(Wa,Wa)*np.eye(Nl)
-            bx=np.dot(np.dot(Delta.T,W),ak)
-            T_x=lamX*np.eye(Nl)
-
-            Xpropose=APGr(W_x+T_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
-            if np.sum(Xpropose) > 0.0:
-                X[k,:]=Xpropose
-            else:
-                print("Zero end")
-                sys.exit()
-        ## ak
-        res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)
-        for k in range(0,Nk):
-            print("A, k=",k)
-            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            Delta=Y-np.dot(W,AX)
-            xk=X[k,:]
-            W_a=(np.dot(xk,xk))*(np.dot(W.T,W))
-            b=np.dot(np.dot(W.T,Delta),xk)
-            T_a=lamA*np.eye(Nj)
-            Apropose=APGr(W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
-            if np.sum(Xpropose) > 0.0:
-                A[:,k]=Apropose
-            else:
-                print("Zero end")
-                sys.exit()
-
-        #####################
-#        nprev=(np.sum(W@A@X))
-#        X = np.dot(np.diag(1/np.sum(X[:,:],axis=1)),X)
-#        A = np.dot(np.diag(1/np.sum(A[:,:],axis=1)),A)
-#        nup=(np.sum(W@A@X))
-#        X=X*nprev/nup
-        #####################
-        res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)+lamX*np.sum(X**2)
-        print("Residual=",res)
-
-        #normalization
-        LogNMF(i,A,X,Nk)
-        bandl=np.array(range(0,len(X[0,:])))
-        import terminalplot
-        terminalplot.plot(list(bandl),list(X[np.mod(jj,Nk),:]))
-
-        jj=jj+1
-        if np.mod(jj,1000) == 0:
-            np.savez(filename+"j"+str(jj),A,X)
-            
-    logmetric=[]
-    return A, X, logmetric
-
-def QP_UNC_NMR(Ntry,lcall,W,A0,X0,lamA,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0):
-    import scipy
-    check_nonnegative(lcall,"LC")
-    check_nonnegative(A0,"A")
-    check_nonnegative(X0,"X")
-    res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)
-    print("Ini residual=",res)
-    A=np.copy(A0)
-    X=np.copy(X0)
-    Y=np.copy(lcall)
-    Ni=np.shape(Y)[0]
-    Nl=np.shape(Y)[1]
-    Nk=np.shape(A)[1]
-    Nj=np.shape(A)[0]
-
-    WTW=np.dot(W.T,W)
-
-    jj=0
-    for i in range(0,Ntry):
-        print(i)
-        ## xk
-        for k in range(0,Nk):
-            print("X, k=",k)
-            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            Delta=Y-np.dot(W,AX)
-            ak=A[:,k]
-            Wa=np.dot(W,ak)
-            W_x=np.dot(Wa,Wa)*np.eye(Nl)
-            bx=np.dot(np.dot(Delta.T,W),ak)
-            Xpropose=APGr(W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
-            if np.sum(Xpropose) > 0.0:
-                X[k,:]=Xpropose
-            else:
-                print("Zero end")
-                sys.exit()
-        ## ak
-        res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)
-        for k in range(0,Nk):
-            print("A, k=",k)
-            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            Delta=Y-np.dot(W,AX)
-            xk=X[k,:]
-            W_a=(np.dot(xk,xk))*(np.dot(W.T,W))
-            b=np.dot(np.dot(W.T,Delta),xk)
-            T_a=lamA*np.eye(Nj)
-            Apropose=APGr(W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
-            if np.sum(Xpropose) > 0.0:
-                A[:,k]=Apropose
-            else:
-                print("Zero end")
-                sys.exit()
-
-        #####################
-#        nprev=(np.sum(W@A@X))
-#        X = np.dot(np.diag(1/np.sum(X[:,:],axis=1)),X)
-#        A = np.dot(np.diag(1/np.sum(A[:,:],axis=1)),A)
-#        nup=(np.sum(W@A@X))
-#        X=X*nprev/nup
-        #####################
-        res=np.sum((lcall-W@A@X)**2)+lamA*np.sum(A**2)
-        print("Residual=",res)
-
-        #normalization
-        LogNMF(i,A,X,Nk)
-        bandl=np.array(range(0,len(X[0,:])))
-        import terminalplot
-        terminalplot.plot(list(bandl),list(X[np.mod(jj,Nk),:]))
-
-        jj=jj+1
-        if np.mod(jj,1000) == 0:
-            np.savez(filename+"j"+str(jj),A,X)
             
     logmetric=[]
     return A, X, logmetric
