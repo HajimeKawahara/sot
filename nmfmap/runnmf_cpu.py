@@ -57,9 +57,9 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
                 X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
 
         ## ak
-        for k in range(0,Nk):
-            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            Delta=Y-np.dot(W,AX)
+#        for k in range(0,Nk):
+#            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
+#            Delta=Y-np.dot(W,AX)
             xk=X[k,:]
             W_a=(np.dot(xk,xk))*(np.dot(W.T,W))
             b=np.dot(np.dot(W.T,Delta),xk)
