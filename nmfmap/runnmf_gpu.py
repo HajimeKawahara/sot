@@ -39,6 +39,7 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
     jj=0
     for i in range(0,Ntry):
         print(i)
+
         ## xk
         if reg=="L2-VRLD":
             sys.exit()
@@ -72,18 +73,15 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
                 X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
                             
         ## ak
-        for k in range(0,Nk):
-#            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            AX=cp.dot(A,X) - cp.dot(A[:,k:k+1],X[k:k+1,:]) 
-
-            Delta=Y-cp.dot(W,AX)
+#        for k in range(0,Nk):
+#            AX=cp.dot(A,X) - cp.dot(A[:,k:k+1],X[k:k+1,:]) 
+#            Delta=Y-cp.dot(W,AX)
             xk=X[k,:]
             W_a=(cp.dot(xk,xk))*(cp.dot(W.T,W))
             b=cp.dot(cp.dot(W.T,Delta),xk)
             T_a=lamA*cp.eye(Nj)
             A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
 
-        #A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
 
         if reg=="L2-VRDet":
             res=cp.sum((Y-cp.dot(cp.dot(W,A),X))**2)+lamA*cp.sum(A**2)+lamX*cp.linalg.det(cp.dot(X,X.T))
