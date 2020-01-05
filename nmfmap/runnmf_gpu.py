@@ -83,7 +83,7 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
             T_a=lamA*cp.eye(Nj)
             A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
 
-        #A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
+        A = cp.dot(cp.diag(1/cp.sum(A[:,:],axis=1)),A)
 
         if reg=="L2-VRDet":
             res=cp.sum((Y-cp.dot(cp.dot(W,A),X))**2)+lamA*cp.sum(A**2)+lamX*cp.linalg.det(cp.dot(X,X.T))

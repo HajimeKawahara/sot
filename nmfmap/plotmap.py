@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
 import matplotlib
-#dat=np.load("npznew/DetAX_a-2.0x1.0_try100000j32000.npz")
-dat=np.load("npznew/L2AX_a-2.0x2.0_try100000j19000.npz")
+#dat=np.load("npznew/DetAX_a-2.0x2.0_try100000j48000.npz")
+#dat=np.load("npznew/L2AX_a-2.0x2.0_try100000j19000.npz")
 #dat=np.load("npznew/uncAX_a-2.0x-inf_try100000j19000.npz")
-
+dat=np.load("npznew/L2-VRLDAX_a-2.0x2.0_try100000j4000.npz")
 A=dat["arr_0"]
 X=dat["arr_1"]
 
