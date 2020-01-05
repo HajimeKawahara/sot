@@ -20,6 +20,7 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
     if reg=="L2-VRDet":
         res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.linalg.det(np.dot(X0,X0.T))
     elif reg=="L2-VRLD":
+        nu=1.0
         res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.log(np.linalg.det(np.dot(X0,X0.T)+delta*np.eye(Nk)))
     elif reg=="Dual-L2":
         res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.sum(X0**2)
@@ -37,18 +38,13 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
     WTW=cp.dot(W.T,W)
 
     jj=0
+    resall=[]
     for i in range(0,Ntry):
         print(i)
 
         ## xk
-        if reg=="L2-VRLD":
-            sys.exit()
-            D=lamX*cp.linalg.inv(cp.dot(X.T,X) + delta*cp.eye(Nl))
-
         for k in range(0,Nk):
             AX=cp.dot(A,X) - cp.dot(A[:,k:k+1],X[k:k+1,:])
-            #AXn=np.dot(np.delete(cp.asnumpy(A),obj=k,axis=1),np.delete(cp.asnumpy(X),obj=k,axis=0))
-            #print(np.sum(AXn-cp.asnumpy(AX)))
             Delta=Y-cp.dot(W,AX)
             ak=A[:,k]
             Wa=cp.dot(W,ak)
@@ -60,40 +56,42 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
                 XXTinverse=np.linalg.inv(np.dot(Xminus,Xminus.T))
                 Kn=np.eye(Nl) - np.dot(np.dot(Xminus.T,XXTinverse),Xminus)
                 Kn=Kn*np.linalg.det(np.dot(Xminus,Xminus.T))*lamX
-                K=cp.asarray(Kn)
-                X[k,:]=APGr(Nl,W_x + K ,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+                D_x=cp.asarray(Kn)
+                X[k,:]=APGr(Nl,W_x + D_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
             elif reg=="L2-VRLD":
-                E=D[k,k]*np.eye(Nl)
-                sys.exit()
-                X[k,:]=APGr(Nl,W_x + E,bx + ex,X[k,:],Ntry=NtryAPGX, eta=eta)                
+                E_x=lamX*nu*cp.eye(Nl)
+                X[k,:]=APGr(Nl,W_x + E_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
             elif reg=="Dual-L2":
-                T_x=lamX*cp.eye(Nj)
+                T_x=lamX*cp.eye(Nl)
                 X[k,:]=APGr(Nl,W_x + T_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
             elif reg=="Unconstrained":
                 X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
                             
         ## ak
-#        for k in range(0,Nk):
-#            AX=cp.dot(A,X) - cp.dot(A[:,k:k+1],X[k:k+1,:]) 
-#            Delta=Y-cp.dot(W,AX)
             xk=X[k,:]
             W_a=(cp.dot(xk,xk))*(cp.dot(W.T,W))
             b=cp.dot(cp.dot(W.T,Delta),xk)
             T_a=lamA*cp.eye(Nj)
             A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
 
-
+        Like=cp.asnumpy(cp.sum((Y-cp.dot(cp.dot(W,A),X))**2))
+        RA=cp.asnumpy(lamA*cp.sum(A0**2))
         if reg=="L2-VRDet":
-            res=cp.sum((Y-cp.dot(cp.dot(W,A),X))**2)+lamA*cp.sum(A**2)+lamX*cp.linalg.det(cp.dot(X,X.T))
+            RX=cp.asnumpy(lamX*cp.linalg.det(cp.dot(X,X.T)))
         elif reg=="L2-VRLD":
-            res=cp.sum((Y-cp.dot(cp.dot(W,A),X))**2)+lamA*cp.sum(A0**2)+lamX*cp.log(cp.linalg.det(cp.dot(X,X.T)+delta*cp.eye(Nk)))
+            eig=np.linalg.eigvals(cp.asnumpy(cp.dot(X,X.T) + delta*cp.eye(Nk)))
+            nu=1.0/np.min(np.abs(eig))
+            print("nu=",nu)
+            RX=cp.asnumpy(lamX*cp.log(cp.linalg.det(cp.dot(X,X.T)+delta*cp.eye(Nk))))
         elif reg=="Dual-L2":
-            res=cp.sum((Y-cp.dot(cp.dot(W,A),X))**2)+lamA*cp.sum(A**2)+lamX*cp.sum(X**2)
+            RX=cp.asnumpy(lamX*cp.sum(X**2))
         elif reg=="Unconstrained":
-            res=cp.sum((Y-cp.dot(cp.dot(W,A),X))**2)+lamA*cp.sum(A**2)
-        
+            RX=0.0
+            
+        res=Like+RA+RX
+        resall.append([res,Like,RA,RX])                
         print("Residual=",res)
-        #normalization
+
         #LogNMF(i,A,X,Nk)
         bandl=np.array(range(0,len(X[0,:])))
         import terminalplot
@@ -101,15 +99,15 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
 
         jj=jj+1
         if np.mod(jj,1000) == 0:
-            np.savez(filename+"j"+str(jj),cp.asunmpy(A),cp.asnumpy(X))
+            np.savez(filename+"j"+str(jj),cp.asnumpy(A),cp.asnumpy(X),resall)
             
-    logmetric=[]
-    return A, X, logmetric
+    return A, X, resall
 
 def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
     #Accelerated Projected Gradient + restart
 #    n=np.shape(Q)[0]
-    normQ = cp.sqrt(cp.sum(Q**2))
+    normQ = np.linalg.norm(cp.asnumpy(Q),2)
+#    print("L=",1/normQ)
     Theta1 = cp.eye(n) - Q/normQ
     theta2 = p/normQ
     x = cp.copy(x0)

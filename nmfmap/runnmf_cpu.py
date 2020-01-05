@@ -90,7 +90,7 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
 def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
     #Accelerated Projected Gradient + restart
     #n=np.shape(Q)[0]
-    normQ = np.sqrt(np.sum(Q**2))
+    normQ = np.linalg.norm(Q,2)
     Theta1 = np.eye(n) - Q/normQ
     theta2 = p/normQ
     x = np.copy(x0)

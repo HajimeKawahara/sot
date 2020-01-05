@@ -73,7 +73,7 @@ N=3
 Ntry=100000
 epsilon=1.e-6
 lamA=1.e-2
-lamX=1.e1
+lamX=1.e2
 
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(N,npix,lcall)
@@ -88,8 +88,8 @@ A0,X0=initnmf.init_random(N,npix,lcall)
 #A0=dat["arr_0"]
 #X0=dat["arr_1"]
 
-regmode="L2-VRDet"
-#regmode="L2-VRLD"
+#regmode="L2-VRDet"
+regmode="L2-VRLD"
 
 filename=regmode+"AX_a"+str(np.log10(lamA))+"x"+str(np.log10(lamX))+"_try"+str(Ntry)
 
