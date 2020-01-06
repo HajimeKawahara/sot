@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
 
-dat=np.load("ax.npz")
+dat=np.load("axVR0_2.npz")
 A=dat["arr_0"]
 X=dat["arr_1"]
 
