@@ -1,13 +1,13 @@
 import cupy as cp
 import numpy as np
 import sys
-
+import time
 def check_nonnegative(Y,lab):
     if np.min(Y)<0:
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
-def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0, delta=1.e-6):
+def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0, delta=1.e-6, off=0, nu=1.0,Lipx="norm2",Lipa="frobenius"):
     import scipy
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
@@ -20,7 +20,6 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
     if reg=="L2-VRDet":
         res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.linalg.det(np.dot(X0,X0.T))
     elif reg=="L2-VRLD":
-        nu=1.0
         res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.log(np.linalg.det(np.dot(X0,X0.T)+delta*np.eye(Nk)))
     elif reg=="Dual-L2":
         res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.sum(X0**2)
@@ -37,7 +36,7 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
     X=cp.asarray(X0)
     WTW=cp.dot(W.T,W)
 
-    jj=0
+    jj=off
     resall=[]
     for i in range(0,Ntry):
         print(i)
@@ -57,22 +56,22 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
                 Kn=np.eye(Nl) - np.dot(np.dot(Xminus.T,XXTinverse),Xminus)
                 Kn=Kn*np.linalg.det(np.dot(Xminus,Xminus.T))*lamX
                 D_x=cp.asarray(Kn)
-                X[k,:]=APGr(Nl,W_x + D_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+                X[k,:]=APGr(Nl,W_x + D_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
             elif reg=="L2-VRLD":
                 E_x=lamX*nu*cp.eye(Nl)
-                X[k,:]=APGr(Nl,W_x + E_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+                X[k,:]=APGr(Nl,W_x + E_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
             elif reg=="Dual-L2":
                 T_x=lamX*cp.eye(Nl)
-                X[k,:]=APGr(Nl,W_x + T_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+                X[k,:]=APGr(Nl,W_x + T_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
             elif reg=="Unconstrained":
-                X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+                X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
                             
         ## ak
             xk=X[k,:]
             W_a=(cp.dot(xk,xk))*(cp.dot(W.T,W))
             b=cp.dot(cp.dot(W.T,Delta),xk)
             T_a=lamA*cp.eye(Nj)
-            A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
+            A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta, Lip=Lipa)
 
         Like=cp.asnumpy(cp.sum((Y-cp.dot(cp.dot(W,A),X))**2))
         RA=cp.asnumpy(lamA*cp.sum(A0**2))
@@ -93,9 +92,10 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
         print("Residual=",res)
 
         #LogNMF(i,A,X,Nk)
-        bandl=np.array(range(0,len(X[0,:])))
-        import terminalplot
-        terminalplot.plot(list(bandl),list(cp.asnumpy(X[np.mod(jj,Nk),:])))
+        if np.mod(jj,10)==0:
+            bandl=np.array(range(0,len(X[0,:])))
+            import terminalplot
+            terminalplot.plot(list(bandl),list(cp.asnumpy(X[np.mod(jj,Nk),:])))
 
         jj=jj+1
         if np.mod(jj,1000) == 0:
@@ -103,11 +103,16 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
             
     return A, X, resall
 
-def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
+def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0, Lip="frobenius"):
     #Accelerated Projected Gradient + restart
 #    n=np.shape(Q)[0]
-    normQ = np.linalg.norm(cp.asnumpy(Q),2)
-#    print("L=",1/normQ)
+#    st=time.time()
+    if Lip=="frobenius":
+        normQ = cp.sqrt(cp.sum(Q**2))
+    elif Lip=="norm2":        
+        normQ = np.linalg.norm(cp.asnumpy(Q),2)        
+#    ed=time.time()
+#    print("norm2",ed-st,"sec")
     Theta1 = cp.eye(n) - Q/normQ
     theta2 = p/normQ
     x = cp.copy(x0)
@@ -129,10 +134,14 @@ def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
         cost=0.5*cp.dot(x,cp.dot(Q,x)) - cp.dot(p,x)
         if cost > costp:
             x = cp.dot(Theta1,xp) + theta2
+            x[x<0] = 0.0            
             y = cp.copy(x)
             alpha=alpha0
         elif costp - cost < eta:
             print(i,cost0 - cost)
+#            edd=time.time()
+#            print("APG",edd-ed,"sec")
+
             return x
 
         costp=cp.copy(cost)
@@ -143,6 +152,8 @@ def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
             sys.exit()
             
     print(i,cost0 - cost)
+#    edd=time.time()
+#    print("APG",edd-ed,"sec")
 
     return x
         

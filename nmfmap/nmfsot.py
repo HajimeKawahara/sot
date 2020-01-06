@@ -10,8 +10,8 @@ import cupy as cp
 import sys
 import healpy as hp
 import initnmf
-import runnmf_cpu as runnmf #CPU version (slow)
-#import runnmf_gpu as runnmf #GPU version
+#import runnmf_cpu as runnmf #CPU version (slow)
+import runnmf_gpu as runnmf #GPU version
 
 np.random.seed(34)
 
@@ -78,21 +78,11 @@ lamX=1.e2
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(N,npix,lcall)
 #A0,X0=initnmf.initpca(N,W,lcall,lamA)
-#Ntryini=10000
-#Initialization by Multiplicative Update
-#A,X,logmetric=runnmf.MP_L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
-#A0,X0=A,X
-#np.savez("init_uncMP",A,X)
-## ===============================================
-#dat=np.load("init_uncMP.npz")
-#A0=dat["arr_0"]
-#X0=dat["arr_1"]
 
 #regmode="L2-VRDet"
 regmode="L2-VRLD"
-
+nu0=1.0
 filename=regmode+"AX_a"+str(np.log10(lamA))+"x"+str(np.log10(lamX))+"_try"+str(Ntry)
-
-A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6)
+A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,off=4000,nu=nu0)
 np.savez(filename,A,X)
 

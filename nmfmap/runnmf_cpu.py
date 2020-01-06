@@ -7,7 +7,7 @@ def check_nonnegative(Y,lab):
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
-def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0,delta=1.e-6):
+def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0,delta=1.e-6,Lipx="norm2",Lipa="frobenius"):
     import scipy
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
@@ -54,15 +54,15 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
                 XXTinverse=np.linalg.inv(np.dot(Xminus,Xminus.T))
                 K=np.eye(Nl) - np.dot(np.dot(Xminus.T,XXTinverse),Xminus)
                 K=K*np.linalg.det(np.dot(Xminus,Xminus.T))*lamX
-                X[k,:]=APGr(Nl,W_x + K ,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+                X[k,:]=APGr(Nl,W_x + K ,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
             elif reg=="L2-VRLD":
                 E_x=lamX*nu*np.eye(Nl)
-                X[k,:]=APGr(Nl,W_x + E_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+                X[k,:]=APGr(Nl,W_x + E_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
             elif reg=="Dual-L2":
                 T_x=lamX*np.eye(Nj)
-                X[k,:]=APGr(Nl,W_x + T_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+                X[k,:]=APGr(Nl,W_x + T_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
             elif reg=="Unconstrained":
-                X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+                X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
 
         ## ak
 #        for k in range(0,Nk):
@@ -72,7 +72,7 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
             W_a=(np.dot(xk,xk))*(np.dot(W.T,W))
             b=np.dot(np.dot(W.T,Delta),xk)
             T_a=lamA*np.eye(Nj)
-            A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
+            A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta, Lip=Lipa)
 
         Like=(np.sum((Y-np.dot(np.dot(W,A),X))**2))
         RA=(lamA*np.sum(A0**2))
@@ -93,9 +93,10 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
         print("Residual=",res)
         #normalization
         #LogNMF(i,A,X,Nk)
-        bandl=np.array(range(0,len(X[0,:])))
-        import terminalplot
-        terminalplot.plot(list(bandl),list(X[np.mod(jj,Nk),:]))
+        if np.mod(jj,100) == 0:
+            bandl=np.array(range(0,len(X[0,:])))
+            import terminalplot
+            terminalplot.plot(list(bandl),list(X[np.mod(jj,Nk),:]))
 
         jj=jj+1
         if np.mod(jj,1000) == 0:
