@@ -10,7 +10,7 @@ import cupy as cp
 import sys
 import healpy as hp
 import initnmf
-import runnmf
+import runnmf_gpu as runnmf
 import read_dscovr as rd
 
 np.random.seed(34)
@@ -19,31 +19,24 @@ np.random.seed(34)
 nside=16
 npix=hp.nside2npix(nside)
 W,t,lcall=rd.read_dscovr("/home/kawahara/exomap/data/for_HKawahara",9)
-
+lcall=lcall*1000
 noiselevel=0.0001
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
 ##################################################
 
-#normmat=np.diag(1.0/np.sum(lcall,axis=0))
 N=3
-lamA=1.e-6
-lamX=1.e-3
+lamA=1.e6
+lamX=0.0
+Ntry=100000
+epsilon=1.e-6
+#regmode="L2-VRDet"
+#regmode="L2-VRLD"
+regmode="Unconstrained"
+filename="DSCOVR"+regmode+"AX_a"+str(np.log10(lamA))+"x"+str(np.log10(lamX))+"_try"+str(Ntry)
 
-## NMF Initialization ============================
-#A0,X0=initnmf.init_random(N,npix,lcall)
-A0,X0=initnmf.initpca(N,W,lcall,lamA)
-runnmf.LogNMF(-1,A0,X0,N)
+A0,X0=initnmf.init_random(N,npix,lcall)
 
-Ntry=10000000
-#lamA=0.0
-#lamX=0.0
-epsilon=1.e-16
+A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6)
+np.savez(filename,A,X)
 
-#A,X=runnmf.NG_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
-#A,X=runnmf.NG_L2MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
-A,X,logmetric=runnmf.L2_NMF(Ntry,lcall,W,A0,X0,lamA,lamX,epsilon)
-#A,X=runnmf.QP_MVC_NMF(Ntry,lcall,W,A0,X0,lam,epsilon)
-
-np.savez("ax_dscovr"+str(int(np.log10(lamX)))+"_"+str(int(np.log10(lamA))),A,X)
-np.savez("metric_dscovr"+str(int(np.log10(lamX)))+"_"+str(int(np.log10(lamA))),logmetric)
 #plt.show()

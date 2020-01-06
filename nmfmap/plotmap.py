@@ -4,8 +4,13 @@ import toymap
 import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
+import matplotlib
+#dat=np.load("npznew/DetAX_a-2.0x1.0_try100000j32000.npz")
+#dat=np.load("npznew/L2AX_a-2.0x2.0_try100000j19000.npz")
+dat=np.load("npznew/DSCOVRUnconstrainedAX_a6.0x-inf_try100000j1000.npz")
 
-dat=np.load("axVR0_2.npz")
+#dat=np.load("npznew/uncAX_a-2.0x-inf_try100000j19000.npz")
+
 A=dat["arr_0"]
 X=dat["arr_1"]
 
@@ -27,16 +32,30 @@ cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky\
 
 #mean albedo between waves and wavee
 #bands=[[0.4,0.5],[0.5,0.6],[0.6,0.7],[0.7,0.8],[0.8,0.9]]#,[0.9,1.0]]
-bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75],[0.75,0.8],[0.8,0.85],[0.85,0.9]]
+#bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75],[0.75,0.8],[0.8,0.85],[0.85,0.9]]
+bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75]]
+
 refsurfaces=[water,soil,veg]
 malbedo=io_surface_type.set_meanalbedo(0.8,0.9,refsurfaces,clear_sky)
 mmap,Ain,Xin=toymap.make_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
 ave_band=np.mean(np.array(bands),axis=1)
 
+cc=plt.cm.viridis
+fontsize=18
+matplotlib.rcParams.update({'font.size':fontsize})
+hp.mollview(A[:,0], title="Component 0",flip="geo",cmap=cc)#,min=0,max=1)
 
-hp.mollview(A[:,0], title="0",flip="geo",cmap=plt.cm.jet)
-hp.mollview(A[:,1], title="1",flip="geo",cmap=plt.cm.jet)
-hp.mollview(A[:,2], title="2",flip="geo",cmap=plt.cm.jet)
+plt.savefig("C0.pdf", bbox_inches="tight", pad_inches=0.0)
+
+hp.mollview(A[:,1], title="Component 1",flip="geo",cmap=cc)#,min=0,max=1)
+plt.savefig("C1.pdf", bbox_inches="tight", pad_inches=0.0)
+
+hp.mollview(A[:,2], title="Component 2",flip="geo",cmap=cc)#,min=0,max=1)
+plt.savefig("C2.pdf", bbox_inches="tight", pad_inches=0.0)
+
+#hp.mollview(A[:,2], title="Component 2",flip="geo",cmap=cc)#,min=0,max=1)
+#plt.savefig("C2.pdf", bbox_inches="tight", pad_inches=0.0)
+
 #hp.mollview(A[:,0]+A[:,1], title="0+1",flip="geo",cmap=plt.cm.jet)
 
 
@@ -55,10 +74,10 @@ ax.plot(water[:,0],water[:,1],c="gray",ls="-.",label="water")
 plt.xlim(0.4,0.9)
 
 #io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,malbedo,valexp)
-
-fac0=0.25
-fac1=0.25
-fac2=0.4
+fac=0.33
+fac0=fac
+fac1=fac
+fac2=fac
 
 
 plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C0")
@@ -75,17 +94,27 @@ plt.tick_params(labelsize=16)
 plt.ylabel("Reflection Spectra",fontsize=16)
 plt.xlabel("wavelength [micron]",fontsize=16)
 plt.legend(fontsize=13)
-
+plt.title("Unconstrained")
 plt.savefig("ref.pdf", bbox_inches="tight", pad_inches=0.0)
+
+#A[(A>0.333333)*(A<0.333334)]=0
+#A[:,0]=A[:,0]*-1.0
+#A[:,3]=0.0
 
 Aclass=np.argmax(A,axis=1)
 print(Aclass)
-hp.mollview(Aclass, title="",flip="geo",cmap=plt.cm.Greys,max=3.5)
+Aclass[Aclass==0]=0
+Aclass[Aclass==1]=70
+Aclass[Aclass==2]=100
+#Aclass[Aclass==3]=30
+
+hp.mollview(Aclass, title="Retrieved",flip="geo",cmap=plt.cm.Greys,max=100)
+plt.savefig("retrieved.pdf", bbox_inches="tight", pad_inches=0.0)
 
 
 dataclass=np.load("/home/kawahara/exomap/sot/data/cmap3class.npz")
 cmapans=dataclass["arr_0"]
-hp.mollview(cmapans, title="ANSWER",flip="geo",cmap=plt.cm.Greys_r)
-
+hp.mollview(cmapans, title="Input",flip="geo",cmap=plt.cm.Greys_r)
+plt.savefig("input.pdf", bbox_inches="tight", pad_inches=0.0)
 
 plt.show()
