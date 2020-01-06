@@ -7,13 +7,21 @@ def check_nonnegative(Y,lab):
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
-def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0):
+def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0,delta=1.e-6):
     import scipy
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
     check_nonnegative(X0,"X")
+    Ni=np.shape(lcall)[0]
+    Nl=np.shape(lcall)[1]
+    Nk=np.shape(A0)[1]
+    Nj=np.shape(A0)[0]
+
     if reg=="L2-VRDet":
         res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.linalg.det(np.dot(X0,X0.T))
+    elif reg=="L2-VRLD":
+        nu=1.0
+        res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.log(np.linalg.det(np.dot(X0,X0.T)+delta*np.eye(Nk)))        
     elif reg=="Dual-L2":
         res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.sum(X0**2)
     elif reg=="Unconstrained":
@@ -26,14 +34,11 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
     A=np.copy(A0)
     X=np.copy(X0)
     Y=np.copy(lcall)
-    Ni=np.shape(Y)[0]
-    Nl=np.shape(Y)[1]
-    Nk=np.shape(A)[1]
-    Nj=np.shape(A)[0]
 
     WTW=np.dot(W.T,W)
 
     jj=0
+    resall=[]
     for i in range(0,Ntry):
         print(i)
         ## xk
@@ -50,6 +55,9 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
                 K=np.eye(Nl) - np.dot(np.dot(Xminus.T,XXTinverse),Xminus)
                 K=K*np.linalg.det(np.dot(Xminus,Xminus.T))*lamX
                 X[k,:]=APGr(Nl,W_x + K ,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
+            elif reg=="L2-VRLD":
+                E_x=lamX*nu*np.eye(Nl)
+                X[k,:]=APGr(Nl,W_x + E_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
             elif reg=="Dual-L2":
                 T_x=lamX*np.eye(Nj)
                 X[k,:]=APGr(Nl,W_x + T_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
@@ -66,12 +74,22 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
             T_a=lamA*np.eye(Nj)
             A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta)
 
+        Like=(np.sum((Y-np.dot(np.dot(W,A),X))**2))
+        RA=(lamA*np.sum(A0**2))
         if reg=="L2-VRDet":
-            res=np.sum((Y-np.dot(np.dot(W,A),X))**2)+lamA*np.sum(A**2)+lamX*np.linalg.det(np.dot(X,X.T))
+            RX=(lamX*np.linalg.det(np.dot(X,X.T)))
+        elif reg=="L2-VRLD":
+            eig=np.linalg.eigvals((np.dot(X,X.T) + delta*np.eye(Nk)))
+            nu=1.0/np.min(np.abs(eig))
+            print("nu=",nu)
+            RX=(lamX*np.log(np.linalg.det(np.dot(X,X.T)+delta*np.eye(Nk))))
         elif reg=="Dual-L2":
-            res=np.sum((Y-np.dot(np.dot(W,A),X))**2)+lamA*np.sum(A**2)+lamX*np.sum(X**2)
+            RX=(lamX*np.sum(X**2))
         elif reg=="Unconstrained":
-            res=np.sum((Y-np.dot(np.dot(W,A),X))**2)+lamA*np.sum(A**2)
+            RX=0.0
+            
+        res=Like+RA+RX
+        resall.append([res,Like,RA,RX])                
         print("Residual=",res)
         #normalization
         #LogNMF(i,A,X,Nk)
@@ -81,10 +99,9 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
 
         jj=jj+1
         if np.mod(jj,1000) == 0:
-            np.savez(filename+"j"+str(jj),A,X)
+            np.savez(filename+"j"+str(jj),A,X,resall)
             
-    logmetric=[]
-    return A, X, logmetric
+    return A, X, resall
 
 
 def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
