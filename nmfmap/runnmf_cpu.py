@@ -57,9 +57,9 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
                 X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta)
 
         ## ak
-        for k in range(0,Nk):
-            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
-            Delta=Y-np.dot(W,AX)
+#        for k in range(0,Nk):
+#            AX=np.dot(np.delete(A,obj=k,axis=1),np.delete(X,obj=k,axis=0))
+#            Delta=Y-np.dot(W,AX)
             xk=X[k,:]
             W_a=(np.dot(xk,xk))*(np.dot(W.T,W))
             b=np.dot(np.dot(W.T,Delta),xk)
@@ -90,7 +90,7 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
 def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
     #Accelerated Projected Gradient + restart
     #n=np.shape(Q)[0]
-    normQ = np.sqrt(np.sum(Q**2))
+    normQ = np.linalg.norm(Q,2)
     Theta1 = np.eye(n) - Q/normQ
     theta2 = p/normQ
     x = np.copy(x0)

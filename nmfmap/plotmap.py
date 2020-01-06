@@ -9,6 +9,7 @@ import matplotlib
 #dat=np.load("npznew/L2AX_a-2.0x2.0_try100000j19000.npz")
 #dat=np.load("npznew/uncAX_a-2.0x-inf_try100000j19000.npz")
 dat=np.load("npznew/L2-VRLDAX_a-2.0x2.0_try100000j4000.npz")
+#dat=np.load("npznew/DSCOVRUnconstrainedAX_a0.0x-inf_try100000j1000.npz")
 A=dat["arr_0"]
 X=dat["arr_1"]
 
@@ -31,6 +32,7 @@ cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky\
 #mean albedo between waves and wavee
 #bands=[[0.4,0.5],[0.5,0.6],[0.6,0.7],[0.7,0.8],[0.8,0.9]]#,[0.9,1.0]]
 bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75],[0.75,0.8],[0.8,0.85],[0.85,0.9]]
+#bands=[[0.4,0.5],[0.5,0.6],[0.6,0.7],[0.7,0.8],[0.8,0.9],[0.9,1.0],[1.1,1.2]]
 refsurfaces=[water,soil,veg]
 malbedo=io_surface_type.set_meanalbedo(0.8,0.9,refsurfaces,clear_sky)
 mmap,Ain,Xin=toymap.make_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
@@ -48,6 +50,9 @@ plt.savefig("C1.pdf", bbox_inches="tight", pad_inches=0.0)
 
 hp.mollview(A[:,2], title="Component 2",flip="geo",cmap=cc)#,min=0,max=1)
 plt.savefig("C2.pdf", bbox_inches="tight", pad_inches=0.0)
+
+#hp.mollview(A[:,3], title="Component 2",flip="geo",cmap=cc)#,min=0,max=1)
+#plt.savefig("C3.pdf", bbox_inches="tight", pad_inches=0.0)
 
 #hp.mollview(A[:,0]+A[:,1], title="0+1",flip="geo",cmap=plt.cm.jet)
 

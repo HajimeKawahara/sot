@@ -62,6 +62,8 @@ lcall=np.dot(np.dot(W,Ainit),Xinit)
 noiselevel=0.0001
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
 #lcall= np.dot(np.diag(1/np.sum(lcall[:,:],axis=1)),lcall)
+#np.savez("lcall",lcall)
+#sys.exit()
 
 nside=16
 npix=hp.nside2npix(nside)
@@ -71,20 +73,20 @@ N=3
 Ntry=100000
 epsilon=1.e-6
 lamA=1.e-2
-lamX=1.e1
+lamX=1.e2
 
 ## NMF Initialization ============================
-#A0,X0=initnmf.init_random(N,npix,lcall)
-##A0,X0=initnmf.initpca(N,W,lcall,lamA)
+A0,X0=initnmf.init_random(N,npix,lcall)
+#A0,X0=initnmf.initpca(N,W,lcall,lamA)
 #Ntryini=10000
 #Initialization by Multiplicative Update
 #A,X,logmetric=runnmf.MP_L2_NMF(Ntryini,lcall,W,A0,X0,lamA,0.0,epsilon)
 #A0,X0=A,X
 #np.savez("init_uncMP",A,X)
 ## ===============================================
-dat=np.load("init_uncMP.npz")
-A0=dat["arr_0"]
-X0=dat["arr_1"]
+#dat=np.load("init_uncMP.npz")
+#A0=dat["arr_0"]
+#X0=dat["arr_1"]
 
 #regmode="L2-VRDet"
 regmode="L2-VRLD"
