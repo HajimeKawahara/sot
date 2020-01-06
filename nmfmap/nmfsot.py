@@ -81,8 +81,7 @@ A0,X0=initnmf.init_random(N,npix,lcall)
 
 #regmode="L2-VRDet"
 regmode="L2-VRLD"
-nu0=1.0
 filename=regmode+"AX_a"+str(np.log10(lamA))+"x"+str(np.log10(lamX))+"_try"+str(Ntry)
-A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,off=4000,nu=nu0)
+A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6)
 np.savez(filename,A,X)
 
