@@ -10,8 +10,8 @@ import cupy as cp
 import sys
 import healpy as hp
 import initnmf
-#import runnmf_cpu as runnmf #CPU version (slow)
-import runnmf_gpu as runnmf #GPU version
+import runnmf_cpu as runnmf #CPU version (slow)
+#import runnmf_gpu as runnmf #GPU version
 
 np.random.seed(34)
 
