@@ -71,17 +71,20 @@ WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
 N=3
 Ntry=100000
-epsilon=1.e-6
+epsilon=1.e-12
 lamA=1.e-2
-lamX=1.e2
+lamX=0.0
 
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(N,npix,lcall)
 #A0,X0=initnmf.initpca(N,W,lcall,lamA)
+fac=np.sum(lcall)/np.sum(A0)/np.sum(X0)
+A0=A0*fac
 
+regmode="Unconstrained"
 #regmode="L2-VRDet"
-regmode="L2-VRLD"
-filename=regmode+"AX_a"+str(np.log10(lamA))+"x"+str(np.log10(lamX))+"_try"+str(Ntry)
+#regmode="L2-VRLD"
+filename=regmode+"aAX_a"+str(np.log10(lamA))+"x"+str(np.log10(lamX))+"_try"+str(Ntry)
 A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6)
 np.savez(filename,A,X)
 
