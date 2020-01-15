@@ -23,7 +23,7 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
         res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.log(np.linalg.det(np.dot(X0,X0.T)+delta*np.eye(Nk)))
     elif reg=="Dual-L2":
         res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.sum(X0**2)
-    elif reg=="Unconstrained":
+    elif reg=="L2":
         res=np.sum((lcall-Win@A0@X0)**2)+lamA*np.sum(A0**2)
     else:
         print("No mode. Halt.")
@@ -63,15 +63,20 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
             elif reg=="Dual-L2":
                 T_x=lamX*cp.eye(Nl)
                 X[k,:]=APGr(Nl,W_x + T_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
-            elif reg=="Unconstrained":
+            elif reg=="L2":
                 X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
-                            
-        ## ak
+
+            ## X normalization
+            #X[k,:]=X[k,:]/cp.sum(X[k,:])
+            
+            ## ak
             xk=X[k,:]
             W_a=(cp.dot(xk,xk))*(cp.dot(W.T,W))
             b=cp.dot(cp.dot(W.T,Delta),xk)
             T_a=lamA*cp.eye(Nj)
             A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta, Lip=Lipa)
+            ## A normalization
+            #A[:,k]=A[:,k]/cp.sum(A[:,k])*Nj
 
         Like=cp.asnumpy(cp.sum((Y-cp.dot(cp.dot(W,A),X))**2))
         RA=cp.asnumpy(lamA*cp.sum(A0**2))
@@ -84,7 +89,7 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
             RX=cp.asnumpy(lamX*cp.log(cp.linalg.det(cp.dot(X,X.T)+delta*cp.eye(Nk))))
         elif reg=="Dual-L2":
             RX=cp.asnumpy(lamX*cp.sum(X**2))
-        elif reg=="Unconstrained":
+        elif reg=="L2":
             RX=0.0
             
         res=Like+RA+RX

@@ -24,7 +24,7 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
         res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.log(np.linalg.det(np.dot(X0,X0.T)+delta*np.eye(Nk)))        
     elif reg=="Dual-L2":
         res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)+lamX*np.sum(X0**2)
-    elif reg=="Unconstrained":
+    elif reg=="L2":
         res=np.sum((lcall-W@A0@X0)**2)+lamA*np.sum(A0**2)
     else:
         print("No mode. Halt.")
@@ -61,7 +61,7 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
             elif reg=="Dual-L2":
                 T_x=lamX*np.eye(Nj)
                 X[k,:]=APGr(Nl,W_x + T_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
-            elif reg=="Unconstrained":
+            elif reg=="L2":
                 X[k,:]=APGr(Nl,W_x,bx,X[k,:],Ntry=NtryAPGX, eta=eta, Lip=Lipx)
 
         ## ak
@@ -85,7 +85,7 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
             RX=(lamX*np.log(np.linalg.det(np.dot(X,X.T)+delta*np.eye(Nk))))
         elif reg=="Dual-L2":
             RX=(lamX*np.sum(X**2))
-        elif reg=="Unconstrained":
+        elif reg=="L2":
             RX=0.0
             
         res=Like+RA+RX
