@@ -69,6 +69,8 @@ nside=16
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
+np.savez("w",W)
+sys.exit()
 N=3
 Ntry=100000
 epsilon=1.e-12

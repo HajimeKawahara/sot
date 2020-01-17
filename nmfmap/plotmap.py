@@ -152,11 +152,12 @@ if __name__=='__main__':
     axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j64000.npz"
     A,X,resall=readax(axfile)
     bands=getband()
-    plot_resall(resall)    
-    moll(A)
-    plref(X,bands)
-    classmap(A)
-    inmap()
+    
+#    plot_resall(resall)    
+#    moll(A)
+#    plref(X,bands)
+#    classmap(A)
+#    inmap()
 
 
 
