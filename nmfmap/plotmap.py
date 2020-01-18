@@ -131,6 +131,27 @@ def classmap(A):
     hp.mollview(Aclass, title="Retrieved",flip="geo",cmap=plt.cm.Greys,max=100)
     plt.savefig("retrieved.pdf", bbox_inches="tight", pad_inches=0.0)
 
+def classmap_color(A):
+    
+   Nj=np.shape(A)[0]
+   tip=0.1
+   indx=np.array(range(0,Nj))
+
+   #small norm filter
+   Aabs=np.sqrt(np.sum(A**2,axis=1))
+   crit=np.mean(Aabs)*0.15
+   mask=Aabs<crit
+   fac=0.75
+   Anorm=A.T/np.sum(A,axis=1)*fac
+   Anorm=Anorm.T
+   Anorm=np.array([Anorm[:,2],Anorm[:,0],Anorm[:,1]]).T
+
+   #fill value for small norm filter
+   Anorm[mask]=np.sqrt(1.0/3.0)
+   cmap = matplotlib.colors.ListedColormap(Anorm)
+   hp.mollview(indx, title="Classification Map",flip="geo",cmap=cmap,min=0-tip,max=Nj-tip)
+   plt.savefig("class.pdf", bbox_inches="tight", pad_inches=0.0)
+
 
 def inmap():
     dataclass=np.load("/home/kawahara/exomap/sot/data/cmap3class.npz")
@@ -147,10 +168,10 @@ if __name__=='__main__':
     A,X,resall=read_data.readax(axfile)
     bands=read_data.getband()
     
-    plot_resall(resall)    
-    moll(A)
+#    plot_resall(resall)    
+#    moll(A)
     plref(X,bands)
-    classmap(A)
+    classmap_color(A)
     plt.show()
     #    inmap()
 
