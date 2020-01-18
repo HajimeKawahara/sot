@@ -8,6 +8,7 @@ import matplotlib
 from sklearn.decomposition import PCA
 import sklearn.linear_model as lm
 import plotmap as pm
+import read_data
 
 def tik(lcall,W):
     ### simple Tikhonov
@@ -37,10 +38,11 @@ def projpc(Xin,Xp):
     return xpc1,xpc2
 
 if __name__=='__main__':
+    import sys
+    #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
+    axfile=sys.argv[1]
 
-
-    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j64000.npz"
-    A,X,resall=pm.readax(axfile)
+    A,X,resall=read_data.readax(axfile)
     W=np.load("w.npz")["arr_0"]
     WA=np.dot(W,A)
     lcall=np.load("lcall.npz")["arr_0"]
@@ -73,7 +75,7 @@ if __name__=='__main__':
     for i in range(0,len(xpc1)):
         plt.text(xpc1[i],xpc2[i],str(i),fontsize=18)
     plt.plot(xpc1,xpc2,"o",color="red",label="endmembers")
-    plt.plot(np.concatenate([xpc1,xpc1]),np.concatenate([xpc2,xpc2]),color="black",ls="dashed")
+    plt.plot(np.concatenate([xpc1,xpc1]),np.concatenate([xpc2,xpc2]),color="gray")
     plt.xlabel("PC1")
     plt.ylabel("PC2")
     plt.legend()        

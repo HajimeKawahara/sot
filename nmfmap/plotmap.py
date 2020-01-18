@@ -5,32 +5,35 @@ import matplotlib.pyplot as plt
 import numpy as np
 import healpy as hp
 import matplotlib
+import mrsa
+import read_data
 
-def readax(axfile):
-    dat=np.load(axfile)
-    A=dat["arr_0"]
-    X=dat["arr_1"]
-    resall=dat["arr_2"]
-
-    return A,X,resall
-
-def getband():
-    bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75],[0.75,0.8],[0.8,0.85],[0.85,0.9]]
-    return bands
+def norm(arr):
+    mask=(arr[:,0]>0.4)*(arr[:,0]<0.9)
+    from scipy import interpolate
+    f = interpolate.interp1d(arr[:,0], arr[:,1], kind='linear')
+    ls,le,ndiv=0.4,0.9,100
+    u=np.linspace(ls,le,ndiv)
+    du=(le-ls)/ndiv
+    val=f(u)
+    normv=1.0/np.sum(val)/du
+    val=val
+    return u,val,normv
 
 def plot_resall(resall):
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
     fig=plt.figure(figsize=(10,7))
     s=0
-    plt.plot(resall[s:,0],label="$||D-WAX||_F^2/2+R(A,X)$")
-    plt.plot(resall[s:,1],label="$||D-WAX||_F^2/2$")
-    plt.plot(resall[s:,2],label="$R(A)$")
-    plt.plot(resall[s:,3],label="$R(X)$")
+    minval=np.min(resall)-1
+    plt.plot(resall[s:,0]-minval,label="$||D-WAX||_F^2/2+R(A,X)$")
+    plt.plot(resall[s:,1]-minval,label="$||D-WAX||_F^2/2$")
+    plt.plot(resall[s:,2]-minval,label="$R(A)$")
+    plt.plot(resall[s:,3]-minval,label="$R(X)$")
     plt.legend()
     plt.yscale("log")
     plt.xlabel("Interation #")
-    plt.ylabel("Cost terms")
+    plt.ylabel("Cost terms - mininum + 1")
     plt.show()
 
 
@@ -54,17 +57,6 @@ def load_template():
     ave_band=np.mean(np.array(bands),axis=1)
     return 
 
-def norm(arr):
-    mask=(arr[:,0]>0.4)*(arr[:,0]<0.9)
-    from scipy import interpolate
-    f = interpolate.interp1d(arr[:,0], arr[:,1], kind='linear')
-    ls,le,ndiv=0.4,0.9,100
-    u=np.linspace(ls,le,ndiv)
-    du=(le-ls)/ndiv
-    val=f(u)
-    normv=1.0/np.sum(val)/du
-    val=val
-    return u,val,normv
 
 def moll(A):
     cc=plt.cm.viridis
@@ -148,16 +140,19 @@ def inmap():
     plt.show()
 
 if __name__=='__main__':
+    import sys
+    #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
+    axfile=sys.argv[1]
 
-    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j64000.npz"
-    A,X,resall=readax(axfile)
-    bands=getband()
+    A,X,resall=read_data.readax(axfile)
+    bands=read_data.getband()
     
-#    plot_resall(resall)    
-#    moll(A)
-#    plref(X,bands)
-#    classmap(A)
-#    inmap()
+    plot_resall(resall)    
+    moll(A)
+    plref(X,bands)
+    classmap(A)
+    plt.show()
+    #    inmap()
 
 
 
