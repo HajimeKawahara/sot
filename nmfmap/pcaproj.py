@@ -39,7 +39,7 @@ def projpc(Xin,Xp):
 
 if __name__=='__main__':
     import sys
-    #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
+#    axfile="npz/T116/T116_L2-VRDet_A-2.0X1.0j99000.npz"
     axfile=sys.argv[1]
 
     A,X,resall=read_data.readax(axfile)
@@ -66,16 +66,17 @@ if __name__=='__main__':
     bpc1,bpc2=projpc(B,Xp)
 
     
-    fontsize=16
+    fontsize=13.5
     matplotlib.rcParams.update({'font.size':fontsize})
     fig=plt.figure(figsize=(7,5))
-    plt.plot(bpc1,bpc2,".",alpha=0.3, label="Disentangled")
     #plt.plot(cpc1,cpc2,".",alpha=0.3)    
-    plt.plot(lcpc1,lcpc2,"+", label="Light curve")
     for i in range(0,len(xpc1)):
         plt.text(xpc1[i],xpc2[i],str(i),fontsize=18)
-    plt.plot(xpc1,xpc2,"o",color="red",label="endmembers")
     plt.plot(np.concatenate([xpc1,xpc1]),np.concatenate([xpc2,xpc2]),color="gray")
+    plt.plot(bpc1,bpc2,".",alpha=0.3, label="Disentangled",color="C0")
+    plt.plot(lcpc1,lcpc2,"+", label="Light curve",color="C1")
+    plt.plot(xpc1,xpc2,"o",color="red",label="Unmixed components")
+
     plt.xlabel("PC1")
     plt.ylabel("PC2")
     plt.legend()        

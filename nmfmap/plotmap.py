@@ -23,17 +23,54 @@ def norm(arr):
 def plot_resall(resall):
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
-    fig=plt.figure(figsize=(10,7))
+    fig=plt.figure(figsize=(9,9))
+    ax=fig.add_subplot(211)
     s=0
-    minval=np.min(resall)-1
-    plt.plot(resall[s:,0]-minval,label="$||D-WAX||_F^2/2+R(A,X)$")
-    plt.plot(resall[s:,1]-minval,label="$||D-WAX||_F^2/2$")
-    plt.plot(resall[s:,2]-minval,label="$R(A)$")
-    plt.plot(resall[s:,3]-minval,label="$R(X)$")
+    minval=0.0
+    plt.plot(resall[s:,0]-minval,label="$||D-WAX||_F^2/2+R(A,X)$",rasterized=True)
+    plt.plot(resall[s:,1]-minval,label="$||D-WAX||_F^2/2$",rasterized=True,ls="dashed")
+    plt.plot(resall[s:,2]-minval,label="$R(A)=\lambda_A ||A||_F^2/2$",rasterized=True,ls="dotted")
+    plt.plot(resall[s:,3]-minval,label="$R(X)=\lambda_X \det{(X X^T)}/2$",rasterized=True,ls="dashdot")
     plt.legend()
     plt.yscale("log")
+    plt.xscale("log")
+    plt.ylabel("Cost terms")
+
+    ax=fig.add_subplot(212)
+    resdiff=-resall[1:,:]+resall[0:-1,:]
+    plt.plot(resdiff[s:,0]-minval,label="$||D-WAX||_F^2/2+R(A,X)$",rasterized=True)
+    plt.axhline(1.e-5,color="C4",ls="dashed")
+#    plt.plot(resdiff[s:,1]-minval,label="$||D-WAX||_F^2/2$")
+#    plt.plot(resdiff[s:,2]-minval,label="$R(A)$")
+#    plt.plot(resdiff[s:,3]-minval,label="$R(X)$")
+#    plt.legend()
+
+    plt.yscale("log")
+    plt.xscale("log")
+    
+    plt.xlabel("Iteration #")
+    plt.ylabel("Difference")
+    plt.savefig("resevo.pdf", bbox_inches="tight", pad_inches=0.0)
+
+    plt.show()
+
+def plot_resdiff(resall):
+    fontsize=18
+    matplotlib.rcParams.update({'font.size':fontsize})
+    fig=plt.figure(figsize=(10,7))
+    s=0
+    minval=0.0
+    resdiff=-resall[1:,:]+resall[0:-1,:]
+    plt.plot(resdiff[s:,0]-minval,label="$||D-WAX||_F^2/2+R(A,X)$")
+#    plt.plot(resdiff[s:,1]-minval,label="$||D-WAX||_F^2/2$")
+#    plt.plot(resdiff[s:,2]-minval,label="$R(A)$")
+#    plt.plot(resdiff[s:,3]-minval,label="$R(X)$")
+    plt.legend()
+    plt.yscale("log")
+    plt.xscale("log")
+
     plt.xlabel("Interation #")
-    plt.ylabel("Cost terms - mininum + 1")
+    plt.ylabel("Cost terms")
     plt.show()
 
 
@@ -79,7 +116,7 @@ def moll(A):
         print("No 4th comp")
         #hp.mollview(A[:,0]+A[:,1], title="0+1",flip="geo",cmap=plt.cm.jet)
 
-def plref(X,bands):
+def plref(X,bands,title=""):
     cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky=io_refdata.read_refdata("/home/kawahara/exomap/sot/data/refdata")
     fig= plt.figure(figsize=(10,7))
     ax = fig.add_subplot(111)
@@ -99,9 +136,9 @@ def plref(X,bands):
     fac2=fac/np.sum(X[2,:])/dband/normvsoil
     #fac3=fac/np.sum(X[3,:])/dband
     
-    plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C0")
-    plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C1")
-    plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C2")
+    plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C2")
+    plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C0")
+    plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C1")
     
     try:
         plt.plot(np.median(bands,axis=1),X[3,:]*fac3,"^",label="Component 3",color="C3")
@@ -110,28 +147,32 @@ def plref(X,bands):
     except:
         print("No 4th comp")
         
-    plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C0")
-    plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C1")
-    plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C2")
+    plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C2",lw=2)
+    plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C0",lw=2)
+    plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C1",lw=2)
     
     plt.tick_params(labelsize=16)
     plt.ylabel("Reflection Spectra",fontsize=16)
     plt.xlabel("wavelength [micron]",fontsize=16)
     plt.legend(fontsize=13)
-    plt.title("Unconstrained")
+    plt.title(title)
     plt.savefig("ref.pdf", bbox_inches="tight", pad_inches=0.0)
 
-def classmap(A):
+def classmap(A,title=""):
     Aclass=np.argmax(A,axis=1)
     Aclass[Aclass==0]=70
     Aclass[Aclass==1]=100
     Aclass[Aclass==2]=0
     #Aclass[Aclass==3]=30
+    Aabs=np.sqrt(np.sum(A**2,axis=1))
+    crit=np.mean(Aabs)*0.15
+    mask=Aabs<crit
+    Aclass[mask]=30
     
-    hp.mollview(Aclass, title="Retrieved",flip="geo",cmap=plt.cm.Greys,max=100)
+    hp.mollview(Aclass, title="Classification "+title,flip="geo",cmap=plt.cm.Greys,max=100,cbar=None)
     plt.savefig("retrieved.pdf", bbox_inches="tight", pad_inches=0.0)
 
-def classmap_color(A):
+def classmap_color(A,title=""):
     
    Nj=np.shape(A)[0]
    tip=0.1
@@ -142,21 +183,30 @@ def classmap_color(A):
    crit=np.mean(Aabs)*0.15
    mask=Aabs<crit
    fac=0.75
+   gg=0.9
+   rr=0.95
+   bb=0.0
+   rot=np.array([[gg,0,np.sqrt(1.0-gg*gg)],[0,1,0],[np.sqrt(1.0-rr*rr-bb*bb),bb,rr]])                   
+   A=np.dot(A,rot)
    Anorm=A.T/np.sum(A,axis=1)*fac
    Anorm=Anorm.T
+
+   bright=np.array([[1.0,0.1,0.1],[0.1,1.0,0.1],[0.2,0.2,1.0]])                   
+   Anorm=np.dot(Anorm,bright)
    Anorm=np.array([Anorm[:,2],Anorm[:,0],Anorm[:,1]]).T
 
    #fill value for small norm filter
    Anorm[mask]=np.sqrt(1.0/3.0)
    cmap = matplotlib.colors.ListedColormap(Anorm)
-   hp.mollview(indx, title="Classification Map",flip="geo",cmap=cmap,min=0-tip,max=Nj-tip)
+   hp.mollview(indx, title="Color composite "+title,flip="geo",cmap=cmap,min=0-tip,max=Nj-tip,cbar=None)
    plt.savefig("class.pdf", bbox_inches="tight", pad_inches=0.0)
+   plt.savefig("class.png", bbox_inches="tight", pad_inches=0.0)
 
 
 def inmap():
     dataclass=np.load("/home/kawahara/exomap/sot/data/cmap3class.npz")
     cmapans=dataclass["arr_0"]
-    hp.mollview(cmapans, title="Input",flip="geo",cmap=plt.cm.Greys_r)
+    hp.mollview(cmapans, title="Input",flip="geo",cmap=plt.cm.Greys_r,cbar=None)
     plt.savefig("input.pdf", bbox_inches="tight", pad_inches=0.0)
     plt.show()
 
@@ -164,16 +214,25 @@ if __name__=='__main__':
     import sys
     #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
     axfile=sys.argv[1]
-
+    try:
+        title=sys.argv[2]
+    except:
+        title=""
     A,X,resall=read_data.readax(axfile)
     bands=read_data.getband()
+    fontsize=18
+    matplotlib.rcParams.update({'font.size':fontsize})
     
-#    plot_resall(resall)    
-#    moll(A)
-    plref(X,bands)
-    classmap_color(A)
+    plot_resall(resall)    
+#    plot_resdiff(resall)    
+
+    moll(A)
+    plref(X,bands,title)
+    classmap_color(A,title)
+#    classmap(A,title)
+
     plt.show()
-    #    inmap()
+    #inmap()
 
 
 
