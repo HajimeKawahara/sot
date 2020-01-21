@@ -11,12 +11,7 @@ def mrsa(vec1,vec2):
         naib=1.0
     return 1.0/np.pi*np.arccos(naib)
 
-if __name__=='__main__':
-    import read_data
-    import sys
-    #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
-    axfile=sys.argv[1]
-    A,X,resall=read_data.readax(axfile)
+def mrsa_mean(X):
     Xini=np.load("Xinit.npz")["arr_0"]
     mrsa_arr=[]
     for i in range(0,3):
@@ -26,4 +21,13 @@ if __name__=='__main__':
         minma=np.min(np.array(ma))
         mrsa_arr.append(minma)
     mrsa_arr=np.array(mrsa_arr)
-    print(np.mean(mrsa_arr))
+    return (np.mean(mrsa_arr))
+
+if __name__=='__main__':
+    import read_data
+    import sys
+    #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
+    axfile=sys.argv[1]
+    A,X,resall=read_data.readax(axfile)
+    mmrsa=mrsa_mean(X)
+    print(mmrsa)

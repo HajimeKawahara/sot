@@ -222,14 +222,14 @@ if __name__=='__main__':
     bands=read_data.getband()
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
-    
-    plot_resall(resall)    
+
+#    plot_resall(resall)    
 #    plot_resdiff(resall)    
 
-    moll(A)
-    plref(X,bands,title)
-    classmap_color(A,title)
-#    classmap(A,title)
+#    moll(A)
+#    plref(X,bands,title)
+#    classmap_color(A,title)
+    classmap(A,title)
 
     plt.show()
     #inmap()
