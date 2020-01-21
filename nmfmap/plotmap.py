@@ -118,15 +118,18 @@ def moll(A):
 
 def plref(X,bands,title=""):
     cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky=io_refdata.read_refdata("/home/kawahara/exomap/sot/data/refdata")
-    fig= plt.figure(figsize=(10,7))
+    fontsize=18
+    matplotlib.rcParams.update({'font.size':fontsize})
+
+    fig= plt.figure(figsize=(8,5.5))
     ax = fig.add_subplot(111)
     nnl=1#len(np.median(bands,axis=1))
     u,val,normvveg=norm(veg)
     ax.plot(u,val,c="black",lw=2,label="vegitation (deciduous)")
     u,val,normvsoil=norm(soil)
-    ax.plot(u,val,c="gray",lw=1,label="soil")
+    ax.plot(u,val,c="gray",lw=2,ls="dashed",label="soil")
     u,val,normvwater=norm(water)
-    ax.plot(u,val,c="gray",ls="-.",label="water")
+    ax.plot(u,val,c="gray",lw=2,ls="-.",label="water")
     plt.xlim(0.4,0.9)
     fac=1.0
     mband=np.median(bands,axis=1)
@@ -154,7 +157,7 @@ def plref(X,bands,title=""):
     plt.tick_params(labelsize=16)
     plt.ylabel("Reflection Spectra",fontsize=16)
     plt.xlabel("wavelength [micron]",fontsize=16)
-    plt.legend(fontsize=13)
+    plt.legend(fontsize=12)
     plt.title(title)
     plt.savefig("ref.pdf", bbox_inches="tight", pad_inches=0.0)
 
@@ -224,14 +227,13 @@ if __name__=='__main__':
     matplotlib.rcParams.update({'font.size':fontsize})
 
 #    plot_resall(resall)    
-#    plot_resdiff(resall)    
-
-#    moll(A)
+    plot_resdiff(resall)    
+    moll(A)
 #    plref(X,bands,title)
 #    classmap_color(A,title)
-    classmap(A,title)
+#    classmap(A,title)
 
-    plt.show()
+#    plt.show()
     #inmap()
 
 
