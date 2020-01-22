@@ -125,7 +125,7 @@ def plref(X,bands,title=""):
     ax = fig.add_subplot(111)
     nnl=1#len(np.median(bands,axis=1))
     u,val,normvveg=norm(veg)
-    ax.plot(u,val,c="black",lw=2,label="vegitation (deciduous)")
+    ax.plot(u,val,c="gray",lw=2,label="vegitation (deciduous)")
     u,val,normvsoil=norm(soil)
     ax.plot(u,val,c="gray",lw=2,ls="dashed",label="soil")
     u,val,normvwater=norm(water)
@@ -225,15 +225,16 @@ if __name__=='__main__':
     bands=read_data.getband()
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
-
-#    plot_resall(resall)    
-    plot_resdiff(resall)    
-    moll(A)
-#    plref(X,bands,title)
+    title=""
+    plot_resall(resall)    
+#    plot_resdiff(resall)    
+#    moll(A)
+    plref(X,bands,title)
 #    classmap_color(A,title)
-#    classmap(A,title)
 
-#    plt.show()
+    classmap(A,title)
+
+    plt.show()
     #inmap()
 
 

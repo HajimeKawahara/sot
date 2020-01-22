@@ -96,6 +96,8 @@ def plot_rega(axfiles):
     ax.plot(10**lam,likarr,"o",color="C0")
     ax.plot(10**lam,likarr,color="C0")
     plt.xscale("log")
+#    plt.yscale("log")
+
     plt.ylabel("$||D - W A X||_F^2$")
     ax=fig.add_subplot(312)
     ax.plot(10**lam,mrsaarr,"o",color="C0")
@@ -115,10 +117,10 @@ def plot_rega(axfiles):
 if __name__=='__main__':
     import sys
 #    axfiles=sys.argv[1:]
-#    axfiles,lam=get_axfiles.get_axfiles_X()
+    axfiles,lam=get_axfiles.get_axfiles_X()
     
 #    plotrefdepx(axfiles)
-#    plot_regx(axfiles)
+    plot_regx(axfiles)
 #    plt.show()
-    axfiles,lam=get_axfiles.get_axfiles_A()
-    plot_rega(axfiles)
+#    axfiles,lam=get_axfiles.get_axfiles_A()
+#    plot_rega(axfiles)
