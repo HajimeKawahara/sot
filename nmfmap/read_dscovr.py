@@ -14,6 +14,8 @@ def read_dscovr(dirname,Nreduce,istart=3):
         lc=lc[::Nreduce,:]
         t=t[::Nreduce]
         W=W[::Nreduce,:]
+        
     return W,t,lc
 
-W,t,lc=read_dscovr("../../data/for_HKawahara",9)
+
+#W,t,lc=read_dscovr("../../data/for_HKawahara",9)

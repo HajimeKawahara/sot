@@ -48,7 +48,7 @@ Pspin=23.9344699/24.0 #Pspin: a sidereal day
 wspin=2*np.pi/Pspin 
 Porb=365.242190402                                            
 worb=2*np.pi/Porb 
-N=1024
+N=512
 expt=Porb #observation duration 10d
 obst=np.linspace(Porb/4,expt+Porb/4,N) 
 
@@ -59,36 +59,35 @@ W=WV[:,:]*WI[:,:]
 npix=hp.nside2npix(nside)
 
 lcall=np.dot(np.dot(W,Ainit),Xinit)
-noiselevel=0.0001
+noiselevel=0.01
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
 #lcall= np.dot(np.diag(1/np.sum(lcall[:,:],axis=1)),lcall)
 #np.savez("lcall",lcall)
-#sys.exit()
 
 nside=16
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
-N=3
-Ntry=100000
+Nk=3
+Ntry=1000000
 epsilon=1.e-12
-lamA=1.e-2
-lamX=1.e0
+lamA=10**(-2)  #-1---4
+lamX=10**(1)
 
 ## NMF Initialization ============================
-A0,X0=initnmf.init_random(N,npix,lcall)
-#A0,X0=initnmf.initpca(N,W,lcall,lamA)
+A0,X0=initnmf.init_random(Nk,npix,lcall)
+#A0,X0=initnmf.initpca(Nk,W,lcall,lamA)
 #fac=np.sum(lcall)/np.sum(A0)/np.sum(X0)
 #A0=A0*fac
 
-trytag="T115x"
+trytag="T122"
 #regmode="L2"
-#regmode="L2-VRDet"
-regmode="L2-VRLD"
+regmode="L2-VRDet"
+#regmode="L2-VRLD"
 #regmode="Dual-L2"
 
-filename=trytag+"_"+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
-A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6)
+filename=trytag+"_N"+str(Nk)+"_"+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
+A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,endc=1.e-5)
 np.savez(filename,A,X)
 
 
