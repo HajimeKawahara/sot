@@ -39,46 +39,48 @@ def projpc(Xin,Xp):
 
 if __name__=='__main__':
     import sys
-#    axfile="npz/T116/T116_L2-VRDet_A-2.0X1.0j99000.npz"
-    axfile=sys.argv[1]
-
-    A,X,resall=read_data.readax(axfile)
+    #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
+    fontsize=16
+    matplotlib.rcParams.update({'font.size':fontsize})
+    fig=plt.figure(figsize=(7,5))
     W=np.load("w.npz")["arr_0"]
-    WA=np.dot(W,A)
     lcall=np.load("lcall.npz")["arr_0"]
-    
-    for i in range(0,np.shape(lcall)[1]):
-        lcall[:,i]=lcall[:,i]/np.sum(WA,axis=1)
-
     pca = PCA(n_components=2)
     pca.fit(lcall) #x(k,l)
     Xp=((pca.components_))
-    xpc1,xpc2=projpc(X,Xp)
-    lcpc1,lcpc2=projpc(lcall,Xp)
+  
+    for l in range(1,3):
+        axfile=sys.argv[l]
+        print(axfile)
+        A,X,resall=read_data.readax(axfile)
+        WA=np.dot(W,A)
+        lcall=np.load("lcall.npz")["arr_0"]
+        for i in range(0,np.shape(lcall)[1]):
+            lcall[:,i]=lcall[:,i]/np.sum(WA,axis=1)
 
-    #unwrap=tik(lcall,W)
-    #cpc1,cpc2=projpc(unwrap,Xp)
+        xpc1,xpc2=projpc(X,Xp)
+        lcpc1,lcpc2=projpc(lcall,Xp)
+        
+        #unwrap=tik(lcall,W)
+        #cpc1,cpc2=projpc(unwrap,Xp)
+        
+        As=np.sum(A,axis=1)
+        for k in range(0,np.shape(WA)[1]):
+            A[:,k]=A[:,k]/As
+            B=np.dot(A,X)
+        bpc1,bpc2=projpc(B,Xp)
+        
+#        plt.plot(lcpc1,lcpc2,"+", label="Light curve")        
+        plt.plot(bpc1,bpc2,".",alpha=0.3, label="Disentangled")
+        #plt.plot(cpc1,cpc2,".",alpha=0.3)    
+#        for i in range(0,len(xpc1)):
+#            plt.text(xpc1[i],xpc2[i],str(i),fontsize=18)
+#        plt.plot(xpc1,xpc2,"o",color="red",label="endmembers")
+#        plt.plot(np.concatenate([xpc1,xpc1]),np.concatenate([xpc2,xpc2]),color="gray")
 
-    As=np.sum(A,axis=1)
-    for k in range(0,np.shape(WA)[1]):
-        A[:,k]=A[:,k]/As
-    B=np.dot(A,X)
-    bpc1,bpc2=projpc(B,Xp)
-
-    
-    fontsize=13.5
-    matplotlib.rcParams.update({'font.size':fontsize})
-    fig=plt.figure(figsize=(7,5))
-    #plt.plot(cpc1,cpc2,".",alpha=0.3)    
-    for i in range(0,len(xpc1)):
-        plt.text(xpc1[i],xpc2[i],str(i),fontsize=18)
-    plt.plot(np.concatenate([xpc1,xpc1]),np.concatenate([xpc2,xpc2]),color="gray")
-    plt.plot(bpc1,bpc2,".",alpha=0.3, label="Disentangled",color="C0")
-    plt.plot(lcpc1,lcpc2,"+", label="Light curve",color="C1")
-    plt.plot(xpc1,xpc2,"o",color="red",label="Unmixed components")
 
     plt.xlabel("PC1")
     plt.ylabel("PC2")
-    plt.legend()        
+#    plt.legend()        
     plt.savefig("pcaproj.pdf", bbox_inches="tight", pad_inches=0.0)
     plt.show()
