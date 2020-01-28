@@ -25,7 +25,7 @@ lcall=lcall/6
 #np.savez("lcdscovr",lcall)
 ##################################################
 N=3
-lamA=1.e-3 #-6 sparse
+lamA=10**(-3.5) #-6 sparse
 lamX=1.e1
 Ntry=100000
 epsilon=1.e-12
@@ -36,9 +36,11 @@ regmode="L2-VRDet"
 #regmode="Unconstrained"
 filename=trytag+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
 
-A0,X0=initnmf.init_random(N,npix,lcall)
-X0=X0/10
-#A0,X0=initnmf.initpca(N,W,lcall,lamA,mode="Ridge")
+#A0,X0=initnmf.init_random(N,npix,lcall)
+#X0=X0/10
+A0,X0=initnmf.initpca(N,W,lcall,lamA,mode="Ridge")
+np.savez("pcad"+str(np.log10(lamA)),A0,X0)
+sys.exit()
 #fac=np.sum(lcall)/np.sum(A0)/np.sum(X0)
 #A0=A0*fac
 A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=1000,eta=1.e-12,endc=-np.inf,Nsave=1000)
