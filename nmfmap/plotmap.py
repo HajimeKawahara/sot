@@ -136,23 +136,25 @@ def plref(X,bands,title=""):
     dband=mband[1]-mband[0]
     fac0=fac/np.sum(X[0,:])/dband/normvveg
     fac1=fac/np.sum(X[1,:])/dband/normvwater
-    fac2=fac/np.sum(X[2,:])/dband/normvsoil
     #fac3=fac/np.sum(X[3,:])/dband
     
     plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C2")
     plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C0")
-    plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C1")
-    
+    plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C2",lw=2)
+    plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C0",lw=2)
+
+    try:
+        fac2=fac/np.sum(X[2,:])/dband/normvsoil
+        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C1")
+        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C1",lw=2)
+    except:
+        print("No 3rd comp")
     try:
         plt.plot(np.median(bands,axis=1),X[3,:]*fac3,"^",label="Component 3",color="C3")
-        plt.plot(np.median(bands,axis=1),X[3,:]*fac3,color="C3")
-        
+        plt.plot(np.median(bands,axis=1),X[3,:]*fac3,color="C3")        
     except:
         print("No 4th comp")
         
-    plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C2",lw=2)
-    plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C0",lw=2)
-    plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C1",lw=2)
     
     plt.tick_params(labelsize=16)
     plt.ylabel("Reflection Spectra",fontsize=16)
@@ -223,16 +225,18 @@ if __name__=='__main__':
         title=""
     A,X,resall=read_data.readax(axfile)
     bands=read_data.getband()
+    bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75],[0.75,0.8],[0.8,0.85]]
+
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
     title=""
     plot_resall(resall)    
 #    plot_resdiff(resall)    
-#    moll(A)
+    moll(A)
     plref(X,bands,title)
-#    classmap_color(A,title)
+    classmap_color(A,title)
 
-    classmap(A,title)
+ #   classmap(A,title)
 
     plt.show()
     #inmap()
