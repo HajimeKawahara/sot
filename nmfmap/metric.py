@@ -57,17 +57,18 @@ def plot_regx(axfiles):
     plt.savefig("regx.pdf", bbox_inches="tight", pad_inches=0.1)
     plt.show()
 
-def plotrefdepx(axfiles):
+def plotrefdepx(axfiles,lam):
     bands=read_data.getband()
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
     fig= plt.figure(figsize=(7,3))
     ax = fig.add_subplot(111)
-    lss=["dashed","dashed","solid","dotted","dotted"]
-    for i in [0,2,4]:
+    lss=["dashed","dashed","dashed","solid","dotted","dotted","dotted"]
+    for i in [0,3,6]:
         axfile=axfiles[i]
         A,X,resall=read_data.readax(axfile)
-        plref_each(X,bands,lss[i],"$\lambda_X=10^{"+str(int(lam[i]))+"}$")
+        print(lam[i])
+        plref_each(X,bands,lss[i],"$\lambda_X=10^{"+str((lam[i]))+"}$")
     plt.ylabel("Unmixed Spectra",fontsize=16)
     plt.xlabel("wavelength [micron]",fontsize=16)
     plt.legend(fontsize=13)
@@ -118,9 +119,8 @@ if __name__=='__main__':
     import sys
 #    axfiles=sys.argv[1:]
     axfiles,lam=get_axfiles.get_axfiles_X()
-    
-#    plotrefdepx(axfiles)
-    plot_regx(axfiles)
+    plotrefdepx(axfiles,lam)
+#    plot_regx(axfiles)
 #    plt.show()
 #    axfiles,lam=get_axfiles.get_axfiles_A()
 #    plot_rega(axfiles)
