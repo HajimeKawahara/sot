@@ -96,18 +96,19 @@ def load_template():
 
 
 def moll(A):
-    fc=0.6
+    fc=0.9
+    bc=1.0
     cc=plt.cm.viridis
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
-    hp.mollview(A[:,0], title="Component 0",flip="geo",cmap=cc,min=0,max=np.max(A[:,0])*fc)
+    hp.mollview(A[:,0], title="Component 0",flip="geo",cmap=cc,min=np.min(A[:,0])*bc,max=np.max(A[:,0])*fc)
     
     plt.savefig("C0.pdf", bbox_inches="tight", pad_inches=0.0)
     
-    hp.mollview(A[:,1], title="Component 1",flip="geo",cmap=cc,min=0,max=np.max(A[:,1])*fc)#,min=0,max=1)
+    hp.mollview(A[:,1], title="Component 1",flip="geo",cmap=cc,min=np.min(A[:,1])*bc,max=np.max(A[:,1])*fc)#,min=0,max=1)
     plt.savefig("C1.pdf", bbox_inches="tight", pad_inches=0.0)
     
-    hp.mollview(A[:,2], title="Component 2",flip="geo",cmap=cc,min=0,max=np.max(A[:,2])*fc)#,min=0,max=1)
+    hp.mollview(A[:,2], title="Component 2",flip="geo",cmap=cc,min=np.min(A[:,2])*bc,max=np.max(A[:,2])*fc)#,min=0,max=1)
     plt.savefig("C2.pdf", bbox_inches="tight", pad_inches=0.0)
     
     try:
@@ -117,7 +118,7 @@ def moll(A):
         print("No 4th comp")
         #hp.mollview(A[:,0]+A[:,1], title="0+1",flip="geo",cmap=plt.cm.jet)
 
-def plref(X,bands,title=""):
+def plref(X,bands,title="",oxlab=False):
     cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky=io_refdata.read_refdata("/home/kawahara/exomap/sot/data/refdata")
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
@@ -131,7 +132,7 @@ def plref(X,bands,title=""):
     ax.plot(u,val,c="gray",lw=2,ls="dashed",label="soil")
     u,val,normvwater=norm(water)
     ax.plot(u,val,c="gray",lw=2,ls="-.",label="water")
-    plt.xlim(0.4,0.9)
+    plt.xlim(0.3,0.9)
     fac=1.0
     mband=np.median(bands,axis=1)
     dband=mband[1]-mband[0]
@@ -159,7 +160,11 @@ def plref(X,bands,title=""):
     plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C2",lw=2)
     plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C0",lw=2)
     plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C1",lw=2)
-    
+
+    if oxlab:
+        plt.axvline(0.688,color="blue",alpha=0.2,lw=5)
+        plt.axvline(0.764,color="blue",alpha=0.2,lw=5)
+#        plt.text("")
     plt.tick_params(labelsize=16)
     plt.ylabel("Reflection Spectra",fontsize=16)
     plt.xlabel("wavelength [micron]",fontsize=16)
@@ -181,7 +186,7 @@ def classmap(A,title=""):
     hp.mollview(Aclass, title="Classification "+title,flip="geo",cmap=plt.cm.Greys,max=100,cbar=None)
     plt.savefig("retrieved.pdf", bbox_inches="tight", pad_inches=0.0)
 
-def classmap_color(A,title=""):
+def classmap_color(A,theme="b",title=""):
     
    Nj=np.shape(A)[0]
    tip=0.1
@@ -189,18 +194,24 @@ def classmap_color(A,title=""):
 
    #small norm filter
    Aabs=np.sqrt(np.sum(A**2,axis=1))
-   crit=np.mean(Aabs)*0.15
+   crit=np.mean(Aabs)*0.015
    mask=Aabs<crit
    fac=0.75
    gg=0.9
    rr=0.95
    bb=0.0
-   rot=np.array([[gg,0,np.sqrt(1.0-gg*gg)],[0,1,0],[np.sqrt(1.0-rr*rr-bb*bb),bb,rr]])                   
-   A=np.dot(A,rot)
-   Anorm=A.T/np.sum(A,axis=1)*fac
-   Anorm=Anorm.T
-
-   bright=np.array([[1.0,0.1,0.1],[0.1,1.0,0.1],[0.2,0.2,1.0]])                   
+   if theme=="3c":
+       rot=np.array([[gg,0,np.sqrt(1.0-gg*gg)],[0,1,0],[np.sqrt(1.0-rr*rr-bb*bb),bb,rr]])                   
+       A=np.dot(A,rot)
+       Anorm=A.T/np.sum(A,axis=1)*fac
+       Anorm=Anorm.T
+       bright=np.array([[1.0,0.1,0.1],[0.1,1.0,0.1],[0.2,0.2,1.0]])
+   else:
+       rot=np.array([[gg,0,np.sqrt(1.0-gg*gg)],[0,1,0],[np.sqrt(1.0-rr*rr-bb*bb),bb,rr]])                   
+       A=np.dot(A,rot)
+       Anorm=A.T/np.sum(A,axis=1)*fac
+       Anorm=Anorm.T
+       bright=np.array([[1.0,1.0,0.1],[0.1,1.0,0.1],[0.2,1.0,1.0]])                   
    Anorm=np.dot(Anorm,bright)
    Anorm=np.array([Anorm[:,2],Anorm[:,0],Anorm[:,1]]).T
 
@@ -228,17 +239,20 @@ if __name__=='__main__':
     except:
         title=""
     A,X,resall=read_data.readax(axfile)
-#    bands=read_data.getband()
-    bands=[[0.317,0.317],[0.325.0.325],[0.340,0.340],[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]] #DSCOVR
+    #    bands=read_data.getband()
+#    bands=[[0.317,0.317],[0.325,0.325],[0.340,0.340],[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]]
+    bands=[[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]]
+    #DSCOVR
 
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
     title=""
+    oxlab=True
     plot_resall(resall)    
 #    plot_resdiff(resall)    
     moll(A)
-    plref(X,bands,title)
-#    classmap_color(A,title)
+    plref(X,bands,title,oxlab)
+    classmap_color(A,title)
 
     classmap(A,title)
 
@@ -247,4 +261,5 @@ if __name__=='__main__':
 
 
 
+#    bands=[0.388,0.443,0.552,0.680,0.688,0.764,0.779]]
 
