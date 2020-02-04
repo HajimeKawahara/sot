@@ -172,11 +172,18 @@ def plref(X,bands,title="",oxlab=False):
     plt.title(title)
     plt.savefig("ref.pdf", bbox_inches="tight", pad_inches=0.0)
 
-def classmap(A,title=""):
+def classmap(A,title="",theme="3c"):
     Aclass=np.argmax(A,axis=1)
-    Aclass[Aclass==0]=70
-    Aclass[Aclass==1]=100
-    Aclass[Aclass==2]=0
+    if theme=="3c":
+        Aclass[Aclass==0]=70
+        Aclass[Aclass==1]=100
+        Aclass[Aclass==2]=0
+    if theme=="4c":
+        Aclass[Aclass==0]=0
+        Aclass[Aclass==1]=100
+        Aclass[Aclass==2]=70
+        Aclass[Aclass==3]=50
+
     #Aclass[Aclass==3]=30
     Aabs=np.sqrt(np.sum(A**2,axis=1))
     crit=np.mean(Aabs)*0.15
@@ -206,14 +213,16 @@ def classmap_color(A,theme="b",title=""):
        Anorm=A.T/np.sum(A,axis=1)*fac
        Anorm=Anorm.T
        bright=np.array([[1.0,0.1,0.1],[0.1,1.0,0.1],[0.2,0.2,1.0]])
-   else:
+       Anorm=np.dot(Anorm,bright)
+       Anorm=np.array([Anorm[:,2],Anorm[:,0],Anorm[:,1]]).T
+
+   elif theme=="4c":
+       #c,o,v,l
        rot=np.array([[gg,0,np.sqrt(1.0-gg*gg)],[0,1,0],[np.sqrt(1.0-rr*rr-bb*bb),bb,rr]])                   
        A=np.dot(A,rot)
        Anorm=A.T/np.sum(A,axis=1)*fac
        Anorm=Anorm.T
        bright=np.array([[1.0,1.0,0.1],[0.1,1.0,0.1],[0.2,1.0,1.0]])                   
-   Anorm=np.dot(Anorm,bright)
-   Anorm=np.array([Anorm[:,2],Anorm[:,0],Anorm[:,1]]).T
 
    #fill value for small norm filter
    Anorm[mask]=np.sqrt(1.0/3.0)
@@ -233,6 +242,7 @@ def inmap():
 if __name__=='__main__':
     import sys
     #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
+    theme="4c"
     axfile=sys.argv[1]
     try:
         title=sys.argv[2]
@@ -252,9 +262,9 @@ if __name__=='__main__':
 #    plot_resdiff(resall)    
     moll(A)
     plref(X,bands,title,oxlab)
-    classmap_color(A,title)
+#    classmap_color(A,title)
 
-    classmap(A,title)
+    classmap(A,title,theme=theme)
 
     plt.show()
     #inmap()
