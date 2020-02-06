@@ -118,7 +118,7 @@ def moll(A):
         print("No 4th comp")
         #hp.mollview(A[:,0]+A[:,1], title="0+1",flip="geo",cmap=plt.cm.jet)
 
-def plref(X,bands,title="",oxlab=False):
+def plref(X,bands,theme,title="",oxlab=False):
     cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky=io_refdata.read_refdata("/home/kawahara/exomap/sot/data/refdata")
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
@@ -126,12 +126,17 @@ def plref(X,bands,title="",oxlab=False):
     fig= plt.figure(figsize=(8,5.5))
     ax = fig.add_subplot(111)
     nnl=1#len(np.median(bands,axis=1))
-    u,val,normvveg=norm(veg)
-    ax.plot(u,val,c="gray",lw=2,label="vegitation (deciduous)")
-    u,val,normvsoil=norm(soil)
-    ax.plot(u,val,c="gray",lw=2,ls="dashed",label="soil")
-    u,val,normvwater=norm(water)
-    ax.plot(u,val,c="gray",lw=2,ls="-.",label="water")
+    if theme=="mock":
+        u,val,normvveg=norm(veg)
+        ax.plot(u,val,c="gray",lw=2,label="vegitation (deciduous)")
+        u,val,normvsoil=norm(soil)
+        ax.plot(u,val,c="gray",lw=2,ls="dashed",label="soil")
+        u,val,normvwater=norm(water)
+        ax.plot(u,val,c="gray",lw=2,ls="-.",label="water")
+    else:
+        normvveg=1.0
+        normvsoil=1.0
+        normvwater=1.0
     plt.xlim(0.3,0.9)
     fac=1.0
     mband=np.median(bands,axis=1)
@@ -146,20 +151,31 @@ def plref(X,bands,title="",oxlab=False):
         fac3=fac/np.sum(X[3,:])/dband
     except:
         print("No 4th comp")
-    plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C2")
-    plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C0")
-    plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C1")
+    if theme=="mock":
+        plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C2")
+        plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C0")
+        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C1")
     
-    try:
-        plt.plot(np.median(bands,axis=1),X[3,:]*fac3,"^",label="Component 3",color="C3")
-        plt.plot(np.median(bands,axis=1),X[3,:]*fac3,color="C3")
+        try:
+            plt.plot(np.median(bands,axis=1),X[3,:]*fac3,"^",label="Component 3",color="C3")
+            plt.plot(np.median(bands,axis=1),X[3,:]*fac3,color="C3")        
+        except:
+            print("No 4th comp")
         
-    except:
-        print("No 4th comp")
-        
-    plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C2",lw=2)
-    plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C0",lw=2)
-    plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C1",lw=2)
+        plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C2",lw=2)
+        plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C0",lw=2)
+        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C1",lw=2)
+    elif theme=="dscovr":
+        #c,o,v,l
+        plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="gray")
+        plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C0")
+        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C2")
+        plt.plot(np.median(bands,axis=1),X[3,:]*fac2,"*",label="Component 3",color="C3")
+
+        plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="gray",lw=2)
+        plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C0",lw=2)
+        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C2",lw=2)
+        plt.plot(np.median(bands,axis=1),X[3,:]*fac2,color="C3",lw=2)
 
     if oxlab:
         plt.axvline(0.688,color="blue",alpha=0.2,lw=5)
@@ -178,7 +194,7 @@ def classmap(A,title="",theme="3c"):
         Aclass[Aclass==0]=70
         Aclass[Aclass==1]=100
         Aclass[Aclass==2]=0
-    if theme=="4c":
+    if theme=="dscovr":
         Aclass[Aclass==0]=0
         Aclass[Aclass==1]=100
         Aclass[Aclass==2]=70
@@ -193,7 +209,7 @@ def classmap(A,title="",theme="3c"):
     hp.mollview(Aclass, title="Classification "+title,flip="geo",cmap=plt.cm.Greys,max=100,cbar=None)
     plt.savefig("retrieved.pdf", bbox_inches="tight", pad_inches=0.0)
 
-def classmap_color(A,theme="b",title=""):
+def classmap_color(A,title="",theme="b"):
     
    Nj=np.shape(A)[0]
    tip=0.1
@@ -204,6 +220,7 @@ def classmap_color(A,theme="b",title=""):
    crit=np.mean(Aabs)*0.015
    mask=Aabs<crit
    fac=0.75
+#   fac=1.0
    gg=0.9
    rr=0.95
    bb=0.0
@@ -216,16 +233,33 @@ def classmap_color(A,theme="b",title=""):
        Anorm=np.dot(Anorm,bright)
        Anorm=np.array([Anorm[:,2],Anorm[:,0],Anorm[:,1]]).T
 
-   elif theme=="4c":
+   elif theme=="dscovr":
        #c,o,v,l
-       rot=np.array([[gg,0,np.sqrt(1.0-gg*gg)],[0,1,0],[np.sqrt(1.0-rr*rr-bb*bb),bb,rr]])                   
+       Acl=A[:,0]
+       Acl=Acl/np.max(Acl)*5.0+1.0
+       #rot=np.array([[1.0,1.0,1.0],[0,1,0],[gg,0,np.sqrt(1.0-gg*gg)],[np.sqrt(1.0-rr*rr-bb*bb),bb,rr]])
+       rot=np.array([[1.0,1.0,1.0],[0,1,0],[np.sqrt(1.0-rr*rr-bb*bb),bb,rr],[gg,0,np.sqrt(1.0-gg*gg)]])
+       
        A=np.dot(A,rot)
        Anorm=A.T/np.sum(A,axis=1)*fac
        Anorm=Anorm.T
-       bright=np.array([[1.0,1.0,0.1],[0.1,1.0,0.1],[0.2,1.0,1.0]])                   
+       bright=np.array([[1.0,0.1,0.1],[0.1,1.0,0.1],[0.2,0.2,1.0]])
+       #       bright=np.array([[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,1.0,0.0]])
+
+       Anorm=np.dot(Anorm,bright)
+       #       Anorm[cmask,:]=Anorm[cmask,:]*2.0
+       B=Anorm[:,2]*Acl
+       C=Anorm[:,0]*Acl
+       D=Anorm[:,1]*Acl
+       B[B>1.0]=1.0
+       C[C>1.0]=1.0
+       D[D>1.0]=1.0
+       
+       Anorm=np.array([B,C,D]).T
+       
 
    #fill value for small norm filter
-   Anorm[mask]=np.sqrt(1.0/3.0)
+   Anorm[mask]=np.sqrt(1.0/3.0)*0.1
    cmap = matplotlib.colors.ListedColormap(Anorm)
    hp.mollview(indx, title="Color composite "+title,flip="geo",cmap=cmap,min=0-tip,max=Nj-tip,cbar=None)
    plt.savefig("class.pdf", bbox_inches="tight", pad_inches=0.0)
@@ -242,7 +276,7 @@ def inmap():
 if __name__=='__main__':
     import sys
     #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
-    theme="4c"
+    theme="dscovr"
     axfile=sys.argv[1]
     try:
         title=sys.argv[2]
@@ -261,10 +295,10 @@ if __name__=='__main__':
     plot_resall(resall)    
 #    plot_resdiff(resall)    
     moll(A)
-    plref(X,bands,title,oxlab)
-#    classmap_color(A,title)
+    plref(X,bands,theme,title,oxlab)
+    classmap_color(A,title,theme=theme)
 
-    classmap(A,title,theme=theme)
+#    classmap(A,title,theme=theme)
 
     plt.show()
     #inmap()
