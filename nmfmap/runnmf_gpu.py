@@ -7,7 +7,7 @@ def check_nonnegative(Y,lab):
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
-def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0, delta=1.e-6, off=0, nu=1.0,Lipx="norm2",Lipa="frobenius"):
+def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0, delta=1.e-6, off=0, nu=1.0,Lipx="norm2",Lipa="frobenius", endc=1.e-5,Nsave=10000):
     import scipy
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
@@ -77,6 +77,11 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
             A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta, Lip=Lipa)
             ## A normalization
             #A[:,k]=A[:,k]/cp.sum(A[:,k])*Nj
+        ## A normalization
+        #for k in range(0,Nk):
+        #    sumk=cp.sum(A[:,:],axis=1)
+        #    sumav=cp.mean(sumk)
+        #    A[:,k]=A[:,k]/sumk*sumav
 
         Like=cp.asnumpy(cp.sum((Y-cp.dot(cp.dot(W,A),X))**2))
         RA=cp.asnumpy(lamA*cp.sum(A0**2))
@@ -91,22 +96,28 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
             RX=cp.asnumpy(lamX*cp.sum(X**2))
         elif reg=="L2":
             RX=0.0
-            
+        resprev=res
         res=Like+RA+RX
+        diff=resprev - res
         resall.append([res,Like,RA,RX])                
-        print("Residual=",res)
+        print("Residual=",res,Like,RA,RX)
+        print("Xave",cp.mean(X))
+        print("Aave",cp.mean(A))
 
         #LogNMF(i,A,X,Nk)
         if np.mod(jj,10)==0:
             bandl=np.array(range(0,len(X[0,:])))
-            import terminalplot
-            terminalplot.plot(list(bandl),list(cp.asnumpy(X[np.mod(jj,Nk),:])))
+            #import terminalplot
+            #terminalplot.plot(list(bandl),list(cp.asnumpy(X[np.mod(jj,Nk),:])))
 
         jj=jj+1
-        if np.mod(jj,1000) == 0:
+        if np.mod(jj,Nsave) == 0:
             np.savez(filename+"j"+str(jj),cp.asnumpy(A),cp.asnumpy(X),resall)
-            
-    return A, X, resall
+        if diff < endc:
+            np.savez(filename+"Ej"+str(jj),cp.asnumpy(A),cp.asnumpy(X),resall)
+            return cp.asnumpy(A),cp.asnumpy(X), resall
+        
+    return cp.asnumpy(A),cp.asnumpy(X), resall
 
 def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0, Lip="frobenius"):
     #Accelerated Projected Gradient + restart

@@ -96,17 +96,18 @@ def load_template():
 
 
 def moll(A):
+    fc=1.0
     cc=plt.cm.viridis
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
-    hp.mollview(A[:,0], title="Component 0",flip="geo",cmap=cc)#,min=0,max=1)
+    hp.mollview(A[:,0], title="Component 0",flip="geo",cmap=cc,min=0,max=np.max(A[:,0])*fc)
     
     plt.savefig("C0.pdf", bbox_inches="tight", pad_inches=0.0)
     
-    hp.mollview(A[:,1], title="Component 1",flip="geo",cmap=cc)#,min=0,max=1)
+    hp.mollview(A[:,1], title="Component 1",flip="geo",cmap=cc,min=0,max=np.max(A[:,1])*fc)#,min=0,max=1)
     plt.savefig("C1.pdf", bbox_inches="tight", pad_inches=0.0)
     
-    hp.mollview(A[:,2], title="Component 2",flip="geo",cmap=cc)#,min=0,max=1)
+    hp.mollview(A[:,2], title="Component 2",flip="geo",cmap=cc,min=0,max=np.max(A[:,2])*fc)#,min=0,max=1)
     plt.savefig("C2.pdf", bbox_inches="tight", pad_inches=0.0)
     
     try:
@@ -136,8 +137,14 @@ def plref(X,bands,title=""):
     dband=mband[1]-mband[0]
     fac0=fac/np.sum(X[0,:])/dband/normvveg
     fac1=fac/np.sum(X[1,:])/dband/normvwater
-    #fac3=fac/np.sum(X[3,:])/dband
-    
+    fac2=fac/np.sum(X[2,:])/dband/normvsoil
+    try:
+        fac0=fac/np.sum(X[0,:])/dband
+        fac1=fac/np.sum(X[1,:])/dband
+        fac2=fac/np.sum(X[2,:])/dband
+        fac3=fac/np.sum(X[3,:])/dband
+    except:
+        print("No 4th comp")
     plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C2")
     plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C0")
     plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C2",lw=2)
@@ -224,15 +231,19 @@ if __name__=='__main__':
     except:
         title=""
     A,X,resall=read_data.readax(axfile)
-    bands=read_data.getband()
-    bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75],[0.75,0.8],[0.8,0.85]]
+    print(resall[-1,:])
+#    bands=read_data.getband()
+#    bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.75],[0.75,0.8],[0.8,0.85]]
+#    bands=read_data.getband()
+#    bands=[[0.317,0.317],[0.325.0.325],[0.340,0.340],[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]] #DSCOVR
+    bands=[[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]] #DSCOVR
 
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
     title=""
     plot_resall(resall)    
 #    plot_resdiff(resall)    
-    moll(A)
+#    moll(A)
     plref(X,bands,title)
     classmap_color(A,title)
 
