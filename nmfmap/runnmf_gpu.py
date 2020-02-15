@@ -7,7 +7,7 @@ def check_nonnegative(Y,lab):
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
-def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0, delta=1.e-6, off=0, nu=1.0,Lipx="norm2",Lipa="frobenius", endc=1.e-5,Nsave=10000):
+def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0, delta=1.e-6, off=0, nu=1.0,Lipx="norm2",Lipa="frobenius", endc=1.e-5,Nsave=10000,semiNMF=False):
     import scipy
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
@@ -74,7 +74,10 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
             W_a=(cp.dot(xk,xk))*(cp.dot(W.T,W))
             b=cp.dot(cp.dot(W.T,Delta),xk)
             T_a=lamA*cp.eye(Nj)
-            A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta, Lip=Lipa)
+            if semiNMF:
+                A[:,k]=AGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta, Lip=Lipa)
+            else:
+                A[:,k]=APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta, Lip=Lipa)
             ## A normalization
             #A[:,k]=A[:,k]/cp.sum(A[:,k])*Nj
         ## A normalization
@@ -172,7 +175,55 @@ def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0, Lip="frobenius"):
 #    print("APG",edd-ed,"sec")
 
     return x
-        
+
+def AGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0, Lip="frobenius"):
+    #Accelerated (non-projected) Gradient + restart for semi NMF
+    if Lip=="frobenius":
+        normQ = cp.sqrt(cp.sum(Q**2))
+    elif Lip=="norm2":        
+        normQ = np.linalg.norm(cp.asnumpy(Q),2)        
+    Theta1 = cp.eye(n) - Q/normQ
+    theta2 = p/normQ
+    x = cp.copy(x0)
+    y = cp.copy(x0)
+    x[x<0]=0.0
+    alpha=alpha0
+    cost0=0.5*cp.dot(x0,cp.dot(Q,x0)) - cp.dot(p,x0)
+    costp=cost0
+    for i in range(0,Ntry):
+        xp=cp.copy(x)
+        x = cp.dot(Theta1,y) + theta2
+        x[x<0] = 0.0
+        dx=x-xp
+        aa=alpha*alpha
+        beta=alpha*(1.0-alpha)
+        alpha=0.5*(np.sqrt(aa*aa + 4*aa) - aa)
+        beta=beta/(alpha + aa)
+        y=x+beta*dx
+        cost=0.5*cp.dot(x,cp.dot(Q,x)) - cp.dot(p,x)
+        if cost > costp:
+            x = cp.dot(Theta1,xp) + theta2
+            y = cp.copy(x)
+            alpha=alpha0
+        elif costp - cost < eta:
+            print(i,cost0 - cost)
+
+            return x
+
+        costp=cp.copy(cost)
+        if cost != cost:
+            print("Halt at AG")
+            print("Q,p,x0",Q,p,x0)
+            print("cost=",cost)
+            sys.exit()
+            
+    print(i,cost0 - cost)
+#    edd=time.time()
+#    print("APG",edd-ed,"sec")
+
+    return x
+
+
 def MP_L2VR_NMF(Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,rho=0.1, off=0):
     #multiplicative L2VR using natural gradient
     check_nonnegative(lcall,"LC")
