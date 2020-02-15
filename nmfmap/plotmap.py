@@ -273,6 +273,26 @@ def inmap():
     plt.savefig("input.pdf", bbox_inches="tight", pad_inches=0.0)
     plt.show()
 
+def getpred(A,X):
+    W=np.load("w.npz")["arr_0"]
+    WA=np.dot(W,A)
+    pred=np.dot(WA,X)
+    lcall=np.load("lcall.npz")["arr_0"]
+    return lcall, pred
+
+def showpred(A,X):
+    lcall,pred=getpred(A,X)
+    fig=plt.figure()
+    for i in range(0,np.shape(lcall)[1]):
+        ax=fig.add_subplot(np.shape(lcall)[1],2,2*i+1)
+        ax.plot((lcall[:,i]-pred[:,i]),".")
+        ax=fig.add_subplot(np.shape(lcall)[1],2,2*i+2)
+        ax.plot((lcall[:,i]))
+
+#        ax.plot(pred[:,i])
+    plt.savefig("lc.pdf", bbox_inches="tight", pad_inches=0.0)
+    plt.show()
+    
 if __name__=='__main__':
     import sys
     #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
@@ -283,24 +303,23 @@ if __name__=='__main__':
     except:
         title=""
     A,X,resall=read_data.readax(axfile)
-    print("res=",resall[-1,:])
+    print(resall[-1,:])
     bands=read_data.getband()
-#    bands=[[0.317,0.317],[0.325,0.325],[0.340,0.340],[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]]
-#    bands=[[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]]
-    #DSCOVR
+    #    bands=[[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]] #DSCOVR
+    
+    showpred(A,X)
+    sys.exit()
 
+    
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
     title=""
     oxlab=True
     plot_resall(resall)    
 #    plot_resdiff(resall)    
-    moll(A)
+#    moll(A)
     plref(X,bands,theme,title,oxlab)
     classmap_color(A,title,theme=theme)
-
-#    classmap(A,title,theme=theme)
-
     plt.show()
     #inmap()
 

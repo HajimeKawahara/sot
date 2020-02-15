@@ -60,10 +60,11 @@ npix=hp.nside2npix(nside)
 
 lcall=np.dot(np.dot(W,Ainit),Xinit)
 noiselevel=0.01
-lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0)
+lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0,np.shape(lcall))
 #lcall= np.dot(np.diag(1/np.sum(lcall[:,:],axis=1)),lcall)
 #np.savez("lcall",lcall)
-
+#print(np.mean(lcall))
+#sys.exit()
 nside=16
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
@@ -80,7 +81,7 @@ A0,X0=initnmf.init_random(Nk,npix,lcall)
 #fac=np.sum(lcall)/np.sum(A0)/np.sum(X0)
 #A0=A0*fac
 
-trytag="T122"
+trytag="T214"
 #regmode="L2"
 regmode="L2-VRDet"
 #regmode="L2-VRLD"

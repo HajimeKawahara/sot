@@ -10,6 +10,8 @@ import read_data
 import get_axfiles
 import plotmap as pm
 import diffclass
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+
 def plref_each(X,bands,ls,lab):
     cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky=io_refdata.read_refdata("/home/kawahara/exomap/sot/data/refdata")
     nnl=1#len(np.median(bands,axis=1))
@@ -34,27 +36,19 @@ def plot_regx(axfiles):
     likarr=[]
     for i,axfile in enumerate(axfiles):
         A,X,resall=read_data.readax(axfile)
-        mmrsa=mrsa.mrsa_meanX(X)
         AFnorm=np.sqrt(np.sum(A*A))
-        mrarr.append(mmrsa)
         likarr.append(resall[-1][1])
-        print(lam[i],resall[-1][1],AFnorm,mmrsa)
 
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
     fig=plt.figure(figsize=(7,5))
-    ax=fig.add_subplot(211)
+    ax=fig.add_subplot(111)
     ax.plot(10**lam,likarr,"o",color="C0")
     ax.plot(10**lam,likarr,color="C0")
     plt.xscale("log")
     plt.ylabel("$||D - W A X||_F^2$")
-    ax=fig.add_subplot(212)
-    ax.plot(10**lam,mrarr,"o",color="C0")
-    ax.plot(10**lam,mrarr,color="C0")
-    plt.xscale("log")
-    plt.ylabel("$\overline{MRSA}$")
     plt.xlabel("$\lambda_X$")
-    plt.savefig("regx.pdf", bbox_inches="tight", pad_inches=0.1)
+    plt.savefig("regxd.pdf", bbox_inches="tight", pad_inches=0.1)
     plt.show()
 
 def plotrefdepx(axfiles,lam):
@@ -76,6 +70,9 @@ def plotrefdepx(axfiles,lam):
     plt.show()
 
 def plot_rega(axfiles):
+    NN=2435*7.
+#    NN=1
+    lcmean=107.40646786191814
     mrarr=[]
     mrsaarr=[]
     likarr=[]
@@ -84,47 +81,31 @@ def plot_rega(axfiles):
         Aclass=diffclass.mclassmap(A)
         mr=diffclass.classdif(Aclass)
         AFnorm=np.sqrt(np.sum(A*A))
-        mmrsa=mrsa.mrsa_meanX(X)
-        mrsaarr.append(mmrsa)
         mrarr.append(mr)
         likarr.append(resall[-1][1])
-        print(lam[i],resall[-1][1],AFnorm,mr,mmrsa)
-
-    fontsize=18
-    matplotlib.rcParams.update({'font.size':fontsize})
     likarr=np.array(likarr)
-    NN=512*10
-    lcmean=105.70907195459881
-    fig=plt.figure(figsize=(7,7.5))
-    ax=fig.add_subplot(311)
+    fontsize=12
+    matplotlib.rcParams.update({'font.size':fontsize})
+    fig=plt.figure(figsize=(7,2.5))
+    ax=fig.add_subplot(111)
     ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,"o",color="C0")
     ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,color="C0")
+#    ax.yaxis.set_major_formatter(FormatStrFormatter("%1.e"))
     plt.xscale("log")
 #    plt.yscale("log")
 
-#    plt.ylabel("$||D - W A X||_F^2$")
-    plt.ylabel("mean residual")
-    ax=fig.add_subplot(312)
-    ax.plot(10**lam,mrsaarr,"o",color="C0")
-    ax.plot(10**lam,mrsaarr,color="C0")
-    plt.xscale("log")
-    plt.ylabel("$\overline{MRSA}$")
-    
-    ax=fig.add_subplot(313)
-    ax.plot(10**lam,mrarr,"o",color="C0")
-    ax.plot(10**lam,mrarr,color="C0")
-    plt.xscale("log")
-    plt.ylabel("CPR")
+#    plt.ylabel("$\sqrt{||D - W A X||_F^2/N}/\overline{D}$")
+    plt.ylabel("Mean residual")
     plt.xlabel("$\lambda_A$")
-    plt.savefig("rega.pdf", bbox_inches="tight", pad_inches=0.1)
+    plt.savefig("regad.pdf", bbox_inches="tight", pad_inches=0.1)
     plt.show()
 
 if __name__=='__main__':
     import sys
 #    axfiles=sys.argv[1:]
-#    axfiles,lam=get_axfiles.get_axfiles_X()
+#    axfiles,lam=get_axfiles.get_axfiles_Xd()
 #    plotrefdepx(axfiles,lam)
 #    plot_regx(axfiles)
 #    plt.show()
-    axfiles,lam=get_axfiles.get_axfiles_A()
+    axfiles,lam=get_axfiles.get_axfiles_Ad()
     plot_rega(axfiles)
