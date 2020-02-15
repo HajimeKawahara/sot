@@ -68,7 +68,7 @@ nside=16
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
-Nk=3
+Nk=4
 Ntry=1000000
 epsilon=1.e-12
 lamA=10**(-2)  #-1---4
@@ -87,7 +87,7 @@ regmode="L2-VRDet"
 #regmode="Dual-L2"
 
 filename=trytag+"_N"+str(Nk)+"_"+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
-A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,endc=1.e-5)
+A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,endc=-np.inf)
 np.savez(filename,A,X)
 
 
