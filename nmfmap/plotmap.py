@@ -126,7 +126,7 @@ def plref(X,bands,theme,title="",oxlab=False):
     fig= plt.figure(figsize=(8,5.5))
     ax = fig.add_subplot(111)
     nnl=1#len(np.median(bands,axis=1))
-    if theme=="mock":
+    if theme=="3c":
         u,val,normvveg=norm(veg)
         ax.plot(u,val,c="gray",lw=2,label="vegitation (deciduous)")
         u,val,normvsoil=norm(soil)
@@ -137,24 +137,30 @@ def plref(X,bands,theme,title="",oxlab=False):
         normvveg=1.0
         normvsoil=1.0
         normvwater=1.0
-    plt.xlim(0.3,0.9)
     fac=1.0
     mband=np.median(bands,axis=1)
     dband=mband[1]-mband[0]
-    fac0=fac/np.sum(X[0,:])/dband/normvveg
-    fac1=fac/np.sum(X[1,:])/dband/normvwater
-    fac2=fac/np.sum(X[2,:])/dband/normvsoil
-    try:
-        fac0=fac/np.sum(X[0,:])/dband
-        fac1=fac/np.sum(X[1,:])/dband
-        fac2=fac/np.sum(X[2,:])/dband
-        fac3=fac/np.sum(X[3,:])/dband
-    except:
-        print("No 4th comp")
-    if theme=="mock":
+    if theme=="3c":
+        plt.xlim(0.4,0.9)
+
+        fac0=fac/np.sum(X[0,:])/dband/normvveg
+        fac1=fac/np.sum(X[1,:])/dband/normvsoil
+        fac2=fac/np.sum(X[2,:])/dband/normvwater
+    else:
+        plt.xlim(0.3,0.9)
+
+        try:
+            fac0=fac/np.sum(X[0,:])/dband
+            fac1=fac/np.sum(X[1,:])/dband
+            fac2=fac/np.sum(X[2,:])/dband
+            fac3=fac/np.sum(X[3,:])/dband
+        except:
+            print("No 4th comp")
+            
+    if theme=="3c":
         plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="C2")
-        plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C0")
-        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C1")
+        plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C1")
+        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C0")
     
         try:
             plt.plot(np.median(bands,axis=1),X[3,:]*fac3,"^",label="Component 3",color="C3")
@@ -163,8 +169,8 @@ def plref(X,bands,theme,title="",oxlab=False):
             print("No 4th comp")
         
         plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C2",lw=2)
-        plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C0",lw=2)
-        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C1",lw=2)
+        plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C1",lw=2)
+        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C0",lw=2)
     elif theme=="dscovr":
         #c,o,v,l
         plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="gray")
@@ -192,8 +198,8 @@ def classmap(A,title="",theme="3c"):
     Aclass=np.argmax(A,axis=1)
     if theme=="3c":
         Aclass[Aclass==0]=70
-        Aclass[Aclass==1]=100
-        Aclass[Aclass==2]=0
+        Aclass[Aclass==1]=0
+        Aclass[Aclass==2]=100
     if theme=="dscovr":
         Aclass[Aclass==0]=0
         Aclass[Aclass==1]=100
@@ -225,6 +231,9 @@ def classmap_color(A,title="",theme="b"):
    rr=0.95
    bb=0.0
    if theme=="3c":
+       B=np.copy(A[:,1])
+       A[:,1]=np.copy(A[:,2])
+       A[:,2]=B
        rot=np.array([[gg,0,np.sqrt(1.0-gg*gg)],[0,1,0],[np.sqrt(1.0-rr*rr-bb*bb),bb,rr]])                   
        A=np.dot(A,rot)
        Anorm=A.T/np.sum(A,axis=1)*fac
@@ -285,9 +294,10 @@ def showpred(A,X):
     fig=plt.figure()
     for i in range(0,np.shape(lcall)[1]):
         ax=fig.add_subplot(np.shape(lcall)[1],2,2*i+1)
-        ax.plot((lcall[:,i]-pred[:,i]),".")
+        ax.plot((lcall[:,i]-pred[:,i])/lcall[:,i]*100.0,".")
         ax=fig.add_subplot(np.shape(lcall)[1],2,2*i+2)
-        ax.plot((lcall[:,i]))
+        ax.plot((lcall[:,i]),".")
+        ax.plot((pred[:,i]))
 
 #        ax.plot(pred[:,i])
     plt.savefig("lc.pdf", bbox_inches="tight", pad_inches=0.0)
@@ -296,7 +306,8 @@ def showpred(A,X):
 if __name__=='__main__':
     import sys
     #    axfile="npz/T116/T116_L2-VRLD_A-2.0X4.0j99000.npz"
-    theme="dscovr"
+#    theme="dscovr"
+    theme="3c"
     axfile=sys.argv[1]
     try:
         title=sys.argv[2]
@@ -307,18 +318,19 @@ if __name__=='__main__':
     bands=read_data.getband()
     #    bands=[[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]] #DSCOVR
     
-    showpred(A,X)
-    sys.exit()
+#    showpred(A,X)
+#    sys.exit()
 
     
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
     title=""
-    oxlab=True
+    oxlab=False
     plot_resall(resall)    
 #    plot_resdiff(resall)    
-#    moll(A)
+    moll(A)
     plref(X,bands,theme,title,oxlab)
+    classmap(A)
     classmap_color(A,title,theme=theme)
     plt.show()
     #inmap()

@@ -21,34 +21,54 @@ def plref_each(X,bands,ls,lab):
     mband=np.median(bands,axis=1)
     dband=mband[1]-mband[0]
     fac0=fac/np.sum(X[0,:])/dband/normvveg
-    fac1=fac/np.sum(X[1,:])/dband/normvwater
-    fac2=fac/np.sum(X[2,:])/dband/normvsoil    
+    fac1=fac/np.sum(X[1,:])/dband/normvsoil    
+    fac2=fac/np.sum(X[2,:])/dband/normvwater
     plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C2",lw=2,ls=ls)
-    plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C0",lw=2,ls=ls,label=lab)
-    plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C1",lw=2,ls=ls)
+    plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C1",lw=2,ls=ls)
+    plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C0",lw=2,ls=ls,label=lab)
     
     plt.tick_params(labelsize=16)
 
 def plot_regx(axfiles):
+    NN=512*10
+    lcmean=105.70907195459881
+
     mrarr=[]
     likarr=[]
+    detx=[]
+    absa=[]
     for i,axfile in enumerate(axfiles):
         A,X,resall=read_data.readax(axfile)
         mmrsa=mrsa.mrsa_meanX(X)
         AFnorm=np.sqrt(np.sum(A*A))
         mrarr.append(mmrsa)
         likarr.append(resall[-1][1])
+        absa.append(resall[-1][2])
+        detx.append(resall[-1][3])#/10**lam[i])
+        
         print(lam[i],resall[-1][1],AFnorm,mmrsa)
+    likarr=np.array(likarr)
+    absa=np.array(absa)
+    detx=np.array(detx)
 
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
-    fig=plt.figure(figsize=(7,5))
-    ax=fig.add_subplot(211)
-    ax.plot(10**lam,likarr,"o",color="C0")
-    ax.plot(10**lam,likarr,color="C0")
+    fig=plt.figure(figsize=(7,7.5))
+    ax=fig.add_subplot(311)
+    ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,"o",color="C0")
+    ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,color="C0")
+    plt.ylabel("mean residual")
     plt.xscale("log")
-    plt.ylabel("$||D - W A X||_F^2$")
-    ax=fig.add_subplot(212)
+    ax=fig.add_subplot(312)    
+    plt.xscale("log")
+    plt.yscale("log")
+#    ax.plot(10**lam,(absa),"o",)
+    ax.plot(10**lam,(detx),"o",color="C0")
+    ax.plot(10**lam,(detx),color="C0")
+    plt.ylabel("$\det{(X X^T)}$")
+
+#    plt.ylabel("$||D - W A X||_F^2$")
+    ax=fig.add_subplot(313)
     ax.plot(10**lam,mrarr,"o",color="C0")
     ax.plot(10**lam,mrarr,color="C0")
     plt.xscale("log")
@@ -63,8 +83,8 @@ def plotrefdepx(axfiles,lam):
     matplotlib.rcParams.update({'font.size':fontsize})
     fig= plt.figure(figsize=(7,3))
     ax = fig.add_subplot(111)
-    lss=["dashed","dashed","dashed","solid","dotted","dotted","dotted"]
-    for i in [0,3,6]:
+    lss=["dashed","dashed","dashed","solid","solid","dotted","dotted"]
+    for i in [0,4,6]:
         axfile=axfiles[i]
         A,X,resall=read_data.readax(axfile)
         print(lam[i])
@@ -122,9 +142,9 @@ def plot_rega(axfiles):
 if __name__=='__main__':
     import sys
 #    axfiles=sys.argv[1:]
-#    axfiles,lam=get_axfiles.get_axfiles_X()
+    axfiles,lam=get_axfiles.get_axfiles_X()
 #    plotrefdepx(axfiles,lam)
-#    plot_regx(axfiles)
+    plot_regx(axfiles)
 #    plt.show()
-    axfiles,lam=get_axfiles.get_axfiles_A()
-    plot_rega(axfiles)
+#    axfiles,lam=get_axfiles.get_axfiles_A()
+#    plot_rega(axfiles)
