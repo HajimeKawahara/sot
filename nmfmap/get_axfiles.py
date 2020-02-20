@@ -45,10 +45,12 @@ def get_axfiles_Ad():
 
 def get_axfiles_Xd():
     axfiles=[\
-             "npz/D203/D203L2-VRDet_A-1.0X-5.0j30000.npz",\
-             "npz/D203/D203L2-VRDet_A-1.5X-5.0j30000.npz",\
-             "npz/D203/D203L2-VRDet_A-2.0X-5.0j30000.npz"
+             "npz/D203n/D203L2-VRDet_A-1.0X-4.5j40000.npz",\
+             "npz/D203n/D203L2-VRDet_A-1.5X-4.5j40000.npz",\
+             "npz/D203/D203L2-VRDet_A-2.0X-4.5j40000.npz",\
+             "npz/D203n/D203L2-VRDet_A-2.5X-4.5j40000.npz",\
+             "npz/D203n/D203L2-VRDet_A-3.0X-4.5j40000.npz"
     ]
-    lamx=[-1.0,-1.5,-2.0]
+    lamx=[-1.0,-1.5,-2.0,-2.5,-3.0]
     lamx=np.array(lamx)
     return axfiles,lamx

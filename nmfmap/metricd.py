@@ -32,21 +32,41 @@ def plref_each(X,bands,ls,lab):
     plt.tick_params(labelsize=16)
 
 def plot_regx(axfiles):
+    NN=2435*7.
+#    NN=1
+    lcmean=107.40646786191814
+    detxn=[]
+ 
     mrarr=[]
     likarr=[]
     for i,axfile in enumerate(axfiles):
         A,X,resall=read_data.readax(axfile)
         AFnorm=np.sqrt(np.sum(A*A))
         likarr.append(resall[-1][1])
+        Xn=np.copy(X)
+        for k in range(0,np.shape(X)[0]):
+            Xn[k,:]=X[k,:]/np.sum(X[k,:])
+        detxn.append(np.linalg.det(np.dot(Xn,Xn.T)))#/10**lam[i])
+ 
+    likarr=np.array(likarr)
+    detxn=np.array(detxn)
 
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
     fig=plt.figure(figsize=(7,5))
-    ax=fig.add_subplot(111)
-    ax.plot(10**lam,likarr,"o",color="C0")
-    ax.plot(10**lam,likarr,color="C0")
+    ax=fig.add_subplot(211)
+    ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,"o",color="C0")
+    ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,color="C0")
     plt.xscale("log")
-    plt.ylabel("$||D - W A X||_F^2$")
+    plt.ylabel("mean residual")
+    ax=fig.add_subplot(212)
+    plt.xscale("log")
+#    plt.yscale("log")
+#    ax.plot(10**lam,(absa),"o",)
+    ax.plot(10**lam,(detxn),"o",color="C0")
+    ax.plot(10**lam,(detxn),color="C0")
+    plt.ylabel("$\det{(\hat{X} \hat{X}^T)}$")
+    
     plt.xlabel("$\lambda_X$")
     plt.savefig("regxd.pdf", bbox_inches="tight", pad_inches=0.1)
     plt.show()
@@ -103,9 +123,9 @@ def plot_rega(axfiles):
 if __name__=='__main__':
     import sys
 #    axfiles=sys.argv[1:]
-#    axfiles,lam=get_axfiles.get_axfiles_Xd()
+    axfiles,lam=get_axfiles.get_axfiles_Xd()
 #    plotrefdepx(axfiles,lam)
-#    plot_regx(axfiles)
+    plot_regx(axfiles)
 #    plt.show()
-    axfiles,lam=get_axfiles.get_axfiles_Ad()
-    plot_rega(axfiles)
+#    axfiles,lam=get_axfiles.get_axfiles_Ad()
+#    plot_rega(axfiles)

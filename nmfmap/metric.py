@@ -36,6 +36,7 @@ def plot_regx(axfiles):
     mrarr=[]
     likarr=[]
     detx=[]
+    detxn=[]
     absa=[]
     for i,axfile in enumerate(axfiles):
         A,X,resall=read_data.readax(axfile)
@@ -44,12 +45,17 @@ def plot_regx(axfiles):
         mrarr.append(mmrsa)
         likarr.append(resall[-1][1])
         absa.append(resall[-1][2])
-        detx.append(resall[-1][3])#/10**lam[i])
+        Xn=np.copy(X)
+        for k in range(0,np.shape(X)[0]):
+            Xn[k,:]=X[k,:]/np.sum(X[k,:])
+        detxn.append(np.linalg.det(np.dot(Xn,Xn.T)))#/10**lam[i])
+        detx.append(np.linalg.det(np.dot(X,X.T)))#/10**lam[i])
         
         print(lam[i],resall[-1][1],AFnorm,mmrsa)
     likarr=np.array(likarr)
     absa=np.array(absa)
     detx=np.array(detx)
+    detxn=np.array(detxn)
 
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
@@ -61,11 +67,13 @@ def plot_regx(axfiles):
     plt.xscale("log")
     ax=fig.add_subplot(312)    
     plt.xscale("log")
-    plt.yscale("log")
+#    plt.yscale("log")
 #    ax.plot(10**lam,(absa),"o",)
-    ax.plot(10**lam,(detx),"o",color="C0")
-    ax.plot(10**lam,(detx),color="C0")
-    plt.ylabel("$\det{(X X^T)}$")
+    ax.plot(10**lam,(detxn),"o",color="C0")
+    ax.plot(10**lam,(detxn),color="C0")
+#    ax.plot(10**lam,(detxn)*1000,color="C0")
+
+    plt.ylabel("$\det{(\hat{X} \hat{X}^T)}$")
 
 #    plt.ylabel("$||D - W A X||_F^2$")
     ax=fig.add_subplot(313)
