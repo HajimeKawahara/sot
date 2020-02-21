@@ -96,6 +96,7 @@ def plot_rega(axfiles):
     mrarr=[]
     mrsaarr=[]
     likarr=[]
+    detxn=[]
     for i,axfile in enumerate(axfiles):
         A,X,resall=read_data.readax(axfile)
         Aclass=diffclass.mclassmap(A)
@@ -103,19 +104,29 @@ def plot_rega(axfiles):
         AFnorm=np.sqrt(np.sum(A*A))
         mrarr.append(mr)
         likarr.append(resall[-1][1])
+        Xn=np.copy(X)
+        for k in range(0,np.shape(X)[0]):
+            Xn[k,:]=X[k,:]/np.sum(X[k,:])
+        detxn.append(np.linalg.det(np.dot(Xn,Xn.T)))#/10**lam[i])
+
     likarr=np.array(likarr)
-    fontsize=12
+    detxn=np.array(detxn)
+
+    fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
-    fig=plt.figure(figsize=(7,2.5))
-    ax=fig.add_subplot(111)
+    fig=plt.figure(figsize=(7,5))
+    ax=fig.add_subplot(211)
     ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,"o",color="C0")
     ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,color="C0")
-#    ax.yaxis.set_major_formatter(FormatStrFormatter("%1.e"))
+    plt.xscale("log")
+    plt.ylabel("mean residual")
+    ax=fig.add_subplot(212)
     plt.xscale("log")
 #    plt.yscale("log")
-
-#    plt.ylabel("$\sqrt{||D - W A X||_F^2/N}/\overline{D}$")
-    plt.ylabel("Mean residual")
+#    ax.plot(10**lam,(absa),"o",)
+    ax.plot(10**lam,(detxn),"o",color="C0")
+    ax.plot(10**lam,(detxn),color="C0")
+    plt.ylabel("$\det{(\hat{X} \hat{X}^T)}$")
     plt.xlabel("$\lambda_A$")
     plt.savefig("regad.pdf", bbox_inches="tight", pad_inches=0.1)
     plt.show()

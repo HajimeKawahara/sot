@@ -29,7 +29,7 @@ def get_axfiles_A():
     return axfiles,lama
 
 
-def get_axfiles_Ad():
+def get_axfiles_Xd():
     axfiles=[\
              "npz/D203/D203L2-VRDet_A-2.0X-3.0j40000.npz",\
              "npz/D203/D203L2-VRDet_A-2.0X-4.0j40000.npz",\
@@ -39,11 +39,11 @@ def get_axfiles_Ad():
              "npz/D203/D203L2-VRDet_A-2.0X-7.0j40000.npz",\
              "npz/D203/D203L2-VRDet_A-2.0X-8.0j40000.npz"
     ]
-    lama=[-3.0,-4.0,-4.5,-5.0,-6.0,-7.0,-8.0]
-    lama=np.array(lama)
-    return axfiles,lama
+    lamx=[-3.0,-4.0,-4.5,-5.0,-6.0,-7.0,-8.0]
+    lamx=np.array(lamx)
+    return axfiles,lamx
 
-def get_axfiles_Xd():
+def get_axfiles_Ad():
     axfiles=[\
              "npz/D203n/D203L2-VRDet_A-1.0X-4.5j40000.npz",\
              "npz/D203n/D203L2-VRDet_A-1.5X-4.5j40000.npz",\
@@ -51,6 +51,6 @@ def get_axfiles_Xd():
              "npz/D203n/D203L2-VRDet_A-2.5X-4.5j40000.npz",\
              "npz/D203n/D203L2-VRDet_A-3.0X-4.5j40000.npz"
     ]
-    lamx=[-1.0,-1.5,-2.0,-2.5,-3.0]
-    lamx=np.array(lamx)
-    return axfiles,lamx
+    lama=[-1.0,-1.5,-2.0,-2.5,-3.0]
+    lama=np.array(lama)
+    return axfiles,lama

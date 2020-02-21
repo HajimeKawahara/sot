@@ -38,8 +38,13 @@ def plot_regx(axfiles):
     detx=[]
     detxn=[]
     absa=[]
+    cpr=[]
     for i,axfile in enumerate(axfiles):
         A,X,resall=read_data.readax(axfile)
+        Aclass=diffclass.mclassmap(A)
+        mr=diffclass.classdif(Aclass)
+        cpr.append(mr)
+
         mmrsa=mrsa.mrsa_meanX(X)
         AFnorm=np.sqrt(np.sum(A*A))
         mrarr.append(mmrsa)
@@ -56,31 +61,40 @@ def plot_regx(axfiles):
     absa=np.array(absa)
     detx=np.array(detx)
     detxn=np.array(detxn)
-
+    cpr=np.array(cpr)
+    
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
-    fig=plt.figure(figsize=(7,7.5))
-    ax=fig.add_subplot(311)
+    fig=plt.figure(figsize=(7,9))
+    ax=fig.add_subplot(411)
     ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,"o",color="C0")
     ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,color="C0")
     plt.ylabel("mean residual")
     plt.xscale("log")
-    ax=fig.add_subplot(312)    
+    ax=fig.add_subplot(412)    
     plt.xscale("log")
 #    plt.yscale("log")
 #    ax.plot(10**lam,(absa),"o",)
     ax.plot(10**lam,(detxn),"o",color="C0")
     ax.plot(10**lam,(detxn),color="C0")
 #    ax.plot(10**lam,(detxn)*1000,color="C0")
-
     plt.ylabel("$\det{(\hat{X} \hat{X}^T)}$")
+#    plt.ylabel("$\det{({X} {X}^T)}$")
 
 #    plt.ylabel("$||D - W A X||_F^2$")
-    ax=fig.add_subplot(313)
-    ax.plot(10**lam,mrarr,"o",color="C0")
-    ax.plot(10**lam,mrarr,color="C0")
+    ax=fig.add_subplot(413)
+    ax.plot(10**lam,mrarr,"o",color="C1")
+    ax.plot(10**lam,mrarr,color="C1")
     plt.xscale("log")
     plt.ylabel("$\overline{MRSA}$")
+    plt.ylim(0.03,0.1)
+
+    ax=fig.add_subplot(414)
+
+    ax.plot(10**lam,cpr,"o",color="C1")
+    ax.plot(10**lam,cpr,color="C1")
+    plt.xscale("log")
+    plt.ylabel("CPR")
     plt.xlabel("$\lambda_X$")
     plt.savefig("regx.pdf", bbox_inches="tight", pad_inches=0.1)
     plt.show()
@@ -104,49 +118,88 @@ def plotrefdepx(axfiles,lam):
     plt.show()
 
 def plot_rega(axfiles):
-    mrarr=[]
+    cpr=[]
     mrsaarr=[]
     likarr=[]
+    detxn=[]
+    detx=[]
+    Anorm=[]
     for i,axfile in enumerate(axfiles):
         A,X,resall=read_data.readax(axfile)
         Aclass=diffclass.mclassmap(A)
         mr=diffclass.classdif(Aclass)
         AFnorm=np.sqrt(np.sum(A*A))
+        Anorm.append(AFnorm)
         mmrsa=mrsa.mrsa_meanX(X)
         mrsaarr.append(mmrsa)
-        mrarr.append(mr)
+        cpr.append(mr)
+        Xn=np.copy(X)
+        for k in range(0,np.shape(X)[0]):
+            Xn[k,:]=X[k,:]/np.sum(X[k,:])
+        detxn.append(np.linalg.det(np.dot(Xn,Xn.T)))#/10**lam[i])
+        detx.append(np.linalg.det(np.dot(X,X.T)))#/10**lam[i])
+
         likarr.append(resall[-1][1])
         print(lam[i],resall[-1][1],AFnorm,mr,mmrsa)
-
+    detx=np.array(detx)
+    detxn=np.array(detxn)
+    Anorm=np.array(Anorm)
     fontsize=18
     matplotlib.rcParams.update({'font.size':fontsize})
     likarr=np.array(likarr)
     NN=512*10
     lcmean=105.70907195459881
-    fig=plt.figure(figsize=(7,7.5))
-    ax=fig.add_subplot(311)
+
+    fig=plt.figure(figsize=(7,4))
+    ax=fig.add_subplot(111,aspect=1)
+    ax.plot(detxn,np.sqrt(likarr))
+    ax.plot(detxn,np.sqrt(likarr),"o",)
+#    plt.xlim(2,20)
+#    plt.xscale("log")
+    plt.yscale("log")
+    plt.show()
+
+    
+    fig=plt.figure(figsize=(7,9))
+    ax=fig.add_subplot(411)
     ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,"o",color="C0")
     ax.plot(10**lam,np.sqrt(likarr/NN)/lcmean,color="C0")
     plt.xscale("log")
+    plt.ylabel("mean residual")
+
+#    ax=fig.add_subplot(512)
+#    plt.xscale("log")
+#    ax.plot(10**lam,(Anorm),"o",color="C0")
+#    ax.plot(10**lam,(Anorm),color="C0")
+#    plt.ylabel("$||A||_F^2$")
 #    plt.yscale("log")
 
-#    plt.ylabel("$||D - W A X||_F^2$")
-    plt.ylabel("mean residual")
-    ax=fig.add_subplot(312)
-    ax.plot(10**lam,mrsaarr,"o",color="C0")
-    ax.plot(10**lam,mrsaarr,color="C0")
+    ax=fig.add_subplot(412)
+
+    ax.plot(10**lam,(detxn),"o",color="C0")
+    ax.plot(10**lam,(detxn),color="C0")
+    plt.ylabel("$\det{(\hat{X} \hat{X}^T)}$")
+#    plt.ylabel("$\det{({X} {X}^T)}$")
+    plt.xscale("log")
+
+    ax=fig.add_subplot(413)
+    ax.plot(10**lam,mrsaarr,"o",color="C1")
+    ax.plot(10**lam,mrsaarr,color="C1")
     plt.xscale("log")
     plt.ylabel("$\overline{MRSA}$")
+    plt.ylim(0.03,0.1)
     
-    ax=fig.add_subplot(313)
-    ax.plot(10**lam,mrarr,"o",color="C0")
-    ax.plot(10**lam,mrarr,color="C0")
+    ax=fig.add_subplot(414)
+    ax.plot(10**lam,cpr,"o",color="C1")
+    ax.plot(10**lam,cpr,color="C1")
     plt.xscale("log")
     plt.ylabel("CPR")
     plt.xlabel("$\lambda_A$")
     plt.savefig("rega.pdf", bbox_inches="tight", pad_inches=0.1)
     plt.show()
 
+
+    
 if __name__=='__main__':
     import sys
 #    axfiles=sys.argv[1:]
@@ -154,5 +207,5 @@ if __name__=='__main__':
 #    plotrefdepx(axfiles,lam)
     plot_regx(axfiles)
 #    plt.show()
-#    axfiles,lam=get_axfiles.get_axfiles_A()
-#    plot_rega(axfiles)
+    axfiles,lam=get_axfiles.get_axfiles_A()
+    plot_rega(axfiles)
