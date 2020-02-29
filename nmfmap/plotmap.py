@@ -314,7 +314,12 @@ if __name__=='__main__':
     except:
         title=""
     A,X,resall=read_data.readax(axfile)
-    print(resall[-1,:])
+    lcmean=105.45194310301967
+    lcsig=lcmean*0.01
+    print("Ln L=",resall[-1,:]/(2*lcsig*lcsig))
+    print("AIC=",2*resall[-1,:]/(2*lcsig*lcsig)+2*(3072*3))
+
+    sys.exit()
     bands=read_data.getband()
     #    bands=[[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]] #DSCOVR
     
