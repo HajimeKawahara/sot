@@ -25,10 +25,10 @@ lcall=lcall/6
 #sys.exit()
 #np.savez("lcdscovr",lcall)
 ##################################################
-N=4
-lamA=10**(-4.0) #-6 sparse #-1,-1.5,-2,-2.5,-3,-3.5,-4
+N=5
+lamA=10**(-2.0) #-6 sparse #-1,-1.5,-2,-2.5,-3,-3.5,-4
 lamX=10**(-4.5)
-Ntry=100000
+Ntry=50000
 epsilon=1.e-12
 trytag="D203"
 semiNMF=False
@@ -36,7 +36,7 @@ regmode="L2-VRDet"
 #regmode="L2-VRLD"
 #regmode="Dual-L2"
 #regmode="Unconstrained"
-filename=trytag+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
+filename=trytag+"N"+str(N)+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
 
 A0,X0=initnmf.init_random(N,npix,lcall)
 #X0=X0/10

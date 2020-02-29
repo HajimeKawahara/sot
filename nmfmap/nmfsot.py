@@ -61,19 +61,18 @@ npix=hp.nside2npix(nside)
 lcall=np.dot(np.dot(W,Ainit),Xinit)
 noiselevel=0.01
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0,np.shape(lcall))
-#lcall= np.dot(np.diag(1/np.sum(lcall[:,:],axis=1)),lcall)
-#np.savez("lcall",lcall)
-#print(np.mean(lcall))
+#np.savez("lcallN"+str(noiselevel),lcall)
 #sys.exit()
 nside=16
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
-Nk=4
-Ntry=1000000
+Nk=2
+Ntry=100000
+Nsave=10000
 epsilon=1.e-12
-lamA=10**(-2)  #-1---4
-lamX=10**(1)
+lamA=10**(-1.0)  #-1---4
+lamX=10**(-2.0)   #2, (0,1,3)
 
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(Nk,npix,lcall)
@@ -81,14 +80,14 @@ A0,X0=initnmf.init_random(Nk,npix,lcall)
 #fac=np.sum(lcall)/np.sum(A0)/np.sum(X0)
 #A0=A0*fac
 
-trytag="T214"
+trytag="T215"
 #regmode="L2"
 regmode="L2-VRDet"
 #regmode="L2-VRLD"
 #regmode="Dual-L2"
 
 filename=trytag+"_N"+str(Nk)+"_"+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
-A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,endc=-np.inf)
+A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,endc=-np.inf,Nsave=Nsave)
 np.savez(filename,A,X)
 
 

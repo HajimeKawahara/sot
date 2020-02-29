@@ -110,8 +110,8 @@ def QP_NMR(reg,Ntry,lcall,Win,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryA
         #LogNMF(i,A,X,Nk)
         if np.mod(jj,10)==0:
             bandl=np.array(range(0,len(X[0,:])))
-            #import terminalplot
-            #terminalplot.plot(list(bandl),list(cp.asnumpy(X[np.mod(jj,Nk),:])))
+#            import terminalplot
+#            terminalplot.plot(list(bandl),list(cp.asnumpy(X[np.mod(jj,Nk),:])))
 
         jj=jj+1
         if np.mod(jj,Nsave) == 0:
