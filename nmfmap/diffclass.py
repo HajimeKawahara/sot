@@ -16,6 +16,6 @@ def classdif(Aclass):
 def mclassmap(A):
     Aclass=np.argmax(A,axis=1)
     Aclass[Aclass==0]=30
-    Aclass[Aclass==1]=0
-    Aclass[Aclass==2]=100
+    Aclass[Aclass==1]=100
+    Aclass[Aclass==2]=0
     return Aclass

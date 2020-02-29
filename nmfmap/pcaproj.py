@@ -43,9 +43,9 @@ if __name__=='__main__':
     axfile=sys.argv[1]
 
     A,X,resall=read_data.readax(axfile)
-    W=np.load("w.npz")["arr_0"]
+    W=np.load("w512.npz")["arr_0"]
     WA=np.dot(W,A)
-    lcall=np.load("lcall.npz")["arr_0"]
+    lcall=np.load("lcallN0.01.npz")["arr_0"]
     
     for i in range(0,np.shape(lcall)[1]):
         lcall[:,i]=lcall[:,i]/np.sum(WA,axis=1)
