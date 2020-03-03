@@ -10,6 +10,8 @@ Go to [Spare](https://github.com/HajimeKawahara/Spare) by Masataka Aizawa
 
 ## Spin-Orbit Tomography (Tikhonov regularization)
 
+- sot/l2map.ipynb
+
 References:[Kawahara & Fujii (2010)](https://arxiv.org/abs/1004.5152),[Kawahara & Fujii (2011)](http://arxiv.org/abs/1106.0136),[Fujii & Kawahara (2012)](http://arxiv.org/abs/1204.3504)
 
 ## Frequency Modulation
