@@ -2,6 +2,11 @@
 
 Toward a picture of an exo Earth...
 
+## SOT using PyTorch
+
+- sot/sotorch
+
+
 ## Spin-Orbit Unmixing (Nonnegative Matrix Factorization)
 
 - sot/nmfmap/nmfsot.py
