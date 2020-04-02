@@ -10,6 +10,12 @@ def init_random(N,npix,Y):
     X0=np.random.rand(N,np.shape(Y)[1])
     return A0,X0
 
+def init_random_direct(N,Y):
+    A0=np.random.rand(np.shape(Y)[0],N)
+    X0=np.random.rand(N,np.shape(Y)[1])
+    return A0,X0
+
+
 def initpca(N,W,lcall,lam,mode="Ridge"):
     import sklearn
     from sklearn.decomposition import PCA

@@ -1,13 +1,12 @@
 import numpy as np
 import sys
 
-
 def check_nonnegative(Y,lab):
     if np.min(Y)<0:
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
-def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0,delta=1.e-6,Lipx="norm2",Lipa="frobenius"):
+def QP_GNMF(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0,delta=1.e-6,Lipx="norm2",Lipa="frobenius"):
     import scipy
     check_nonnegative(lcall,"LC")
     check_nonnegative(A0,"A")
@@ -104,9 +103,11 @@ def QP_NMR(reg,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=10,NtryAPG
             
     return A, X, resall
 
+#
+#APGr: Accelerated Projected Gradient + restart
+#
 
 def APGr(n,Q,p,x0,Ntry=1000,alpha0=0.9,eta=0.0):
-    #Accelerated Projected Gradient + restart
     #n=np.shape(Q)[0]
     normQ = np.linalg.norm(Q,2)
     Theta1 = np.eye(n) - Q/normQ

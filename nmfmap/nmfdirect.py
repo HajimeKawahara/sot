@@ -12,7 +12,7 @@ import healpy as hp
 import initnmf
 #import runnmf_cpu as runnmf #CPU version (slow)
 import runnmf_gpu as runnmf #GPU version
-
+from sklearn.decomposition import NMF
 np.random.seed(34)
 
 ## load class map
@@ -58,39 +58,69 @@ WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
 npix=hp.nside2npix(nside)
 
+#compute lambert beta function
+Aunif=np.ones(np.shape(Ainit)[0])
+lambertf=np.dot(W,Aunif)
+np.savez("lambert",lambertf)
+
 lcall=np.dot(np.dot(W,Ainit),Xinit)
+lcall=(lcall.T/lambertf).T
+
 noiselevel=0.01
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0,np.shape(lcall))
-#lcall= np.dot(np.diag(1/np.sum(lcall[:,:],axis=1)),lcall)
-#np.savez("lcall",lcall)
-#print(np.mean(lcall))
+
+
+#fig=plt.figure()
+#plt.plot(lambertf)
+#plt.plot(lcall[:,3])
+#plt.show()
 #sys.exit()
-nside=16
-npix=hp.nside2npix(nside)
-WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
-W=WV[:,:]*WI[:,:]
+
 Nk=3
-Ntry=1000000
+Ntry=10000
 epsilon=1.e-12
-lamA=10**(-2)  #-1---4
-lamX=10**(1)
+
+lamA=0.0  #-1---4
+lamX=10**(-1)
 
 ## NMF Initialization ============================
-A0,X0=initnmf.init_random(Nk,npix,lcall)
-#A0,X0=initnmf.initpca(Nk,W,lcall,lamA)
-#fac=np.sum(lcall)/np.sum(A0)/np.sum(X0)
-#A0=A0*fac
+# USE NMF (no regularization) in scikit-learn
+model = NMF(n_components=Nk, init='random', random_state=0)
+A0 = model.fit_transform(lcall)
+X0 = model.components_
+np.savez("directNMF",A0,X0)
 
-trytag="T214"
+trytag="LC401"
 #regmode="L2"
 regmode="L2-VRDet"
 #regmode="L2-VRLD"
 #regmode="Dual-L2"
 
 filename=trytag+"_N"+str(Nk)+"_"+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
-A,X,logmetric=runnmf.QP_GNMF(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,endc=1.e-5)
-np.savez(filename,A,X)
+#A,X,logmetric=runnmf.QP_NMF(regmode,Ntry,lcall,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=1000,NtryAPGA=1,eta=1.e-16,endc=0.0,Lipfaca=1.e-3,Lipfacx=1.e-3)
+A,X,logmetric=runnmf.QP_NMF(regmode,Ntry,lcall,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=1000,NtryAPGA=1,eta=1.e-16,endc=0.0,Lipfaca=1.e-2,Lipfacx=1.0)
 
+print("mean residual=",np.sqrt(np.sum(lcall-A@X)**2)/np.shape(lcall)[0])
+
+
+AX=A@X
+res=lcall-AX
+fig=plt.figure()
+ax=fig.add_subplot(211)
+plt.plot(lcall[:,0])
+plt.plot(AX[:,0],".")
+ax=fig.add_subplot(212)
+plt.plot(res[:,0])
+plt.show()
+
+fig=plt.figure()
+ax=fig.add_subplot(211)
+for k in range(0,Nk):
+    plt.plot(X[k,:])
+plt.show()
+
+
+np.savez(filename,A,X)
 
 
 

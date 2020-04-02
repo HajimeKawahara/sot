@@ -54,3 +54,14 @@ def get_axfiles_Ad():
     lama=[-1.0,-1.5,-2.0,-2.5,-3.0]
     lama=np.array(lama)
     return axfiles,lama
+
+def get_axfiles_directX():
+    axfiles=[\
+             "npz/L401/LC401_N3_L2-VRDet_A-infX-1.0Ej1.npz",\
+             "npz/L401/LC401_N3_L2-VRDet_A-infX0.0Ej11.npz",\
+             "npz/L401/LC401_N3_L2-VRDet_A-infX1.0Ej8.npz",\
+             "npz/L401/LC401_N3_L2-VRDet_A-infX2.0Ej18.npz"
+    ]
+    lamx=[-1.0,0.0,1,2]
+    lamx=np.array(lamx)
+    return axfiles,lamx

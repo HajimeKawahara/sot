@@ -42,7 +42,7 @@ A0,X0=initnmf.init_random(N,npix,lcall)
 #A0,X0=initnmf.initpca(N,W,lcall,lamA,mode="Ridge")
 #fac=np.sum(lcall)/np.sum(A0)/np.sum(X0)
 #A0=A0*fac
-A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=1000,eta=1.e-12,endc=-np.inf,Nsave=1000,semiNMF=semiNMF)
+A,X,logmetric=runnmf.QP_GNMF(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=1000,eta=1.e-12,endc=-np.inf,Nsave=1000,semiNMF=semiNMF)
 np.savez(filename,A,X)
 
 #plt.show()

@@ -10,7 +10,7 @@ import read_data
 import get_axfiles
 import plotmap as pm
 import diffclass
-def plref_each(X,bands,ls,lab):
+def plref_each(X,bands,ls,lab,symbol=False):
     cloud,cloud_ice,snow_fine,snow_granular,snow_med,soil,veg,ice,water,clear_sky=io_refdata.read_refdata("/home/kawahara/exomap/sot/data/refdata")
     nnl=1#len(np.median(bands,axis=1))
     u,val,normvveg=pm.norm(veg)
@@ -26,9 +26,14 @@ def plref_each(X,bands,ls,lab):
     plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="C2",lw=2,ls=ls)
     plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C1",lw=2,ls=ls)
     plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C0",lw=2,ls=ls,label=lab)
-    
+    if symbol:
+        plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",color="C2",lw=2,ls=ls)
+        plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",color="C1",lw=2,ls=ls)
+        plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",color="C0",lw=2,ls=ls)
+        
     plt.tick_params(labelsize=16)
 
+    
 def plot_regx(axfiles):
     NN=512*10
     lcmean=105.70907195459881
@@ -46,6 +51,7 @@ def plot_regx(axfiles):
         cpr.append(mr)
 
         mmrsa=mrsa.mrsa_meanX(X)
+        print("mmrsa=",mmrsa)
         AFnorm=np.sqrt(np.sum(A*A))
         mrarr.append(mmrsa)
         likarr.append(resall[-1][1])

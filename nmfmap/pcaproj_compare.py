@@ -1,5 +1,5 @@
 #
-# PCA projection (Figure 5 in Kawahara 2020)
+# PCA projection comparing direct NMF
 #
 import io_surface_type 
 import io_refdata
@@ -42,8 +42,7 @@ def projpc(Xin,Xp):
 
 if __name__=='__main__':
     import sys
-    #axfile=npz/T215/T215_N3_L2-VRDet_A-1.0X2.0j100000.npz
-    axfile=sys.argv[1]
+    axfile="npz/T215/T215_N3_L2-VRDet_A-1.0X2.0j100000.npz"
 
     A,X,resall=read_data.readax(axfile)
     W=np.load("w512.npz")["arr_0"]
@@ -52,6 +51,7 @@ if __name__=='__main__':
     
     for i in range(0,np.shape(lcall)[1]):
         lcall[:,i]=lcall[:,i]/np.sum(WA,axis=1)
+
 
     pca = PCA(n_components=2)
     pca.fit(lcall) #x(k,l)
@@ -68,6 +68,19 @@ if __name__=='__main__':
     B=np.dot(A,X)
     bpc1,bpc2=projpc(B,Xp)
 
+    #### DIRECT
+    dat=np.load("directNMF.npz")
+    Xd=dat["arr_1"]
+    dpc1,dpc2=projpc(Xd,Xp)
+    
+    axd1="npz/L401/LC401_N3_L2-VRDet_A-infX-3.0Ej1.npz"
+    Ad,Xd,resall=read_data.readax(axd1)
+    dm3pc1,dm3pc2=projpc(Xd,Xp)
+
+    axd1="npz/L401/LC401_N3_L2-VRDet_A-infX0.0Ej11.npz"
+    Ad,Xd,resall=read_data.readax(axd1)
+    d1pc1,d1pc2=projpc(Xd,Xp)
+
     
     fontsize=13.5
     matplotlib.rcParams.update({'font.size':fontsize})
@@ -76,12 +89,18 @@ if __name__=='__main__':
     for i in range(0,len(xpc1)):
         plt.text(xpc1[i],xpc2[i],str(i),fontsize=18)
     plt.plot(np.concatenate([xpc1,xpc1]),np.concatenate([xpc2,xpc2]),color="gray")
-    plt.plot(bpc1,bpc2,".",alpha=0.3, label="Disentangled",color="C0")
+#    plt.plot(bpc1,bpc2,".",alpha=0.3, label="Disentangled",color="C0")
     plt.plot(lcpc1,lcpc2,"+", label="Light curve",color="C1")
     plt.plot(xpc1,xpc2,"o",color="red",label="Unmixed components")
+    plt.plot(d1pc1,d1pc2,"s",color="C0",label="Direct NMF")
+    plt.plot(np.concatenate([d1pc1,d1pc1]),np.concatenate([d1pc2,d1pc2]),color="gray")
+#    plt.plot(dm3pc1,dm3pc2,"s",color="C0",label="Direct NMF")
+#    plt.plot(np.concatenate([dm3pc1,dm3pc1]),np.concatenate([dm3pc2,dm3pc2]),color="gray")
+    plt.plot(dpc1,dpc2,"s",color="C0",label="Direct NMF")
+    plt.plot(np.concatenate([dpc1,dpc1]),np.concatenate([dpc2,dpc2]),color="gray")
 
     plt.xlabel("PC1")
     plt.ylabel("PC2")
     plt.legend()        
-    plt.savefig("pcaproj.pdf", bbox_inches="tight", pad_inches=0.0)
+    plt.savefig("pcaproj_comp.pdf", bbox_inches="tight", pad_inches=0.0)
     plt.show()
