@@ -21,8 +21,8 @@ npix=hp.nside2npix(nside)
 W,t,lcall=rd.read_dscovr("/home/kawahara/exomap/data/for_HKawahara",4,istart=3)
 lcall=lcall*npix
 lcall=lcall/6
-#print(np.shape(lcall),np.mean(lcall))
-#sys.exit()
+print(np.shape(lcall),np.mean(lcall))
+sys.exit()
 #np.savez("lcdscovr",lcall)
 ##################################################
 N=5

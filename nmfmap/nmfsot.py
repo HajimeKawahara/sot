@@ -59,8 +59,8 @@ W=WV[:,:]*WI[:,:]
 npix=hp.nside2npix(nside)
 
 lcall=np.dot(np.dot(W,Ainit),Xinit)
-print(np.mean(lcall))
-sys.exit()
+#print(np.mean(lcall))
+#sys.exit()
 noiselevel=0.01
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0,np.shape(lcall))
 #np.savez("lcallN"+str(noiselevel),lcall)
