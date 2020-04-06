@@ -33,7 +33,6 @@ This jupyter notebook includes SOT + L2 regularization (SOT-L2) and L-curve crit
 
 - sot/l2map.ipynb
 
-References:
 The algorithm is based on [Kawahara & Fujii (2010)](https://arxiv.org/abs/1004.5152),[Kawahara & Fujii (2011)](http://arxiv.org/abs/1106.0136), and [Fujii & Kawahara (2012)](http://arxiv.org/abs/1204.3504).
 
 ## Frequency Modulation
