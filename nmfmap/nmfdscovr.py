@@ -21,21 +21,22 @@ npix=hp.nside2npix(nside)
 W,t,lcall=rd.read_dscovr("/home/kawahara/exomap/data/for_HKawahara",4,istart=3)
 lcall=lcall*npix
 lcall=lcall/6
-#print(np.std(lcall)**2*np.shape(lcall)[0]*np.shape(lcall)[1])
+print(np.shape(lcall),np.mean(lcall))
+sys.exit()
 #np.savez("lcdscovr",lcall)
 ##################################################
-N=3
-lamA=10**(-2.0) #-6 sparse
-lamX=10**(-10.0)
-Ntry=100000
+N=5
+lamA=10**(-2.0) #-6 sparse #-1,-1.5,-2,-2.5,-3,-3.5,-4
+lamX=10**(-4.5)
+Ntry=50000
 epsilon=1.e-12
-trytag="Ds201"
-semiNMF=True
+trytag="D203"
+semiNMF=False
 regmode="L2-VRDet"
 #regmode="L2-VRLD"
 #regmode="Dual-L2"
 #regmode="Unconstrained"
-filename=trytag+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
+filename=trytag+"N"+str(N)+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
 
 A0,X0=initnmf.init_random(N,npix,lcall)
 #X0=X0/10
