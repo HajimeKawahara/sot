@@ -14,20 +14,20 @@ References:
 
 ## Spin-Orbit Tomography
 
-### Spin-Orbit Tomography (L1+Total Squared Variation)
+### L1+Total Squared Variation
 
 - [Spare](https://github.com/HajimeKawahara/Spare) 
 
 References:
 [Aizawa, Kawahara, Fan (2020)]()
 
-### Spin-Orbit Tomography using PyTorch
+### PyTorch version
 
 - sot/sotorch
 
-SOT by ADAM optimizer. 
+SOT using automatic differentiation and ADAM optimizer in Pytorch. 
 
-### Spin-Orbit Tomography (L2/Tikhonov regularization)
+### L2/Tikhonov regularization
 
 - sot/l2map.ipynb
 This jupyter notebook includes SOT-L2 and L-curve criterion.
