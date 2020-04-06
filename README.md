@@ -1,4 +1,7 @@
+<img src="https://github.com/HajimeKawahara/gabc/blob/master/documents/fig/logo.png" Titie="explanation" Width=150px>
+
 # Spin-Orbit Tomography
+
 
 Toward a picture of an exo Earth...
 

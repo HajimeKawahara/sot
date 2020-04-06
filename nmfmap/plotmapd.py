@@ -176,12 +176,12 @@ def plref(X,bands,theme,title="",oxlab=False):
         plt.plot(np.median(bands,axis=1),X[0,:]*fac0,"o",label="Component 0",color="gray")
         plt.plot(np.median(bands,axis=1),X[1,:]*fac1,"s",label="Component 1",color="C0")
         plt.plot(np.median(bands,axis=1),X[2,:]*fac2,"^",label="Component 2",color="C2")
-        plt.plot(np.median(bands,axis=1),X[3,:]*fac2,"*",label="Component 3",color="C3")
+        plt.plot(np.median(bands,axis=1),X[3,:]*fac3,"*",label="Component 3",color="C3")
 
         plt.plot(np.median(bands,axis=1),X[0,:]*fac0,color="gray",lw=2)
         plt.plot(np.median(bands,axis=1),X[1,:]*fac1,color="C0",lw=2)
         plt.plot(np.median(bands,axis=1),X[2,:]*fac2,color="C2",lw=2)
-        plt.plot(np.median(bands,axis=1),X[3,:]*fac2,color="C3",lw=2)
+        plt.plot(np.median(bands,axis=1),X[3,:]*fac3,color="C3",lw=2)
 
     if oxlab:
         plt.axvline(0.688,color="blue",alpha=0.2,lw=5)
@@ -323,7 +323,7 @@ if __name__=='__main__':
     print("Ln L=",resall[-1,:]/(2*lcsig*lcsig))
     print("AIC=",2*resall[-1,:]/(2*lcsig*lcsig)+2*(3072*3))
 
-    sys.exit()
+#    sys.exit()
     #bands=read_data.getband()
     bands=[[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]] #DSCOVR
     

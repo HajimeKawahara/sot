@@ -48,10 +48,11 @@ if __name__=='__main__':
     W=np.load("w512.npz")["arr_0"]
     WA=np.dot(W,A)
     lcall=np.load("lcallN0.01.npz")["arr_0"]
-    
+
+   
     for i in range(0,np.shape(lcall)[1]):
         lcall[:,i]=lcall[:,i]/np.sum(WA,axis=1)
-
+#        lcall[:,i]=lcall[:,i]/np.sum(Ad,axis=1)
 
     pca = PCA(n_components=2)
     pca.fit(lcall) #x(k,l)
@@ -62,6 +63,8 @@ if __name__=='__main__':
     #unwrap=tik(lcall,W)
     #cpc1,cpc2=projpc(unwrap,Xp)
 
+
+    
     As=np.sum(A,axis=1)
     for k in range(0,np.shape(WA)[1]):
         A[:,k]=A[:,k]/As
@@ -71,6 +74,7 @@ if __name__=='__main__':
     #### DIRECT
     dat=np.load("directNMF.npz")
     Xd=dat["arr_1"]
+    Xd=Xd/np.sum(Xd)*np.sum(X)
     dpc1,dpc2=projpc(Xd,Xp)
     
     axd1="npz/L401/LC401_N3_L2-VRDet_A-infX-3.0Ej1.npz"
@@ -79,6 +83,7 @@ if __name__=='__main__':
 
     axd1="npz/L401/LC401_N3_L2-VRDet_A-infX0.0Ej11.npz"
     Ad,Xd,resall=read_data.readax(axd1)
+    Xd=Xd/np.sum(Xd)*np.sum(X)
     d1pc1,d1pc2=projpc(Xd,Xp)
 
     
@@ -96,7 +101,7 @@ if __name__=='__main__':
     plt.plot(np.concatenate([d1pc1,d1pc1]),np.concatenate([d1pc2,d1pc2]),color="gray")
 #    plt.plot(dm3pc1,dm3pc2,"s",color="C0",label="Direct NMF")
 #    plt.plot(np.concatenate([dm3pc1,dm3pc1]),np.concatenate([dm3pc2,dm3pc2]),color="gray")
-    plt.plot(dpc1,dpc2,"s",color="C0",label="Direct NMF")
+    plt.plot(dpc1,dpc2,"s",color="C3",label="VR")
     plt.plot(np.concatenate([dpc1,dpc1]),np.concatenate([dpc2,dpc2]),color="gray")
 
     plt.xlabel("PC1")
