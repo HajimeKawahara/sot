@@ -11,8 +11,7 @@ Spin-Orbit Unmixing using the [non-negative matrix factorization (NMF)](https://
 - sot/nmfmap/nmfsot.py
 This code solves SOU-NMF for a cloudless toy model.
 
-References:
-[Kawahara (2020)]()
+The algorithm is based on [Kawahara (2020)]().
 
 ## Spin-Orbit Tomography
 Spin-Orbit Tomography (SOT) is a retrieval technique of a 2 dimensinal map of an Exo Earth from time-series data of integrated reflection light.
@@ -22,8 +21,7 @@ SOT-Sparse uses L1 and Total Squared Variation (TSV).
 
 - [Spare](https://github.com/HajimeKawahara/Spare) 
 
-References:
-[Aizawa, Kawahara, Fan (2020)]()
+The algorithm is based on [Aizawa, Kawahara, Fan (2020)]().
 
 ### PyTorch Version
 SOT-L2 using automatic differentiation and ADAM optimizer in PyTorch. 
@@ -36,12 +34,12 @@ This jupyter notebook includes SOT + L2 regularization (SOT-L2) and L-curve crit
 - sot/l2map.ipynb
 
 References:
-[Kawahara & Fujii (2010)](https://arxiv.org/abs/1004.5152),[Kawahara & Fujii (2011)](http://arxiv.org/abs/1106.0136),[Fujii & Kawahara (2012)](http://arxiv.org/abs/1204.3504)
+The algorithm is based on [Kawahara & Fujii (2010)](https://arxiv.org/abs/1004.5152),[Kawahara & Fujii (2011)](http://arxiv.org/abs/1106.0136), and [Fujii & Kawahara (2012)](http://arxiv.org/abs/1204.3504).
 
 ## Frequency Modulation
 The orientation of the spin axis can be inferred from frequency modulation (FM) of the light curve. 
 
-References:[Kawahara (2016)](https://arxiv.org/abs/1603.02898)
+The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
 
 ## Related Projects
 
