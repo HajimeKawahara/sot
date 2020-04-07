@@ -15,7 +15,10 @@ The algorithm is based on [Kawahara (2020)]().
 
 
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/sotnmf.png" Titie="The recovered composite map of the real light curve of Earth by DSCOVR using SOU-NMF" Width=300px>
-The recovered composite map of the real light curve of Earth by [DSCOVR](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory) using SOU-NMF.
+
+The recovered composite map of the real light curve of Earth by 
+ [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory) 
+using SOU-NMF.
 
 ## Spin-Orbit Tomography
 Spin-Orbit Tomography (SOT) is a retrieval technique of a 2 dimensinal map of an Exo Earth from time-series data of integrated reflection light.
@@ -46,8 +49,8 @@ The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
 
 ## Related Projects
 
-- [ReflectDirect](https://github.com/joelcolinschwartz/ReflectDirect)
-- [exocartographer](https://github.com/bfarr/exocartographer)
-- [EARL](https://github.com/HalHaggard/EARL)
-- [starry](https://github.com/rodluger/starry) 
-- [bluedot](https://github.com/HajimeKawahara/bluedot) 
+- [ReflectDirect](https://github.com/joelcolinschwartz/ReflectDirect) Python suite for analysis of planet reflected light by Joel Schwartz et al.
+- [exocartographer](https://github.com/bfarr/exocartographer) Bayesian framework of a 2D mapping and obliquity measurement by Ben Farr et al.
+- [EARL](https://github.com/HalHaggard/EARL) Spherical harmonics decomposition of reflected light by Hal Hagaard et al.
+- [starry](https://github.com/rodluger/starry) Tools for mapping planets and stars by Rodrigo Luger et al.
+- [bluedot](https://github.com/HajimeKawahara/bluedot) A pale blue dot simulater by Hajime Kawahara. 
