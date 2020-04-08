@@ -11,7 +11,7 @@ Spin-Orbit Unmixing using the [non-negative matrix factorization (NMF)](https://
 - sot/nmfmap/nmfsot.py
 This code solves SOU-NMF for a cloudless toy model.
 
-The algorithm is based on [Kawahara (2020)]().
+The algorithm is based on [Kawahara (2020)]() (ApJ accepted).
 
 
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/sotnmf.png" Titie="The recovered composite map of the real light curve of Earth by DSCOVR using SOU-NMF" Width=300px>
@@ -31,7 +31,7 @@ SOT-Sparse uses L1 and Total Squared Variation (TSV).
 The algorithm is based on [Aizawa, Kawahara, Fan (2020)]().
 
 ### PyTorch Version
-SOT-L2 using automatic differentiation and ADAM optimizer in PyTorch. 
+SOT-L2 using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch. 
 
 - sot/sotorch
 
