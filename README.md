@@ -28,7 +28,7 @@ SOT-Sparse uses L1 and Total Squared Variation (TSV).
 
 - [Spare](https://github.com/2ndmk2/Spare) 
 
-The algorithm is based on [Aizawa, Kawahara, Fan (2020)]().
+The algorithm is based on [Aizawa, Kawahara, Fan (2020)](https://arxiv.org/abs/2004.03941).
 
 ### PyTorch Version
 SOT-L2 using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch. 
