@@ -53,9 +53,9 @@ The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
 
 ## Related Projects
 
-- [ReflectDirect](https://github.com/joelcolinschwartz/ReflectDirect) Python suite for analysis of planet reflected light by Joel Schwartz et al.
-- [exocartographer](https://github.com/bfarr/exocartographer) Bayesian framework of a 2D mapping and obliquity measurement by Ben Farr et al.
-- [EARL](https://github.com/HalHaggard/EARL) Spherical harmonics decomposition of reflected light by Hal Hagaard et al.
-- [starry](https://github.com/rodluger/starry) Tools for mapping planets and stars by Rodrigo Luger et al.
-- [samurai](https://github.com/jlustigy/samurai) Rotational Unmixing by Lustig-Yaeger et al.
-- [bluedot](https://github.com/HajimeKawahara/bluedot) A pale blue dot simulater by Hajime Kawahara. 
+- [ReflectDirect](https://github.com/joelcolinschwartz/ReflectDirect) Python suite for analysis of planet reflected light by [Joel Schwartz et al](https://arxiv.org/abs/1511.05152).
+- [exocartographer](https://github.com/bfarr/exocartographer) Bayesian framework of a 2D mapping and obliquity measurement by [Ben Farr et al](https://arxiv.org/abs/1802.06805).
+- [EARL](https://github.com/HalHaggard/EARL) Spherical harmonics decomposition of reflected light by [Hal Haggard et al]https://arxiv.org/abs/1802.06805(https://arxiv.org/abs/1802.02075).
+- [samurai](https://github.com/jlustigy/samurai) Rotational Unmixing by [Lustig-Yaeger et al](https://arxiv.org/abs/1901.05011).
+- [starry](https://github.com/rodluger/starry) Tools for mapping planets and stars by [Rodrigo Luger et al](https://arxiv.org/abs/1903.12182).
+- [bluedot](https://github.com/HajimeKawahara/bluedot) A pale blue dot simulater by Hajime Kawahara (beta version). 
