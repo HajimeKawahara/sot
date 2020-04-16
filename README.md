@@ -11,7 +11,7 @@ Spin-Orbit Unmixing using the [non-negative matrix factorization (NMF)](https://
 - sot/nmfmap/nmfsot.py
 This code solves SOU-NMF for a cloudless toy model.
 
-The algorithm is based on [Kawahara (2020)]().
+The algorithm is based on [Kawahara (2020)](http://arxiv.org/abs/2004.03931) (ApJ accepted).
 
 
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/sotnmf.png" Titie="The recovered composite map of the real light curve of Earth by DSCOVR using SOU-NMF" Width=300px>
@@ -28,10 +28,10 @@ SOT-Sparse uses L1 and Total Squared Variation (TSV).
 
 - [Spare](https://github.com/2ndmk2/Spare) 
 
-The algorithm is based on [Aizawa, Kawahara, Fan (2020)]().
+The algorithm is based on [Aizawa, Kawahara, Fan (2020)](https://arxiv.org/abs/2004.03941).
 
 ### PyTorch Version
-SOT-L2 using automatic differentiation and ADAM optimizer in PyTorch. 
+SOT-L2 using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch. 
 
 - sot/sotorch
 
@@ -55,8 +55,9 @@ The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
 
 ## Related Projects
 
-- [ReflectDirect](https://github.com/joelcolinschwartz/ReflectDirect) Python suite for analysis of planet reflected light by Joel Schwartz et al.
-- [exocartographer](https://github.com/bfarr/exocartographer) Bayesian framework of a 2D mapping and obliquity measurement by Ben Farr et al.
-- [EARL](https://github.com/HalHaggard/EARL) Spherical harmonics decomposition of reflected light by Hal Hagaard et al.
-- [starry](https://github.com/rodluger/starry) Tools for mapping planets and stars by Rodrigo Luger et al.
-- [bluedot](https://github.com/HajimeKawahara/bluedot) A pale blue dot simulater by Hajime Kawahara. 
+- [ReflectDirect](https://github.com/joelcolinschwartz/ReflectDirect) Python suite for analysis of planet reflected light by [Joel Schwartz et al](https://arxiv.org/abs/1511.05152).
+- [exocartographer](https://github.com/bfarr/exocartographer) Bayesian framework of a 2D mapping and obliquity measurement by [Ben Farr et al](https://arxiv.org/abs/1802.06805).
+- [EARL](https://github.com/HalHaggard/EARL) Spherical harmonics decomposition of reflected light by [Hal Haggard et al](https://arxiv.org/abs/1802.02075).
+- [samurai](https://github.com/jlustigy/samurai) Rotational Unmixing by [Lustig-Yaeger et al](https://arxiv.org/abs/1901.05011).
+- [starry](https://github.com/rodluger/starry) Tools for mapping planets and stars by [Rodrigo Luger et al](https://arxiv.org/abs/1903.12182).
+- [bluedot](https://github.com/HajimeKawahara/bluedot) A pale blue dot simulater by Hajime Kawahara (beta version). 
