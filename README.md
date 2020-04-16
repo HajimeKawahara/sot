@@ -45,9 +45,11 @@ The algorithm is based on [Kawahara & Fujii (2010)](https://arxiv.org/abs/1004.5
 ## Frequency Modulation
 The orientation of the spin axis can be inferred from frequency modulation (FM) of the light curve. 
 
-- fm/rottheory.py
+- fm/rottheory.py modulation factor. Reproduce Figure 2 in [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
 
-- [juwvid](https://github.com/HajimeKawahara/juwvid) Code for the Wigner-Ville analysis
+<img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/rott.png">
+
+- [juwvid](https://github.com/HajimeKawahara/juwvid) Code for the Wigner-Ville analysis written in Julia-0.6.
 
 The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
 
