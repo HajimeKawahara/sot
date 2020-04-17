@@ -48,6 +48,8 @@ The orientation of the spin axis can be inferred from frequency modulation (FM) 
 - fm/rottheory.py the modulation factor. It can reproduce Figure 2 in [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
 
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/rott.png" Titie="Fig 2 in Kawahara 2016" Width=300px>
+<img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/rott2.png" Titie="Fig 2 in Kawahara 2016" Width=300px>
+<img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/rott3.png" Titie="Fig 2 in Kawahara 2016" Width=300px>
 
 - [juwvid](https://github.com/HajimeKawahara/juwvid) Code for the Wigner-Ville analysis written in Julia-0.6.
 
