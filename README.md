@@ -32,7 +32,7 @@ The algorithm is based on [Aizawa, Kawahara, Fan (2020)](https://arxiv.org/abs/2
 
 ### L2/Tikhonov Regularization
 
-This jupyter notebook for the SOT + L2 regularization (SOT-L2), L-curve criterion, including the code from scratch, with use of scikit-learn.Ridge, and with the optimization using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch.
+Jupyter notebooks for the SOT + L2 regularization (SOT-L2), L-curve criterion, including the code from scratch, with use of scikit-learn.Ridge, and with the optimization using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch.
 
 - sot/l2map
 
