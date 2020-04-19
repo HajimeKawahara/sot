@@ -36,9 +36,9 @@ SOT-L2 using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic
 - sot/sotorch
 
 ### L2/Tikhonov Regularization
-This jupyter notebook includes SOT + L2 regularization (SOT-L2) and L-curve criterion.
+This jupyter notebook includes SOT + L2 regularization (SOT-L2), L-curve criterion.
 
-- sot/l2map.ipynb
+- sot/l2map
 
 The algorithm is based on [Kawahara & Fujii (2010)](https://arxiv.org/abs/1004.5152),[Kawahara & Fujii (2011)](http://arxiv.org/abs/1106.0136), and [Fujii & Kawahara (2012)](http://arxiv.org/abs/1204.3504).
 
