@@ -30,13 +30,9 @@ SOT-Sparse uses L1 and Total Squared Variation (TSV).
 
 The algorithm is based on [Aizawa, Kawahara, Fan (2020)](https://arxiv.org/abs/2004.03941).
 
-### PyTorch Version
-SOT-L2 using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch. 
-
-- sot/sotorch
-
 ### L2/Tikhonov Regularization
-This jupyter notebook includes SOT + L2 regularization (SOT-L2), L-curve criterion.
+
+This jupyter notebook for the SOT + L2 regularization (SOT-L2), L-curve criterion, including the code from scratch, with use of scikit-learn.Ridge, and with the optimization using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch.
 
 - sot/l2map
 
