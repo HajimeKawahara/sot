@@ -9,7 +9,7 @@ import healpy as hp
 import time
 import scipy.signal
 from scipy.interpolate import splev, splrep
-
+import tqdm
 
 def comp_omega(nside):
     omega = []
@@ -65,7 +65,7 @@ def comp_weight(nside, zeta, inc, Thetaeq, Thetav, Phiv):
 
 #    start = time.time()
     WV = []
-    for ir in range(0, np.shape(eS)[1]):
+    for ir in (range(0, np.shape(eS)[1])):
         ele = np.dot(eR[:, ir, :].T, eO)
         WV.append(ele)
     WV = np.array(WV)
@@ -80,7 +80,7 @@ def comp_weight(nside, zeta, inc, Thetaeq, Thetav, Phiv):
 #    start = time.time()
 #    print np.shape(eR), np.shape(eS)
     WI = []
-    for ir in range(0, np.shape(eS)[1]):
+    for ir in (range(0, np.shape(eS)[1])):
         ele = np.dot(eR[:, ir, :].T, eS[:, ir])
         WI.append(ele)
     WI = np.array(WI)

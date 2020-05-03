@@ -215,7 +215,7 @@ def classmap(A,title="",theme="3c"):
     hp.mollview(Aclass, title="Classification "+title,flip="geo",cmap=plt.cm.Greys,max=100,cbar=None)
     plt.savefig("retrieved.pdf", bbox_inches="tight", pad_inches=0.0)
 
-def classmap_color(A,title="",theme="b"):
+def classmap_color(A,title="",theme="b",pdfname="class.pdf",pngname="class.png"):
     
    Nj=np.shape(A)[0]
    tip=0.1
@@ -271,8 +271,8 @@ def classmap_color(A,title="",theme="b"):
    Anorm[mask]=np.sqrt(1.0/3.0)*0.1
    cmap = matplotlib.colors.ListedColormap(Anorm)
    hp.mollview(indx, title="Color composite "+title,flip="geo",cmap=cmap,min=0-tip,max=Nj-tip,cbar=None)
-   plt.savefig("class.pdf", bbox_inches="tight", pad_inches=0.0)
-   plt.savefig("class.png", bbox_inches="tight", pad_inches=0.0)
+   plt.savefig(pdfname, bbox_inches="tight", pad_inches=0.0)
+   plt.savefig(pngname, bbox_inches="tight", pad_inches=0.0)
 
 
 def inmap():

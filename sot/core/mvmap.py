@@ -2,6 +2,7 @@
 
 import rotmap
 import numpy as np
+from tqdm import tqdm
 
 def rotating_map(mmap,obst,rotphimax=0.0,rotthetamax=3*np.pi/4):
     Nt=len(obst)
@@ -17,11 +18,11 @@ def rotating_map(mmap,obst,rotphimax=0.0,rotthetamax=3*np.pi/4):
         Nj,Nl=np.shape(mmap)
 
         M=[]
-        for i in range(0,Nt):
+        for i in tqdm(range(0,Nt)):
             MM=[]
-            for l in range(0,Nl):
+            for l in (range(0,Nl)):
                 MM.append(rotmap.rotate_map(mmap[:,l], rottheta[i], rotphi[i]))
-            M.append(MM)
+            M.append(np.array(MM).T)
         M=np.array(M)
         
     return M
