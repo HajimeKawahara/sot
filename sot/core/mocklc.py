@@ -14,7 +14,7 @@ import tqdm
 def comp_omega(nside):
     omega = []
     npix = hp.nside2npix(nside)
-    print(("npix=", npix))
+    #print(("npix=", npix))
     for ipix in range(0, npix):
         theta, phi = hp.pix2ang(nside, ipix)
         omega.append([theta, phi])
@@ -60,8 +60,8 @@ def comp_weight(nside, zeta, inc, Thetaeq, Thetav, Phiv):
     eS = uniteS(Thetaeq, Thetav)
     eR = uniteR(zeta, Phiv, omega)
 
-    print("Shopes of eO, eS, eR")
-    print(np.shape(eO), np.shape(eS), np.shape(eR))
+    #print("Shapes of eO, eS, eR")
+    #print(np.shape(eO), np.shape(eS), np.shape(eR))
 
 #    start = time.time()
     WV = []

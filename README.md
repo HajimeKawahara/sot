@@ -49,6 +49,16 @@ The orientation of the spin axis can be inferred from frequency modulation (FM) 
 
 The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
 
+## USER-UNFRIENDLY INSTALL...
+
+Set PYTHONPATH = /location/sot/sot/core
+
+Set PYTHONPATH = /location/sot/sot/plot
+
+Set PYTHONPATH = /location/sot/nmfmap
+
+Install some python modules you got in error messages.
+
 ## Related Projects
 
 - [ReflectDirect](https://github.com/joelcolinschwartz/ReflectDirect) Python suite for analysis of planet reflected light by [Joel Schwartz et al](https://arxiv.org/abs/1511.05152).
