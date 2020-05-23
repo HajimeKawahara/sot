@@ -48,3 +48,4 @@ def samplefunc(tarr,sa,fa,err):
     for t in tarr:
         y.append(np.sum(sa*np.sin(2*np.pi*fa*t),axis=0))
     return np.array(y)-np.mean(y)+np.random.normal(0,err,len(y))
+

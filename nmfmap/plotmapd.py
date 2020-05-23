@@ -319,15 +319,7 @@ if __name__=='__main__':
     lcsig=lcmean*0.03
     Nd=2435*7
     print("Ln L=",resall[-1,:]/(2*lcsig*lcsig))
-<<<<<<< HEAD
     print("AIC=",2*resall[-1,:]/(2*lcsig*lcsig)+2*(3072*3))
-
-#    sys.exit()
-=======
-    print("AIC=",2*resall[-1,:]/(2*lcsig*lcsig)+2*(3072*float(Ns)))
-    print("BIC",2*resall[-1,:]/(2*lcsig*lcsig)+np.log(Nd)*(3072*float(Ns)))
-    sys.exit()
->>>>>>> 4bfb71c64793b48e5df7c5bd7e7271fa54dcff06
     #bands=read_data.getband()
     bands=[[0.388,0.388],[0.443,0.443],[0.552,0.552],[0.680,0.680],[0.688,0.688],[0.764,0.764],[0.779,0.779]] #DSCOVR
     
