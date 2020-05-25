@@ -27,8 +27,6 @@ def read_dscovr(dirname,Nreduce,istart=3):
         
     tframe=np.array(tframe)
     lc=np.concatenate([lc2016,lc2017])
-    print(np.shape(tframe),np.shape(lc))
-    
     lc=np.array(lc[:,1+istart:11])
     if Nreduce > 1:
         lc=lc[::Nreduce,:]
@@ -49,5 +47,5 @@ if __name__ == "__main__":
     from sklearn.decomposition import PCA
     
     W,t,lc=read_dscovr("../../data/for_HKawahara",9)
-    plt.plot(t,lc[:,0],".")
-    plt.show()
+#    plt.plot(t,lc[:,0],".")
+#    plt.show()
