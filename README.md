@@ -23,6 +23,7 @@ using SOU-NMF.
 ## Spin-Orbit Tomography
 Spin-Orbit Tomography (SOT) is a retrieval technique of a 2 dimensinal map of an Exo Earth from time-series data of integrated reflection light.
 
+
 ### SOT + Sparse Modeling
 SOT-Sparse uses L1 and Total Squared Variation (TSV).
 

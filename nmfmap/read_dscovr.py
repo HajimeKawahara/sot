@@ -60,8 +60,29 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     import numpy as np
     from sklearn.decomposition import PCA
-    
-    W,t,lc,lab=read_dscovr("../../data/for_HKawahara",9,timeobj=True)
+    import matplotlib
+    fontsize=16
+    matplotlib.rcParams.update({'font.size':fontsize})
+
+    W,t,lc,lab=read_dscovr("../../data/for_HKawahara",1,timeobj=True)
     print(lab)
-    plt.plot(t,lc[:,0],".")
+
+    fig=plt.figure()
+    ax=fig.add_subplot(211)
+    plt.plot(t,lc[0:,1],".",color="black")
+    plt.plot(t,lc[0:,1],alpha=0.5,color="gray")
+    plt.ylabel("0.44 $\\mu$m")
+
+    plt.xlim(0,30)
+    plt.ylim(0.28,0.33)
+
+    ax=fig.add_subplot(212)
+    plt.plot(t,lc[0:,6],".",color="black")
+    plt.plot(t,lc[0:,6],alpha=0.5,color="gray")
+    plt.ylabel("0.78 $\\mu$m")
+    plt.xlabel("day")
+
+    plt.xlim(0,30)
+    plt.ylim(0.19,0.28)
+    plt.savefig("lcdscvr.pdf", bbox_inches="tight", pad_inches=0.0)
     plt.show()
