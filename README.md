@@ -13,7 +13,6 @@ This code solves SOU-NMF for a cloudless toy model.
 
 The algorithm is based on [Kawahara (2020)](http://arxiv.org/abs/2004.03931) (ApJ accepted).
 
-
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/sotnmf.png" Titie="The recovered composite map of the real light curve of Earth by DSCOVR using SOU-NMF" Width=300px>
 
 The recovered composite map of the real light curve of Earth by 
@@ -27,8 +26,6 @@ Spin-Orbit Tomography (SOT) is a retrieval technique of a 2 dimensinal map of an
 
 SOT for time-varying geometry. Coming soon.
 
-
-
 ### SOT + Sparse Modeling
 SOT-Sparse uses L1 and Total Squared Variation (TSV).
 
@@ -40,7 +37,7 @@ The algorithm is based on [Aizawa, Kawahara, Fan (2020)](https://arxiv.org/abs/2
 
 Jupyter notebooks for the SOT + L2 regularization (SOT-L2), L-curve criterion, including the code from scratch, with use of scikit-learn.Ridge, and with the optimization using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch.
 
-- sot/l2map
+- sot/tutorial
 
 The algorithm is based on [Kawahara & Fujii (2010)](https://arxiv.org/abs/1004.5152),[Kawahara & Fujii (2011)](http://arxiv.org/abs/1106.0136), and [Fujii & Kawahara (2012)](http://arxiv.org/abs/1204.3504).
 
