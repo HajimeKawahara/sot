@@ -6,12 +6,10 @@ In the near future, direct imaging missions will search for Earth-like planets a
 Spin-Orbit Unmixing (SOU) is a unified retrieval model for spectral unmixing and spin-orbit tomography.
 
 ### NMF with Volume Regularization 
-Spin-Orbit Unmixing using the [non-negative matrix factorization (NMF)](https://en.wikipedia.org/wiki/Non-negative_matrix_factorization) and L2 and volume regularization (SOU-NMF). 
+Spin-Orbit Unmixing using the [non-negative matrix factorization (NMF)](https://en.wikipedia.org/wiki/Non-negative_matrix_factorization) and L2 and volume regularization (SOU-NMF) based on [Kawahara ApJ 894 58 (2020)](http://arxiv.org/abs/2004.03931).
 
 - sot/nmfmap/nmfsot.py
 This code solves SOU-NMF for a cloudless toy model.
-
-The algorithm is based on [Kawahara (2020)](http://arxiv.org/abs/2004.03931) (ApJ accepted).
 
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/sotnmf.png" Titie="The recovered composite map of the real light curve of Earth by DSCOVR using SOU-NMF" Width=300px>
 
@@ -22,8 +20,8 @@ using SOU-NMF.
 ## Spin-Orbit Tomography
 Spin-Orbit Tomography (SOT) is a retrieval technique of a 2 dimensinal map of an Exo Earth from time-series data of integrated reflection light.
 
-### Dynamic Mapping
-SOT for time-varying geometry.
+### Bayesian Dynamic SOT
+SOT for time-varying geometry with a full Bayesian modeling based on Kawahara and Masuda (2020).
 
 - sot/dymap
 
@@ -32,7 +30,7 @@ SOT-Sparse uses L1 and Total Squared Variation (TSV).
 
 - [Spare](https://github.com/2ndmk2/Spare) 
 
-The algorithm is based on [Aizawa, Kawahara, Fan (2020)](https://arxiv.org/abs/2004.03941).
+The algorithm is based on [Aizawa, Kawahara, Fan ApJ 896 22 (2020)](https://arxiv.org/abs/2004.03941).
 
 ### L2/Tikhonov Regularization
 
