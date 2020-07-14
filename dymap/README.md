@@ -1,4 +1,4 @@
-# dymap
+# Bayesian Dynamic Spin-Orbit Tomography
 
 ## basic
 
