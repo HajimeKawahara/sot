@@ -5,26 +5,25 @@ In the near future, direct imaging missions will search for Earth-like planets a
 ## Spin-Orbit Tomography
 Spin-Orbit Tomography (SOT) is a retrieval technique of a 2 dimensinal map of an Exo Earth from time-series data of integrated reflection light.
 
+### Tutorial
+Jupyter notebooks for the SOT + L2 regularization (including the code from scratch with use of scikit-learn.Ridge, and with the optimization using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch) and the Bayesian SOT.
+
+- sot/tutorial
+
+The algorithm is based on [Kawahara & Fujii (2010)](https://arxiv.org/abs/1004.5152),[Kawahara & Fujii (2011)](http://arxiv.org/abs/1106.0136), [Fujii & Kawahara (2012)](http://arxiv.org/abs/1204.3504), and Kawahara and Masuda (2020).
+
 ### Bayesian Dynamic SOT
 SOT for time-varying geometry with a full Bayesian modeling (dynamic SOT) based on Kawahara and Masuda (2020).
-It also includes codes for the Bayesian static SOT.
+It also includes codes for the Bayesian version of the static SOT.
 
 - sot/dymap
 
 ### SOT + Sparse Modeling
 SOT-Sparse uses L1 and Total Squared Variation (TSV).
 
-- [Spare](https://github.com/2ndmk2/Spare) 
+- [Spare](https://github.com/2ndmk2/Spare) (external)
 
 The algorithm is based on [Aizawa, Kawahara, Fan, ApJ, 896, 22 (2020)](https://arxiv.org/abs/2004.03941).
-
-### L2/Tikhonov Regularization
-
-Jupyter notebooks for the SOT + L2 regularization (SOT-L2), L-curve criterion, including the code from scratch, with use of scikit-learn.Ridge, and with the optimization using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch.
-
-- sot/tutorial
-
-The algorithm is based on [Kawahara & Fujii (2010)](https://arxiv.org/abs/1004.5152),[Kawahara & Fujii (2011)](http://arxiv.org/abs/1106.0136), and [Fujii & Kawahara (2012)](http://arxiv.org/abs/1204.3504).
 
 ## Spin-Orbit Unmixing 
 Spin-Orbit Unmixing (SOU) is a unified retrieval model for spectral unmixing and spin-orbit tomography.
@@ -50,7 +49,7 @@ The orientation of the spin axis can be inferred from frequency modulation (FM) 
 
 - [juwvid](https://github.com/HajimeKawahara/juwvid) Code for the Wigner-Ville analysis written in Julia-0.6.
 
-The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
+The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898). See also [Nakagawa et al. (2020)](https://arxiv.org/abs/2006.11437).
 
 ## USER-UNFRIENDLY INSTALL...
 
@@ -59,6 +58,8 @@ Set PYTHONPATH = /location/sot/sot/core
 Set PYTHONPATH = /location/sot/sot/plot
 
 Set PYTHONPATH = /location/sot/nmfmap
+
+Set PYTHONPATH = /location/sot/dymap
 
 Install some python modules you got in error messages.
 
