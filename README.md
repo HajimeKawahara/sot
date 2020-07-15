@@ -17,7 +17,8 @@ It also includes codes for the Bayesian version of the static SOT.
 - sot/dymap
 
 [![Dynamic map (DSCOVR)](https://img.youtube.com/vi/rGMWbAUAv4Y/0.jpg)](https://youtu.be/rGMWbAUAv4Y)
-Dynamic map using the real light curve (PC1) of Earth by [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory) (youtube link). 
+
+Figure (Click): Dynamic map using the real light curve (PC1) of Earth by [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory) (youtube link). 
 
 ### SOT + Sparse Modeling
 SOT-Sparse uses L1 and Total Squared Variation (TSV).
@@ -37,7 +38,7 @@ This code solves SOU-NMF for a cloudless toy model.
 
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/sotnmf.png" Titie="The recovered composite map of the real light curve of Earth by DSCOVR using SOU-NMF" Width=400px>
 
-The recovered composite map of the real light curve of Earth by 
+Figure: The recovered composite map of the real light curve of Earth by 
  [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory) 
 using SOU-NMF.
 
