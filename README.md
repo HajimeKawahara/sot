@@ -18,6 +18,8 @@ It also includes codes for the Bayesian version of the static SOT.
 
 - sot/dymap
 
+[![Dynamic map (DSCOVR)](https://img.youtube.com/vi/rGMWbAUAv4Y/0.jpg)](https://youtu.be/rGMWbAUAv4Y)
+
 ### SOT + Sparse Modeling
 SOT-Sparse uses L1 and Total Squared Variation (TSV).
 
