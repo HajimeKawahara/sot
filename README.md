@@ -10,8 +10,6 @@ Jupyter notebooks for the SOT + L2 regularization (including the code from scrat
 
 - sot/tutorial
 
-The algorithm is based on [Kawahara & Fujii (2010)](https://arxiv.org/abs/1004.5152),[Kawahara & Fujii (2011)](http://arxiv.org/abs/1106.0136), [Fujii & Kawahara (2012)](http://arxiv.org/abs/1204.3504), and Kawahara and Masuda (2020).
-
 ### Bayesian Dynamic SOT
 SOT for time-varying geometry with a full Bayesian modeling (dynamic SOT) based on Kawahara and Masuda (2020).
 It also includes codes for the Bayesian version of the static SOT.
@@ -19,6 +17,7 @@ It also includes codes for the Bayesian version of the static SOT.
 - sot/dymap
 
 [![Dynamic map (DSCOVR)](https://img.youtube.com/vi/rGMWbAUAv4Y/0.jpg)](https://youtu.be/rGMWbAUAv4Y)
+Dynamic map using the real light curve (PC1) of Earth by [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory) (youtube link). 
 
 ### SOT + Sparse Modeling
 SOT-Sparse uses L1 and Total Squared Variation (TSV).
@@ -36,7 +35,7 @@ Spin-Orbit Unmixing using the [non-negative matrix factorization (NMF)](https://
 - sot/nmfmap/nmfsot.py
 This code solves SOU-NMF for a cloudless toy model.
 
-<img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/sotnmf.png" Titie="The recovered composite map of the real light curve of Earth by DSCOVR using SOU-NMF" Width=300px>
+<img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/sotnmf.png" Titie="The recovered composite map of the real light curve of Earth by DSCOVR using SOU-NMF" Width=400px>
 
 The recovered composite map of the real light curve of Earth by 
  [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory) 
