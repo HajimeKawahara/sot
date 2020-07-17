@@ -16,7 +16,7 @@ It also includes codes for the Bayesian version of the static SOT.
 
 - sot/dymap
 
-[![Dynamic map (toy model)](https://img.youtube.com/vi/Rb8SGrsApJ4/0.jpg)](https://youtu.be/Rb8SGrsApJ4)
+[![Dynamic map (toy model)](https://img.youtube.com/vi/eP-aQ0PVPAs/0.jpg)](https://youtu.be/eP-aQ0PVPAs)
 
 Figure (Click): Input toy model and the retrieved dynamic map.
 
