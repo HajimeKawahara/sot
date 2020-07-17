@@ -16,9 +16,14 @@ It also includes codes for the Bayesian version of the static SOT.
 
 - sot/dymap
 
-[![Dynamic map (DSCOVR)](https://img.youtube.com/vi/rGMWbAUAv4Y/0.jpg)](https://youtu.be/rGMWbAUAv4Y)
+[![Dynamic map (toy model)](https://img.youtube.com/vi/Rb8SGrsApJ4/0.jpg)](https://youtu.be/Rb8SGrsApJ4)
 
-Figure (Click): Dynamic map using the real light curve (PC1) of Earth by [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory) (youtube link). 
+Figure (Click): Input toy model and the retrieved dynamic map.
+
+[![Dynamic map (DSCOVR)](https://img.youtube.com/vi/rGMWbAUAv4Y/0.jpg)](https://youtu.be/rGMWbAUAv4Y) 
+
+Figure (Click): Dynamic map using the real light curve (PC1) of Earth by [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory). 
+
 
 ### SOT + Sparse Modeling
 SOT-Sparse uses L1 and Total Squared Variation (TSV).
