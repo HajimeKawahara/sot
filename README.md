@@ -16,9 +16,6 @@ It also includes codes for the Bayesian version of the static SOT.
 
 - [sot/dymap](https://github.com/HajimeKawahara/sot/tree/master/dymap)
 
-[![Dynamic map (toy model)](https://img.youtube.com/vi/eP-aQ0PVPAs/0.jpg)](https://youtu.be/eP-aQ0PVPAs)
-
-Figure (Click): Input toy model and the retrieved dynamic map.
 
 [![Dynamic map (DSCOVR)](https://img.youtube.com/vi/rGMWbAUAv4Y/0.jpg)](https://youtu.be/rGMWbAUAv4Y) 
 
