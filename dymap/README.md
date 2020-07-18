@@ -5,6 +5,10 @@
 - dynamic_sampling.py: sampling of the posterior of the nonlinear parameters 
 - dynamic_map.py: sampling and mean of the geography
 
+[![Dynamic map (toy model)](https://img.youtube.com/vi/eP-aQ0PVPAs/0.jpg)](https://youtu.be/eP-aQ0PVPAs)
+
+Figure (Click): Input toy model and the retrieved dynamic map.
+
 ## Same but with Spin Rate as a Free Parameter
 
 - dynamic_sampling_spin.py: sampling of the posterior of the nonlinear parameters 
