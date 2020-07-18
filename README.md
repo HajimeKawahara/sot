@@ -6,7 +6,7 @@ In the near future, direct imaging missions will search for Earth-like planets a
 Spin-Orbit Tomography (SOT) is a retrieval technique of a 2 dimensinal map of an Exo Earth from time-series data of integrated reflection light.
 
 ### Tutorial
-Jupyter notebooks for the SOT + L2 regularization (including the code from scratch with use of scikit-learn.Ridge, and with the optimization using [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation) and ADAM optimizer in PyTorch) and the Bayesian SOT.
+[Jupyter notebooks](https://github.com/HajimeKawahara/sot/tree/master/tutorial) for the SOT + L2 regularization (including [the code from scratch](https://github.com/HajimeKawahara/sot/blob/master/tutorial/sotl2.ipynb), that L2 with [the use of scikit-learn.Ridge](https://github.com/HajimeKawahara/sot/blob/master/tutorial/sotl2_sklearn_ridge.ipynb), and L2 with [the optimization using automatic differentiation and ADAM optimizer in PyTorch](https://github.com/HajimeKawahara/sot/blob/master/tutorial/sotl2_pytorch.ipynb) and [the Bayesian SOT](https://github.com/HajimeKawahara/sot/blob/master/tutorial/sot_Bayesian.ipynb).
 
 - sot/tutorial
 
@@ -14,11 +14,16 @@ Jupyter notebooks for the SOT + L2 regularization (including the code from scrat
 SOT for time-varying geometry with a full Bayesian modeling (dynamic SOT) based on Kawahara and Masuda (2020).
 It also includes codes for the Bayesian version of the static SOT.
 
-- sot/dymap
+- [sot/dymap](https://github.com/HajimeKawahara/sot/tree/master/dymap)
 
-[![Dynamic map (DSCOVR)](https://img.youtube.com/vi/rGMWbAUAv4Y/0.jpg)](https://youtu.be/rGMWbAUAv4Y)
+[![Dynamic map (toy model)](https://img.youtube.com/vi/eP-aQ0PVPAs/0.jpg)](https://youtu.be/eP-aQ0PVPAs)
 
-Figure (Click): Dynamic map using the real light curve (PC1) of Earth by [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory) (youtube link). 
+Figure (Click): Input toy model and the retrieved dynamic map.
+
+[![Dynamic map (DSCOVR)](https://img.youtube.com/vi/rGMWbAUAv4Y/0.jpg)](https://youtu.be/rGMWbAUAv4Y) 
+
+Figure (Click): Dynamic map using the real light curve (PC1) of Earth by [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory). 
+
 
 ### SOT + Sparse Modeling
 SOT-Sparse uses L1 and Total Squared Variation (TSV).
@@ -33,8 +38,8 @@ Spin-Orbit Unmixing (SOU) is a unified retrieval model for spectral unmixing and
 ### NMF with Volume Regularization 
 Spin-Orbit Unmixing using the [non-negative matrix factorization (NMF)](https://en.wikipedia.org/wiki/Non-negative_matrix_factorization) and L2 and volume regularization (SOU-NMF) based on [Kawahara, ApJ, 894, 58 (2020)](http://arxiv.org/abs/2004.03931).
 
-- sot/nmfmap/nmfsot.py
-This code solves SOU-NMF for a cloudless toy model.
+- [sot/nmfmap](https://github.com/HajimeKawahara/sot/tree/master/nmfmap)
+For instance, nmfsot.py solves SOU-NMF for a cloudless toy model.
 
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/sotnmf.png" Titie="The recovered composite map of the real light curve of Earth by DSCOVR using SOU-NMF" Width=400px>
 
@@ -45,7 +50,7 @@ using SOU-NMF.
 ## Frequency Modulation
 The orientation of the spin axis can be inferred from frequency modulation (FM) of the light curve. 
 
-- fm/rottheory.py the modulation factor. It can reproduce Figure 2 in [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
+- [fm/rottheory.py](https://github.com/HajimeKawahara/sot/blob/master/fm/rottheory.py) the modulation factor. It can reproduce Figure 2 in [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
 
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/rott.png" Titie="Fig 2 in Kawahara 2016" Width=270px><img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/rott2.png" Titie="Fig 2 in Kawahara 2016" Width=270px><img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/rott3.png" Titie="Fig 2 in Kawahara 2016" Width=270px>
 
@@ -53,7 +58,7 @@ The orientation of the spin axis can be inferred from frequency modulation (FM) 
 
 The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898). See also [Nakagawa et al. (2020)](https://arxiv.org/abs/2006.11437).
 
-## USER-UNFRIENDLY INSTALL...
+## ...USER-UNFRIENDLY INSTALL
 
 Set PYTHONPATH = /location/sot/sot/core
 
