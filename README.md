@@ -57,15 +57,13 @@ The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898). S
 
 ## ...USER-UNFRIENDLY INSTALL
 
-Set PYTHONPATH = /location/sot/sot/core
+Set PYTHONPATH 
+- /location/sot/sot/core
+- /location/sot/sot/plot
+- /location/sot/nmfmap
+- /location/sot/dymap
 
-Set PYTHONPATH = /location/sot/sot/plot
-
-Set PYTHONPATH = /location/sot/nmfmap
-
-Set PYTHONPATH = /location/sot/dymap
-
-Install some python modules you got in error messages.
+SOT package uses healpy, emcee (for dymap), pycuda (for nmfmap). Install some python packages if you get error messages.
 
 ## Related Projects
 
