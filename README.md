@@ -11,7 +11,7 @@ Spin-Orbit Tomography (SOT) is a retrieval technique of a 2 dimensinal map of an
 - sot/tutorial
 
 ### Bayesian Dynamic SOT
-SOT for time-varying geometry with a full Bayesian modeling (dynamic SOT) based on Kawahara and Masuda (2020).
+SOT for time-varying geometry with a full Bayesian modeling (dynamic SOT) based on [Kawahara and Masuda (2020)](https://arxiv.org/abs/2007.13096).
 It also includes codes for the Bayesian version of the static SOT.
 
 - [sot/dymap](https://github.com/HajimeKawahara/sot/tree/master/dymap)
