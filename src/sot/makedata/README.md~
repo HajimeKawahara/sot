@@ -1,0 +1,3 @@
+# sot/sot/makedata
+
+The code in this directory makes files needed in the demo of sot package using external datasets. We do not put the original external datasets here. You need to find these data somewhere.

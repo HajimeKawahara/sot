@@ -1,0 +1,68 @@
+import numpy as np
+import healpy as hp
+import io_refdata
+
+
+def read_classification(filename):
+    data = np.loadtxt(filename, skiprows=6)
+    ydim = 1776
+    xdim = 4320
+    cmap = data.reshape(ydim, xdim)
+    return cmap
+
+
+def merge_to_4classes(cmap, val_desert=100, val_snow=90, val_veg=30):
+    ydim = 1776
+    xdim = 4320
+    val_ocean = 0
+    # 4 categories classification
+    # desert
+    mask = (cmap > 15)+(cmap == 7)
+    cmap[mask] = val_desert
+    # vegetation
+    mask = (cmap > 0)*(cmap < 15)
+    cmap[mask] = val_veg
+    # snow/ice
+    mask = (cmap == 15)
+    cmap[mask] = val_snow
+    vals = np.array([val_ocean, val_desert, val_snow, val_veg])
+    valexp = ["ocean", "desert", "snow", "veg"]
+    return cmap, vals, valexp
+
+def merge_to_3classes(cmap, val_desert=100, val_veg=30):
+    ydim = 1776
+    xdim = 4320
+    val_ocean = 0
+    # 4 categories classification
+    # desert
+    mask = (cmap > 15)+(cmap == 7)
+    cmap[mask] = val_desert
+    # vegetation
+    mask = (cmap > 0)*(cmap < 15)
+    cmap[mask] = val_veg
+    # snow/ice
+    mask = (cmap == 15)
+    cmap[mask] = val_ocean
+    vals = np.array([val_ocean, val_desert, val_veg])
+    valexp = ["ocean", "desert", "veg"]
+    return cmap, vals, valexp
+
+
+def set_meanalbedo(waves, wavee, refsurfaces, sky):
+    atm = io_refdata.get_meanalbedo(sky, waves, wavee)
+    ma = []
+    for i in range(0, len(refsurfaces)):
+        ma.append(io_refdata.get_meanalbedo(refsurfaces[i], waves, wavee)+atm)
+    return np.array(ma)
+
+
+def copy_to_healpix(cmap, nside=16):
+    npix = hp.nside2npix(nside)
+    arr = np.zeros(npix)
+    ydim, xdim = np.shape(cmap)
+    for ipix in range(0, npix):
+        theta, phi = hp.pix2ang(nside, ipix)  # theta:0-pi, phi:0-2pi
+        itheta = int(theta/np.pi*ydim)
+        iphi = int(np.mod(phi+np.pi,2*np.pi)/(2*np.pi)*xdim)
+        arr[ipix] = cmap[itheta, iphi]
+    return arr, nside
