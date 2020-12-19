@@ -1,5 +1,13 @@
 # Bayesian Dynamic Spin-Orbit Tomography
 
+|  function   |      |
+| ----------- | ---- |
+|  Geography  |  o   |
+|  Unmixing   |  -   |
+|  Dynamic    |  o   |
+|  Bayesian   |  o   |
+
+
 ## Bayesian Dynamic SOT for a Toy Model 
 
 - dynamic_sampling.py: sampling of the posterior of the nonlinear parameters 

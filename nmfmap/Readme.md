@@ -1,4 +1,12 @@
-# SOU using Nonnegative matrix factrization 
+# Spin-Orbit Unmixing using Nonnegative Matrix Factrization 
+
+|  function   |      |
+| ----------- | ---- |
+|  Geography  |  o   |
+|  Unmixing   |  o   |
+|  Dynamic    |  -   |
+|  Bayesian   |  -   |
+
 
 - runnmf_gpu.py Optimizer for the geometric NMF with volume regularization, using cupy.
 - runnmf_cpu.py CPU version, slow, less tested than the GPU version.
