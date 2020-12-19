@@ -1,19 +1,28 @@
 #!/usr/bin/env python
+"""
+Summary
+------------
+
+Dynamic mapping using a geometric sampling (dynamic_sampling.py)
+
+"""
+
 import numpy as np
 import healpy as hp
 import pylab 
 import matplotlib.pyplot as plt
 import time
-import mocklc 
 import matplotlib
-import sepmat 
-import gpkernel 
-import scipy
 import emcee
 import sys
 import tqdm
-import rundynamic_cpu as rundynamic
-import plotdymap
+import scipy
+
+from sot.core import mocklc 
+from sot.core import sepmat 
+from sot.dymap import gpkernel 
+from sot.dymap import rundynamic_cpu as rundynamic
+from sot.sotplot import plotdymap
 #from multiprocessing import Pool
 
 #from numpy.random import standard_normal
@@ -24,7 +33,7 @@ if __name__ == "__main__":
     matplotlib.rcParams.update({'font.size':fontsize})
     
     # LOAD sampled parameters
-    fsample="samples/test524/flat_sample_dyRBF.npz"
+    fsample="/home/kawahara/exomap/gpmap/samples/test524/flat_sample_dyRBF.npz"
     dat=np.load(fsample,allow_pickle=True)
     flat_samples=dat["arr_0"]
     print(np.shape(flat_samples))
@@ -100,11 +109,7 @@ if __name__ == "__main__":
     Aast_mean=(Aast)/Nsample
     plotdymap.plotseqmap(Aast_mean,frames,"mapest","",vmin=0.0,vmax=1.3)
     np.savez("dymap"+tag,Aast_mean)
-    
     randmap=np.array(randmap)
     np.savez("dyran"+tag,randmap)
 
 
-
-
-#plotdymap.plotseqmap(np.diagonal(randmap),frames,"mapran","",vmin=0.0,vmax=1.3)

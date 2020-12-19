@@ -5,17 +5,19 @@ import healpy as hp
 import pylab 
 import matplotlib.pyplot as plt
 import time
-import mocklc 
 import matplotlib
-import sepmat 
-import gpkernel 
 import scipy
 import emcee
 import sys
-import mvmap
+import corner
+
+from sot.dymap import gpkernel 
+from sot.core import mocklc 
+from sot.core import sepmat 
+from sot.core import mvmap
+
 
 Ns=2000
-
 np.random.seed(53)
 
 #set geometry
@@ -115,7 +117,6 @@ labels=["zeta","Thetaeq","gamma","alpha","tau"]
 inputgeo=[inc,Thetaeq,zeta,Pspin,Porb,obst]
 np.savez("flat_sample_dy"+tag,flat_samples,W,lc,inputgeo)
 
-import corner
 fig = corner.corner(flat_samples, labels=labels, truths=[zeta,Thetaeq,None,None,None])
 plt.savefig("corner_dy"+tag+".png")
 plt.savefig("corner_dy"+tag+".pdf")

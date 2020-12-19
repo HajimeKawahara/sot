@@ -1,6 +1,10 @@
-#Generating a moving map
+"""
+Summary
+----------
+Generating a moving map
 
-import rotmap
+"""
+from sot.core import rotmap
 import numpy as np
 from tqdm import tqdm
 
