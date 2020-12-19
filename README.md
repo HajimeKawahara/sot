@@ -2,15 +2,31 @@
 
 In the near future, direct imaging missions will search for Earth-like planets around nearby stars. One of the problems is how to characterize the planet surface. To address this question, we are developing a surface map and components reconstruction method using a one-dimensional light curve of a direct-imaged planet. The orbital motion and spin rotation of a planet conveys information about the spherical surface to the time-series of the light curve. In the future, this theoretical work will be tested in the era of space direct imaging of exoplanets. See [wiki](https://github.com/HajimeKawahara/sot/wiki) for further description.
 
-## Spin-Orbit Tomography
+
+# Spin-Orbit Tomography
 Spin-Orbit Tomography (SOT) is a retrieval technique of a 2 dimensinal map of an Exo Earth from time-series data of integrated reflection light.
 
-### Tutorial
-[Jupyter notebooks](https://github.com/HajimeKawahara/sot/tree/master/tutorial) for the SOT + L2 regularization (including [the code from scratch](https://github.com/HajimeKawahara/sot/blob/master/tutorial/sotl2.ipynb), that L2 with [the use of scikit-learn.Ridge](https://github.com/HajimeKawahara/sot/blob/master/tutorial/sotl2_sklearn_ridge.ipynb), and L2 with [the optimization using automatic differentiation and ADAM optimizer in PyTorch](https://github.com/HajimeKawahara/sot/blob/master/tutorial/sotl2_pytorch.ipynb) and [the Bayesian SOT](https://github.com/HajimeKawahara/sot/blob/master/tutorial/sot_Bayesian.ipynb).
+## INSTALL
 
-- sot/tutorial
+```
+python setup.py install
+```
 
-### Bayesian Dynamic SOT
+## tutorial
+
+See sot/tutorial
+
+## bin
+
+See sot/bin
+
+- dynamic_sampling -- sampling geometric parameters for Bayesian Dynamic SOT
+- dynamic_map -- dynamic mapping using the sampling of geometric parameters
+- nmfsot -- spin-orbit unmixing using a NMF (L2-VR) for a cloudless toy model.
+
+# Retrieval methods
+
+## Bayesian Dynamic SOT
 SOT for time-varying geometry with a full Bayesian modeling (dynamic SOT) based on [Kawahara and Masuda (2020)](https://arxiv.org/abs/2007.13096).
 It also includes codes for the Bayesian version of the static SOT.
 
@@ -36,7 +52,6 @@ Spin-Orbit Unmixing (SOU) is a unified retrieval model for spectral unmixing and
 Spin-Orbit Unmixing using the [non-negative matrix factorization (NMF)](https://en.wikipedia.org/wiki/Non-negative_matrix_factorization) and L2 and volume regularization (SOU-NMF) based on [Kawahara, ApJ, 894, 58 (2020)](http://arxiv.org/abs/2004.03931).
 
 - [sot/nmfmap](https://github.com/HajimeKawahara/sot/tree/master/nmfmap)
-For instance, nmfsot.py solves SOU-NMF for a cloudless toy model.
 
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/sotnmf.png" Titie="The recovered composite map of the real light curve of Earth by DSCOVR using SOU-NMF" Width=400px>
 
@@ -54,16 +69,6 @@ The orientation of the spin axis can be inferred from frequency modulation (FM) 
 - [juwvid](https://github.com/HajimeKawahara/juwvid) Code for the Wigner-Ville analysis written in Julia-0.6.
 
 The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898). See also [Nakagawa et al. (2020)](https://arxiv.org/abs/2006.11437).
-
-## ...USER-UNFRIENDLY INSTALL
-
-Set PYTHONPATH 
-- /location/sot/sot/core
-- /location/sot/sot/plot
-- /location/sot/nmfmap
-- /location/sot/dymap
-
-SOT package uses healpy, emcee (for dymap), pycuda (for nmfmap). Install some python packages if you get error messages.
 
 ## Related Projects
 
