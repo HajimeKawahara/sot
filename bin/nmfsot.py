@@ -1,17 +1,18 @@
 import time
 import numpy as np
-import io_surface_type 
-import io_refdata
-import toymap
-import mocklc
 import matplotlib.pyplot as plt
 import healpy as hp
 import cupy as cp
 import sys
 import healpy as hp
-import initnmf
-#import runnmf_cpu as runnmf #CPU version (slow)
-import runnmf_gpu as runnmf #GPU version
+
+from sot.core import io_surface_type 
+from sot.core import io_refdata
+from sot.core import toymap
+from sot.core import mocklc
+from sot.nmfmap import initnmf
+#from sot.nmfmap import runnmf_cpu as runnmf #CPU version (slow)
+from sot.nmfmap import runnmf_gpu as runnmf #GPU version
 
 np.random.seed(34)
 
@@ -87,7 +88,7 @@ regmode="L2-VRDet"
 #regmode="Dual-L2"
 
 filename=trytag+"_N"+str(Nk)+"_"+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
-A,X,logmetric=runnmf.QP_NMR(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,endc=-np.inf,Nsave=Nsave)
+A,X,logmetric=runnmf.QP_GNMF(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,endc=-np.inf,Nsave=Nsave)
 np.savez(filename,A,X)
 
 

@@ -1,6 +1,6 @@
 import numpy as np
 import healpy as hp
-import io_refdata
+from sot.core import io_refdata
 
 
 def read_classification(filename):

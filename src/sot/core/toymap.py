@@ -1,5 +1,5 @@
 import numpy as np
-import io_surface_type
+from sot.core import io_surface_type
 import sys
 
 def make_multiband_map(cmap, refsurfaces, sky, vals, bands, onsky=False):
