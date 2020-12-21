@@ -3,7 +3,7 @@
 Summary
 ------------
 
-Gradient Descent for Dynamic mapping
+Point Estimate for Dynamic mapping
 
 """
 
@@ -21,15 +21,13 @@ from sot.core import mocklc
 from sot.core import sepmat 
 from sot.core import mvmap
 from sot.dymap import gpkernel 
-from sot.optim import fdysot
+from sot.dymap import rundynamic_cpu as rd
 from sot.sotplot import plotdymap
 
 if __name__ == "__main__":
 
     fontsize=16
-    matplotlib.rcParams.update({'font.size':fontsize})
-    
-    Ns=2000
+    matplotlib.rcParams.update({'font.size':fontsize})    
     np.random.seed(53)
     
     #set geometry
@@ -67,27 +65,14 @@ if __name__ == "__main__":
     lc=lc+noise
     print("Lc",time.time()-ts,"sec")
 
-    Nsample=10000
     tau=360.0
     gamma=16.5/180.0*np.pi
     sep=sepmat.calc_sepmatrix(nside)
     KS=gpkernel.RBF(sep,gamma)
     KT=gpkernel.Matern32(obst,tau)
-    invKS=np.linalg.inv(KS)
-    invKT=np.linalg.inv(KT)
     alpha=0.25
-
-    eta=0.001    
-    M=np.random.normal(loc=0.0,scale=1.0,size=np.shape(W))
-    for i in tqdm.tqdm(range(0,Nsample)):
-#    for i in range(0,Nsample):
-        #residual vector
-        rL=fdysot.residual(lc,W,M)
-        #dRMdM=fdysot.dRMdM(M,invKS,invKT,alpha)
-        dRMdM = 2.0*M
-        dLdM=fdysot.dLdM(W,rL)/sigma**2
-        dQdM=dLdM+dRMdM
-        M = M - eta*dQdM
+    Pid=np.eye(Ni)*sigma**-2
+    Mast=rd.Mean_DYSOT(W,KS,KT,alpha,lc,Pid)
 
     frames=[0,int(Ni/2),Ni-1] 
-    plotdymap.plotseqmap(M,frames,"mapest","",vmin=0.0,vmax=1.3)
+    plotdymap.plotseqmap(Mast,frames,"mapest","",vmin=0.0,vmax=1.3)

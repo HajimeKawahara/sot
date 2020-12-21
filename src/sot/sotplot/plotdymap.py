@@ -26,7 +26,7 @@ def bound_earth(boundary_data):
     theta,phi=hp.pixelfunc.pix2ang(nside,nbound)
     return theta,phi
     
-def plotseqmap(A,frames,tag="map",title=None,zero=True,vmin=None,vmax=None,cmap=plt.cm.pink,Earth=False,boundary_data="/home/kawahara/exomap/sot/data/earth_boundary.npz",color="#66CC99"):
+def plotseqmap(A,frames,tag="map",title=None,zero=True,vmin=None,vmax=None,cmap=plt.cm.pink,Earth=False,boundary_data="/home/kawahara/exomap/sot/data/earth_boundary.npz",color="#66CC99",png=True,pdf=True, show=False):
     if Earth:
         thetaE,phiE=bound_earth(boundary_data)
     
@@ -49,9 +49,12 @@ def plotseqmap(A,frames,tag="map",title=None,zero=True,vmin=None,vmax=None,cmap=
                 hp.mollview(A[i,:], title=title[j],flip="geo",cmap=cmap,min=vmin,max=vmax)
                 if Earth:
                     hp.projplot(thetaE, phiE,".",c=color,alpha=0.5) 
-
-            plt.savefig("png/"+tag+str(i)+".png")
-            plt.savefig("pdf/"+tag+str(i)+".pdf")
+            if png:
+                plt.savefig("png/"+tag+str(i)+".png")
+            if pdf:
+                plt.savefig("pdf/"+tag+str(i)+".pdf")
+            if show:
+                plt.show()
             plt.close()
             j=j+1
 
@@ -67,8 +70,13 @@ def plotseqmap(A,frames,tag="map",title=None,zero=True,vmin=None,vmax=None,cmap=
                     hp.mollview(A[i,:,k], title=title[j],flip="geo",cmap=cmap)
                 else:
                     hp.mollview(A[i,:,k], title=title[j],flip="geo",cmap=cmap,min=vmin,max=vmax)
-                plt.savefig("png/"+tag+str(i)+"_"+str(k)+".png")
-                plt.savefig("pdf/"+tag+str(i)+"_"+str(k)+".pdf")
+                if png:
+                    plt.savefig("png/"+tag+str(i)+"_"+str(k)+".png")
+                if pdf:
+                    plt.savefig("pdf/"+tag+str(i)+"_"+str(k)+".pdf")
+                if show:
+                    plt.show()
+
                 plt.close()
             j=j+1
     else:
