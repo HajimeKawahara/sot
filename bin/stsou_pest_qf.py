@@ -85,7 +85,7 @@ Ntry=100000
 Nsave=10000
 epsilon=1.e-12
 lamA=10**(-1.0)  #-1---4
-lamX=10**(-2.0)   #2, (0,1,3)
+lamX=10**(2.0)   #2, (0,1,3)
 
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(Nk,npix,lcall)
