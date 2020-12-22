@@ -18,6 +18,8 @@ from sot.core import io_refdata
 from sot.core import toymap
 from sot.core import mocklc
 from sot.nmfmap import initnmf
+from sot.core import sepmat 
+from sot.dymap import gpkernel 
 #from sot.nmfmap import runnmf_cpu as runnmf #CPU version (slow)
 from sot.nmfmap import runnmf_gpu as runnmf #GPU version
 
@@ -71,10 +73,16 @@ noiselevel=0.01
 lcall=lcall+noiselevel*np.mean(lcall)*np.random.normal(0.0,1.0,np.shape(lcall))
 #np.savez("lcallN"+str(noiselevel),lcall)
 #sys.exit()
-nside=16
+nside=8
 npix=hp.nside2npix(nside)
 WI,WV=mocklc.comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv)
 W=WV[:,:]*WI[:,:]
+
+sep=sepmat.calc_sepmatrix(nside)
+gamma=16.5/180.0*np.pi
+KS=gpkernel.RBF(sep,gamma)
+
+
 Nk=3
 Ntry=100000
 Nsave=10000
@@ -90,12 +98,13 @@ A0,X0=initnmf.init_random(Nk,npix,lcall)
 
 trytag="T215"
 #regmode="L2"
-regmode="L2-VRDet"
+regmode="GP-VRDet"
 #regmode="L2-VRLD"
 #regmode="Dual-L2"
+print(KS)
 
 filename=trytag+"_N"+str(Nk)+"_"+regmode+"_A"+str(np.log10(lamA))+"X"+str(np.log10(lamX))
-A,X,logmetric=runnmf.QP_GNMF(regmode,Ntry,lcall,W,A0,X0,lamA,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,endc=-np.inf,Nsave=Nsave)
+A,X,logmetric=runnmf.GPQP_GNMF(regmode,Ntry,lcall,W,A0,X0,0.1*KS,lamX,epsilon,filename,NtryAPGX=100,NtryAPGA=300,eta=1.e-6,endc=-np.inf,Nsave=Nsave)
 np.savez(filename,A,X)
 
 

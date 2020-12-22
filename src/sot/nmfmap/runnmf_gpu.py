@@ -9,7 +9,7 @@ def check_nonnegative(Y,lab):
         print("Error: Negative elements in the initial matrix of "+lab)
         sys.exit()
 
-def GPQP_GNMF(reg,Ntry,lcall,Win,A0,X0,KS,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0, delta=1.e-6, off=0, nu=1.0,Lipx="norm2",Lipa="frobenius", endc=1.e-5,Nsave=10000,semiNMF=False):
+def GPQP_GNMF(reg,Ntry,lcall,Win,A0,X0,KSin,lamX,epsilon,filename,NtryAPGX=10,NtryAPGA=1000,eta=0.0, delta=1.e-6, off=0, nu=1.0,Lipx="norm2",Lipa="frobenius", endc=1.e-5,Nsave=10000,semiNMF=False):
     """
     Summary
     --------------
@@ -26,15 +26,15 @@ def GPQP_GNMF(reg,Ntry,lcall,Win,A0,X0,KS,lamX,epsilon,filename,NtryAPGX=10,Ntry
     Nk=np.shape(A0)[1]
     Nj=np.shape(A0)[0]
 
-    invKS=np.linalg.inv(KS)
+    invKS0=np.linalg.inv(KSin)
     if reg=="GP-VRDet":
-        res=np.sum((lcall-Win@A0@X0)**2)+np.trace(A0.T@invKS@A0)+lamX*np.linalg.det(np.dot(X0,X0.T))
+        res=np.sum((lcall-Win@A0@X0)**2)+np.trace(A0.T@invKS0@A0)+lamX*np.linalg.det(np.dot(X0,X0.T))
     elif reg=="GP-VRLD":
-        res=np.sum((lcall-Win@A0@X0)**2)+np.trace(A0.T@invKS@A0)+lamX*np.log(np.linalg.det(np.dot(X0,X0.T)+delta*np.eye(Nk)))
+        res=np.sum((lcall-Win@A0@X0)**2)+np.trace(A0.T@invKS0@A0)+lamX*np.log(np.linalg.det(np.dot(X0,X0.T)+delta*np.eye(Nk)))
     elif reg=="GP-L2":
-        res=np.sum((lcall-Win@A0@X0)**2)+np.trace(A0.T@invKS@A0)+lamX*np.sum(X0**2)
+        res=np.sum((lcall-Win@A0@X0)**2)+np.trace(A0.T@invKS0@A0)+lamX*np.sum(X0**2)
     elif reg=="GP":
-        res=np.sum((lcall-Win@A0@X0)**2)+np.trace(A0.T@invKS@A0)
+        res=np.sum((lcall-Win@A0@X0)**2)+np.trace(A0.T@invKS0@A0)
     else:
         print("No mode. Halt.")
         sys.exit()
@@ -48,6 +48,11 @@ def GPQP_GNMF(reg,Ntry,lcall,Win,A0,X0,KS,lamX,epsilon,filename,NtryAPGX=10,Ntry
 
     jj=off
     resall=[]
+    
+    Kw=cp.asarray(Win@KSin@Win.T)
+    KS=cp.asarray(KSin)
+    invKS=np.linalg.inv(KS)
+
     for i in range(0,Ntry):
         print(i)
 
@@ -79,27 +84,18 @@ def GPQP_GNMF(reg,Ntry,lcall,Win,A0,X0,KS,lamX,epsilon,filename,NtryAPGX=10,Ntry
             ## X normalization
             #X[k,:]=X[k,:]/cp.sum(X[k,:])
             
-            ## ak
+            ## ak            
             xk=X[k,:]
-            ck=cp.sum(ck**2)
-            Kw=cp.dot(cp.dot(W,KS),W.T)
-            IKw=np.eye(Ni)+ck*Kw        
-            Xlc=scipy.linalg.solve(IKw,lc,assume_a="pos")
-            A[:,k]= ck*cp.dot(cp.dot(KS,W.T),Xlc)
-
-            
-            
-            ######
-            W_a=(cp.dot(xk,xk))*(cp.dot(W.T,W))
-            b=cp.dot(cp.dot(W.T,Delta),xk)
-            T_a=lamA*cp.eye(Nj)
-            if semiNMF:
-                A[:,k]=apg.AGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta, Lip=Lipa)
-            else:
-                A[:,k]=apg.APGr(Nj,W_a+T_a,b,A[:,k],Ntry=NtryAPGA, eta=eta, Lip=Lipa)
-
+            ck=cp.sum(xk**2)
+            lk=cp.sum(Delta*xk,axis=1)/ck
+            IKw=cp.eye(Ni)+ck*Kw        
+            Xlc=cp.linalg.solve(IKw,lk)
+            atmp= ck*cp.dot(cp.dot(KS,W.T),Xlc)
+#            atmp[atmp<0.0]=0.0
+#            A[:,k]=atmp
+                        
         Like=cp.asnumpy(cp.sum((Y-cp.dot(cp.dot(W,A),X))**2))
-        RA=np.trace(A.T@invKS@A)
+        RA=cp.asnumpy(cp.trace(A.T@invKS@A))
         if reg=="GP-VRDet":
             RX=cp.asnumpy(lamX*cp.linalg.det(cp.dot(X,X.T)))
         elif reg=="GP-VRLD":
@@ -112,6 +108,7 @@ def GPQP_GNMF(reg,Ntry,lcall,Win,A0,X0,KS,lamX,epsilon,filename,NtryAPGX=10,Ntry
         elif reg=="GP":
             RX=0.0
         resprev=res
+
         res=Like+RA+RX
         diff=resprev - res
         resall.append([res,Like,RA,RX])                
@@ -122,8 +119,8 @@ def GPQP_GNMF(reg,Ntry,lcall,Win,A0,X0,KS,lamX,epsilon,filename,NtryAPGX=10,Ntry
         #LogNMF(i,A,X,Nk)
         if np.mod(jj,10)==0:
             bandl=np.array(range(0,len(X[0,:])))
-#            import terminalplot
-#            terminalplot.plot(list(bandl),list(cp.asnumpy(X[np.mod(jj,Nk),:])))
+            import terminalplot
+            terminalplot.plot(list(bandl),list(cp.asnumpy(X[np.mod(jj,Nk),:])))
 
         jj=jj+1
         if np.mod(jj,Nsave) == 0:
