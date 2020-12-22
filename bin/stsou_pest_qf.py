@@ -1,3 +1,15 @@
+"""
+Summary
+-------------
+Static Spin-Orbit Unmixing using a block coordinate descent and quadratic forms both for A and X. 
+
+- regmode="L2": L2 for A
+- regmode="L2-VRDet": L2 for A VRDet for X
+- regmode="L2-VRLD": L2 for A VR logdet for X
+- regmode="Dual-L2": L2 both for A and X
+
+"""
+
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -73,7 +85,7 @@ Ntry=100000
 Nsave=10000
 epsilon=1.e-12
 lamA=10**(-1.0)  #-1---4
-lamX=10**(-2.0)   #2, (0,1,3)
+lamX=10**(2.0)   #2, (0,1,3)
 
 ## NMF Initialization ============================
 A0,X0=initnmf.init_random(Nk,npix,lcall)

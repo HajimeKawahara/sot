@@ -1,3 +1,10 @@
+"""
+Summary
+------------------
+Core functions for Dynamic SOT
+
+"""
+
 import numpy as np
 import scipy
 import time 
