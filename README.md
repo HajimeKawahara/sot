@@ -20,9 +20,10 @@ See sot/tutorial
 
 See sot/bin
 
-- dynamic_sampling -- sampling geometric parameters for Bayesian Dynamic SOT
-- dynamic_map -- dynamic mapping using the sampling of geometric parameters
-- nmfsot -- spin-orbit unmixing using a NMF (L2-VR) for a cloudless toy model.
+- dysot_pest -- Point estimate of time-varying map using dynamic SOT
+- dysot_sampling -- Sampling geometric parameters for Bayesian dynamic SOT
+- dysot_bayesmap -- Bayesian dynamic mapping using the sampling of geometric parameters
+- stsou_pest_qf -- Static spin-orbit unmixing using a NMF (L2-VR) for a cloudless toy model.
 
 # Retrieval methods
 
