@@ -14,7 +14,20 @@ python setup.py install
 
 ## tutorial
 
-See sot/tutorial
+Jupyter notebook based tutorial. See sot/tutorial
+
+### L2
+- sotl2.ipynb -- L2-SOT from scratch
+- sotl2_sklearn_ridge.ipynb -- using Scikit-Learn ridge
+- sotl2_pytorch.ipynb -- using an ADAM optimizer in pytorch
+- sotl2_jax.ipynb -- using an ADAM optimizer in JAX
+
+### Bayesian SOT
+- sot_Bayesian.ipynb -- Bayesian static SOT
+
+### Dynamic SOT
+- dynamic SOT for a rotating Earth.ipynb -- dynamic SOT (point estimate)
+
 
 ## bin
 
