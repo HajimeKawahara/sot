@@ -16,11 +16,10 @@ from jax import jit
 def comp_omega(nside):
     omega = []
     npix = hp.nside2npix(nside)
-    #print(("npix=", npix))
     for ipix in range(0, npix):
         theta, phi = hp.pix2ang(nside, ipix)
         omega.append([theta, phi])
-    return jnp.array(omega)
+    return omega
 
 @jit
 def uniteO(inc, Thetaeq):
@@ -54,9 +53,9 @@ def uniteR(zeta, Phiv, omega):
 
     return eR
 
-@jit
+#@jit
 def comp_weight(nside,zeta,inc,Thetaeq,Thetav,Phiv):
-    omega=comp_omega(nside)
+    omega=jnp.array(comp_omega(nside))
     eO=uniteO(inc,Thetaeq)
     eS=uniteS(Thetaeq,Thetav)
     eR=uniteR(zeta,Phiv,omega)
