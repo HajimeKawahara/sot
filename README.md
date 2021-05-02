@@ -90,5 +90,6 @@ The algorithm is based on [Kawahara (2016)](https://arxiv.org/abs/1603.02898). S
 - [exocartographer](https://github.com/bfarr/exocartographer) Bayesian framework of a 2D mapping and obliquity measurement by [Ben Farr et al](https://arxiv.org/abs/1802.06805).
 - [EARL](https://github.com/HalHaggard/EARL) Spherical harmonics decomposition of reflected light by [Hal Haggard et al](https://arxiv.org/abs/1802.02075).
 - [samurai](https://github.com/jlustigy/samurai) Rotational Unmixing by [Lustig-Yaeger et al](https://arxiv.org/abs/1901.05011).
-- [starry](https://github.com/rodluger/starry) Tools for mapping planets and stars by [Rodrigo Luger et al](https://arxiv.org/abs/1903.12182).
+- [starry](https://github.com/rodluger/starry)/[starrynight](https://github.com/rodluger/starrynight) Tools for mapping planets and stars by [Rodrigo Luger et al](https://arxiv.org/abs/1903.12182) and [Rodrigo Luger et al](https://arxiv.org/abs/2103.06275).
+- [neural_exocartography](https://github.com/aasensio/neural_exocartography) mapping with learned denoiser (dnn) by [Asensio-Ramos and Palle](https://arxiv.org/abs/2012.04460)
 - [bluedot](https://github.com/HajimeKawahara/bluedot) A pale blue dot simulater by Hajime Kawahara (beta version). 
