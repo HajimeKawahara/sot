@@ -73,6 +73,9 @@ Figure: The recovered composite map of the real light curve of Earth by
  [Deep Space Climate Observatory](https://en.wikipedia.org/wiki/Deep_Space_Climate_Observatory) 
 using SOU-NMF.
 
+### SOU + Sparse modeling
+[exomap](https://github.com/atsuki-kuwata/exomap), Kuwata, H.K., Aizawa et al. to be submitted.
+
 ## Frequency Modulation
 The orientation of the spin axis can be inferred from frequency modulation (FM) of the light curve. 
 
