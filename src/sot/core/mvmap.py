@@ -1,7 +1,4 @@
-"""
-Summary
-----------
-Generating a moving map
+"""generates a moving map
 
 """
 from sot.core import rotmap

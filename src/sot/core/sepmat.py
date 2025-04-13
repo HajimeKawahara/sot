@@ -1,6 +1,5 @@
 import healpy as hp
 import numpy as np
-import time 
 
 def calc_sepmatrix(nside):
     v = hp.pix2vec(nside, np.arange(0, hp.nside2npix(nside)))
