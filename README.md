@@ -1,5 +1,9 @@
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/newlogo.png" Titie="Spin-Orbit Tomography" Width=600px>
 
+
+**_Currently undergoing major renovation._**
+
+
 In the near future, direct imaging missions will search for Earth-like planets around nearby stars. One of the problems is how to characterize the planet surface. To address this question, we are developing a surface map and components reconstruction method using a one-dimensional light curve of a direct-imaged planet. The orbital motion and spin rotation of a planet conveys information about the spherical surface to the time-series of the light curve. In the future, this theoretical work will be tested in the era of space direct imaging of exoplanets. See [wiki](https://github.com/HajimeKawahara/sot/wiki) for further description.
 
 
@@ -76,7 +80,7 @@ using SOU-NMF.
 ## Frequency Modulation
 The orientation of the spin axis can be inferred from frequency modulation (FM) of the light curve. 
 
-- [fm/rottheory.py](https://github.com/HajimeKawahara/sot/blob/master/fm/rottheory.py) the modulation factor. It can reproduce Figure 2 in [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
+- [misc/rottheory.py](https://github.com/HajimeKawahara/sot/blob/develop/misc/rottheory.py) the modulation factor. It can reproduce Figure 2 in [Kawahara (2016)](https://arxiv.org/abs/1603.02898).
 
 <img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/rott.png" Titie="Fig 2 in Kawahara 2016" Width=270px><img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/rott2.png" Titie="Fig 2 in Kawahara 2016" Width=270px><img src="https://github.com/HajimeKawahara/sot/blob/master/data/fig/rott3.png" Titie="Fig 2 in Kawahara 2016" Width=270px>
 
