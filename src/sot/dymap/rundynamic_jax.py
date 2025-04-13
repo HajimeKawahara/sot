@@ -16,3 +16,4 @@ def Mean_DYSOT(W,KS,KT,alpha,lc,Pid):
     Xlc=jnp.linalg.solve(IKw,Pid@lc)
     Aast=alpha*KT@(W.T*Xlc).T@KS
     return Aast
+
