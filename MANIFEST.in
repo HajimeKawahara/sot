@@ -1,0 +1,13 @@
+include include src/sot/data/refdata/clear_sky.npz
+include include src/sot/data/refdata/clouds.txt
+include src/sot/data/refdata/clouds_ice.txt
+include src/sot/data/refdata/fine_snow.txt
+include src/sot/data/refdata/granular_snow.txt
+include src/sot/data/refdata/ice.txt
+include src/sot/data/refdata/medium_snow.txt
+include src/sot/data/refdata/ocean_McLinden.csv
+include src/sot/data/refdata/ocean_McLinden2.csv
+include src/sot/data/refdata/sea.txt
+include src/sot/data/refdata/soil.txt
+include src/sot/data/refdata/veg_deciduous.txt
+include src/sot/data/refdata/water.txt
