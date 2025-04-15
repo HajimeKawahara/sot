@@ -1,5 +1,19 @@
-include include src/sot/data/refdata/clear_sky.npz
-include include src/sot/data/refdata/clouds.txt
+include src/sot/data/cmap3class.npz
+include src/sot/data/cmap4class.npz
+include src/sot/data/earth_boundary.npz
+
+include src/sot/data/mockalbedo2.fits
+include src/sot/data/mockalbedo4.fits
+include src/sot/data/mockalbedo8.fits
+include src/sot/data/mockalbedo16.fits
+include src/sot/data/mockalbedo32.fits
+include src/sot/data/mockalbedo64.fits
+include src/sot/data/mockland16.fits
+include src/sot/data/mockland32.fits
+include src/sot/data/mockland64.fits
+
+include src/sot/data/refdata/clear_sky.npz
+include src/sot/data/refdata/clouds.txt
 include src/sot/data/refdata/clouds_ice.txt
 include src/sot/data/refdata/fine_snow.txt
 include src/sot/data/refdata/granular_snow.txt
