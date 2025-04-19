@@ -6,27 +6,38 @@ import numpy as np
 from tqdm import tqdm
 
 def rotating_map(mmap,obst,rotphimax=0.0,rotthetamax=3*np.pi/4):
-    Nt=len(obst)
-    rotphi=np.linspace(0.0,rotphimax,Nt)
-    rottheta=np.linspace(0.0,rotthetamax,Nt)
+    """generates a rotating map
+    
+    Args:
+        mmap (array): map (Nj, ) or (Nj, Nl)
+        obst (array): time series (Ni,)
+        rotphimax (float, optional): _description_. Defaults to 0.0.
+        rotthetamax (_type_, optional): _description_. Defaults to 3*np.pi/4.
+
+    Returns:
+        array: moving map (Ni, Nj) or (Nj, Ni, Nl)
+    """
+    Ni=len(obst)
+    rotphi=np.linspace(0.0,rotphimax,Ni)
+    rottheta=np.linspace(0.0,rotthetamax,Ni)
     ndim=np.shape(np.shape(mmap))[0]
     if ndim==1:
-        M=[]
-        for i in range(0,Nt):
-            M.append(rotmap.rotate_map(mmap, rottheta[i], rotphi[i]))
-        M=np.array(M)
+        movmap=[]
+        for i in range(0,Ni):
+            movmap.append(rotmap.rotate_map(mmap, rottheta[i], rotphi[i]))
+        movmap=np.array(movmap)
     elif ndim==2:
-        Nj,Nl=np.shape(mmap)
+        _,Nl=np.shape(mmap)
 
-        M=[]
-        for i in tqdm(range(0,Nt)):
+        movmap=[]
+        for i in tqdm(range(0,Ni)):
             MM=[]
             for l in (range(0,Nl)):
                 MM.append(rotmap.rotate_map(mmap[:,l], rottheta[i], rotphi[i]))
-            M.append(np.array(MM).T)
-        M=np.array(M)
+            movmap.append(np.array(MM).T)
+        movmap=np.array(movmap)
         
-    return M
+    return movmap
 
 def sinmap(mmap,obst,Ns=10):
     err=0.3

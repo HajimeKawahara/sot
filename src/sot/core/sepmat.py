@@ -2,6 +2,14 @@ import healpy as hp
 import numpy as np
 
 def calc_sepmatrix(nside):
+    """calculate the separation angle matrix for a given nside
+    
+    Args:
+        nside (int): N side
+
+    Returns:
+        array: separation matrix (nside, nside)
+    """
     v = hp.pix2vec(nside, np.arange(0, hp.nside2npix(nside)))
     v = np.column_stack(v)
     cossep = np.sum(v[np.newaxis,:,:]*v[:,np.newaxis,:], axis=2)
