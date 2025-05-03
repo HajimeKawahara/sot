@@ -1,3 +1,4 @@
+"""separation matrix"""
 import healpy as hp
 import numpy as np
 
@@ -21,3 +22,4 @@ def calc_sepmatrix(nside):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     sepmat=calc_sepmatrix(16)
+

@@ -1,3 +1,6 @@
+"""generates toy maps
+"""
+
 import numpy as np
 from sot.core import io_surface_type
 
