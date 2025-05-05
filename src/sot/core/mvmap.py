@@ -1,7 +1,7 @@
 """generates a moving map
 
 """
-from sot.core import rotmap
+from sot.core import mapops 
 import numpy as np
 from tqdm import tqdm
 
@@ -24,7 +24,7 @@ def rotating_map(mmap,obst,rotphimax=0.0,rotthetamax=3*np.pi/4):
     if ndim==1:
         movmap=[]
         for i in range(0,Ni):
-            movmap.append(rotmap.rotate_map(mmap, rottheta[i], rotphi[i]))
+            movmap.append(mapops.rotate_map(mmap, rottheta[i], rotphi[i]))
         movmap=np.array(movmap)
     elif ndim==2:
         _,Nl=np.shape(mmap)
@@ -33,7 +33,7 @@ def rotating_map(mmap,obst,rotphimax=0.0,rotthetamax=3*np.pi/4):
         for i in tqdm(range(0,Ni)):
             MM=[]
             for l in (range(0,Nl)):
-                MM.append(rotmap.rotate_map(mmap[:,l], rottheta[i], rotphi[i]))
+                MM.append(mapops.rotate_map(mmap[:,l], rottheta[i], rotphi[i]))
             movmap.append(np.array(MM).T)
         movmap=np.array(movmap)
         
