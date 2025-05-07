@@ -82,23 +82,3 @@ def plotseqmap(movmap,frames,tag="map",title=None,zero=True,vmin=None,vmax=None,
             j=j+1
     else:
         print("It's not dynamic map! shape=",np.shape(np.shape(A))[0])
-        
-if __name__ == "__main__":
-    import healpy as hp
-    import pylab 
-    import matplotlib.pyplot as plt
-    import mvmap
-    import matplotlib
-    fontsize=16
-    matplotlib.rcParams.update({'font.size':fontsize})
-
-    mmap=hp.read_map("/home/kawahara/exomap/sot/data/mockalbedo16.fits")
-    mask=(mmap>0.0)
-    mmap[mask]=1.0
-    Porb=365.242190402                                            
-    Ni=1024
-    obst=np.linspace(0.0,Porb,Ni)
-    M=mvmap.rotating_map(mmap,obst,rotthetamax=np.pi/2.0)
-    frames=[0,int(Ni/2),Ni-1] 
-    plotseqmap(M,frames,"mapin",title=["0 day","182 day","364 day"],vmin=0.0,vmax=1.0,cmap=plt.cm.bone,zero=False)
-
