@@ -2,40 +2,59 @@
 """
 
 import numpy as np
-from sot.core import io_surface_type
 
 
-def make_multiband_map(cmap, refsurfaces, sky, vals, bands, onsky=False):
+def _compute_mean_albedo(ref, waves, wavee):
+    mask = (ref[:, 0] >= waves) * (ref[:, 0] <= wavee)
+    return np.mean(ref[mask, 1])
+
+
+def generate_multiband_map(
+    cmap, dict_class, refdict, reference_surfaces, bands, onsky=False, sky=None
+):
+    """generate a multiband map
+    Args:
+        cmap (np.ndarray): classification map
+        dict_class (dict): dictionary of class names and their values
+        refdict (dict): dictionary of reference data
+        reference_surfaces (list): list of reference surfaces
+        bands (list): list of bands, each band is a tuple of (start, end)
+        onsky (bool): whether to include sky albedo
+        sky (np.ndarray): sky albedo data
+    Returns:
+        mmap (np.ndarray): multiband map (npix, ncomp)
+        spectrum_matrix (np.ndarray): spectrum matrix (ncomp, nbands)
+    
+    """
     nbands = np.shape(bands)[0]
-    ncomp = len(refsurfaces)
-    if len(refsurfaces) != len(vals):
-        print("inconsisitent val and refsurces. CHECK IT.")
+    ncomp = len(reference_surfaces)
+    if ncomp != len(dict_class):
+        raise ValueError("inconsisitent numbers of dict_class and reference_sarfaces")
 
     # map
-    Ain = np.zeros((len(cmap), ncomp))
-    for i in range(0, ncomp):
-        mask = cmap == vals[i]
-        Ain[mask, i] = 1.0
+    labels = list(dict_class.keys())
+    ncomp = len(labels)
+    value2col = {dict_class[label]: i for i, label in enumerate(labels)}
+    col_idx = np.vectorize(value2col.get)(cmap)
+    mmap = np.eye(ncomp, dtype=int)[col_idx]
 
-    # spectra
-    Xin = []
+    # spectrum
+    spectrum_matrix=[]
     for ibands in range(0, nbands):
         waves = bands[ibands][0]
         wavee = bands[ibands][1]
-        malbedo_band = io_surface_type.set_meanalbedo(
-            waves, wavee, refsurfaces, sky, onsky
-        )
-        Xin.append(malbedo_band)
+        if onsky:
+            atm = _compute_mean_albedo(sky, waves, wavee)
+        else:
+            atm = 0.0
+        
+        ma = []
+        for label in labels:
+            raw_spectrum = refdict[reference_surfaces[label]]
+            ma.append(_compute_mean_albedo(raw_spectrum, waves, wavee) + atm)
+        spectrum_matrix.append(np.array(ma))
 
-    Xin = np.array(Xin).T
-    mmap = np.dot(Ain, Xin)
-    return mmap, Ain, Xin
+    spectrum_matrix = np.array(spectrum_matrix).T
+    
+    return mmap, spectrum_matrix
 
-
-def make_ecmap(cmap, vals):
-    ncomp = len(vals)
-    ecmap = np.zeros((len(cmap), ncomp))  # map for each component
-    for i in range(0, ncomp):
-        mask = cmap == vals[i]
-        ecmap[mask, i] = 1.0
-    return ecmap

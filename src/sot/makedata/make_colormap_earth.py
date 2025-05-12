@@ -50,7 +50,7 @@ else:
     sys.exit()
 
 malbedo = io_surface_type.set_meanalbedo(0.8, 0.9, refsurfaces, clear_sky)
-mmap, malbedo, mspectrum = toymap.make_multiband_map(cmap, refsurfaces, clear_sky, vals, bands)
+mmap, malbedo, mspectrum = toymap.generate_multiband_map(cmap, refsurfaces, clear_sky, vals, bands)
 ave_band = np.mean(np.array(bands), axis=1)
 io_surface_type.plot_albedo(
     veg, soil, cloud, snow_med, water, clear_sky, ave_band, malbedo, valexp

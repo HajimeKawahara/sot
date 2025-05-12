@@ -1,6 +1,5 @@
 import numpy as np
 import healpy as hp
-from sot.core import io_refdata
 
 
 def read_classification(filename):
@@ -12,8 +11,6 @@ def read_classification(filename):
 
 
 def merge_to_4classes(cmap, val_desert=100, val_snow=90, val_veg=30):
-    ydim = 1776
-    xdim = 4320
     val_ocean = 0
     # 4 categories classification
     # desert
@@ -30,8 +27,6 @@ def merge_to_4classes(cmap, val_desert=100, val_snow=90, val_veg=30):
     return cmap, vals, valexp
 
 def merge_to_3classes(cmap, val_desert=100, val_veg=30):
-    ydim = 1776
-    xdim = 4320
     val_ocean = 0
     # 4 categories classification
     # desert
@@ -46,19 +41,6 @@ def merge_to_3classes(cmap, val_desert=100, val_veg=30):
     vals = np.array([val_ocean, val_desert, val_veg])
     valexp = ["ocean", "desert", "veg"]
     return cmap, vals, valexp
-
-
-def set_meanalbedo(waves, wavee, refsurfaces, sky, onsky=False):
-    ma = []
-    if onsky:
-        atm = io_refdata.get_meanalbedo(sky, waves, wavee)
-        for i in range(0, len(refsurfaces)):
-            ma.append(io_refdata.get_meanalbedo(refsurfaces[i], waves, wavee)+atm)
-    else:
-        for i in range(0, len(refsurfaces)):
-            ma.append(io_refdata.get_meanalbedo(refsurfaces[i], waves, wavee))
-        
-    return np.array(ma)
 
 
 def copy_to_healpix(cmap, nside=16):

@@ -49,7 +49,7 @@ bands=[[0.4,0.45],[0.45,0.5],[0.5,0.55],[0.55,0.6],[0.6,0.65],[0.65,0.7],[0.7,0.
 refsurfaces=[water,soil,veg]
 #malbedo=io_surface_type.set_meanalbedo(0.8,0.9,refsurfaces,clear_sky)
 
-mmap,Ainit,Xinit=toymap.make_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
+mmap,Ainit,Xinit=toymap.generate_multiband_map(cmap,refsurfaces,clear_sky,vals,bands)
 ave_band=np.mean(np.array(bands),axis=1)
 io_surface_type.plot_albedo(veg,soil,cloud,snow_med,water,clear_sky,ave_band,Xinit,valexp)
 
