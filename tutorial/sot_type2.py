@@ -128,8 +128,7 @@ alpha = 0.25
 
 Pid = jnp.eye(Ni*Nl) * sigma**-2 #when using jnp.eye Matrix becomes singular when x32
     
-Mast = meanmap_inverse_type2(W, spectral_matrix, KS, KX, alpha, Pid, lc.T.flatten())
-Mast = Mast/Ni
+Mast = meanmap_inverse_type2(W, spectral_matrix, KS, KX, alpha, Pid, lc)
 print(Mast.shape)
 
 hp.mollview(Mast[:,0], title="k=0",flip="geo")
@@ -148,7 +147,7 @@ lc_pred = type2(W, spectral_matrix, Mast)
 
 fig = plt.figure(figsize=(20, 10))
 #list_select = range(Nl)
-list_select = [9]
+list_select = [0, 9]
 
 ax = fig.add_subplot(211)
 for i in list_select:
