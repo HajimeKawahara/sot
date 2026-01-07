@@ -1,6 +1,6 @@
 import healpy as hp
 import jax.numpy as jnp
-
+from jax import jit
 
 def compute_omega(nside):
     omega = []
@@ -48,12 +48,11 @@ def unit_vector_eR(zeta, Phiv, omega):
 
     return eR
 
-
-def compute_weight(nside, zeta, inc, Thetaeq, Thetav, Phiv):
+@jit
+def compute_weight(zeta, inc, Thetaeq, Thetav, Phiv, omega_vector):
     """computes geometric weights  
     
     Args:
-        nside (_type_): _description_
         zeta (_type_): _description_
         inc (_type_): _description_
         Thetaeq (_type_): _description_
@@ -64,10 +63,9 @@ def compute_weight(nside, zeta, inc, Thetaeq, Thetav, Phiv):
         array: illuminated weight
         array: visible weight
     """
-    omega = jnp.array(compute_omega(nside))
     eO = unit_vector_eO(inc, Thetaeq)
     eS = unit_vector_eS(Thetaeq, Thetav)
-    eR = unit_vector_eR(zeta, Phiv, omega)
+    eR = unit_vector_eR(zeta, Phiv, omega_vector)
     WV = jnp.einsum("ijk,i->jk", eR, eO)
     WV = jnp.where(WV < 0.0, 0.0, WV)
     WI = jnp.einsum("ijk,ij->jk", eR, eS)
