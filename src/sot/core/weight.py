@@ -8,7 +8,7 @@ def compute_omega(nside):
     for ipix in range(0, npix):
         theta, phi = hp.pix2ang(nside, ipix)
         omega.append([theta, phi])
-    return omega
+    return jnp.array(omega)
 
 
 def unit_vector_eO(inc, Thetaeq):
